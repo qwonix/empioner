@@ -41,9 +41,9 @@ jobs:
     needs: docker-build-push
     steps:
       - name: Stop and remove containers, networks
-        run: docker compose down
-      - name: Remove unused data
-        run: docker system prune -a -f
+        run: docker compose stop
+      - name: Update images
+        run: docker compose pull
 
   deploy:
     runs-on: self-hosted
@@ -73,3 +73,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Start docker containers
         run: docker compose up -d
+
+  clear:
+    runs-on: self-hosted
+    needs: deploy
+    steps:
+      - name: Remove unused data
+        run: docker system prune -a -f
