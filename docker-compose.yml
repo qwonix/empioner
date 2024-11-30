@@ -1,0 +1,93 @@
+services:
+  empioner-redis:
+    image: redis:7.4.0-alpine
+    container_name: empioner_redis
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_USER=${REDIS_USER}
+      - REDIS_USER_PASSWORD=${REDIS_USER_PASSWORD}
+    ports:
+      - "6379:6379"
+    command: >
+      sh -c '
+        mkdir -p /usr/local/etc/redis &&
+        echo "bind 0.0.0.0" > /usr/local/etc/redis/redis.conf &&
+        echo "requirepass $REDIS_PASSWORD" >> /usr/local/etc/redis/redis.conf &&
+        echo "appendonly yes" >> /usr/local/etc/redis/redis.conf &&
+        echo "appendfsync everysec" >> /usr/local/etc/redis/redis.conf &&
+        echo "user default off" > /usr/local/etc/redis/users.acl &&й
+        echo "user $REDIS_USER on >$REDIS_USER_PASSWORD ~* +@all" >> /usr/local/etc/redis/users.acl &&
+        redis-server /usr/local/etc/redis/redis.conf --aclfile /usr/local/etc/redis/users.acl
+      '
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "$REDIS_PASSWORD", "ping" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - redis_data:/var/lib/redis/data
+
+  empioner-mongo:
+    image: mongo:7.0
+    container_name: empioner_mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh empioner-mongo:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - mongo_data:/var/lib/mongo/data
+
+  empioner-postgres:
+    image: postgres:17-alpine
+    container_name: empioner_postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  empioner-bot:
+    image: qwonix/empioner-bot:latest
+    container_name: empioner_bot
+    depends_on:
+      - empioner-postgres
+      - empioner-mongo
+      - empioner-redis
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://empioner-postgres:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=empioner-redis
+      - SPRING_DATA_REDIS_USERNAME=${REDIS_USER}
+      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
+      - SPRING_DATA_MONGODB_HOST=empioner-mongo
+      - SPRING_DATA_MONGODB_USERNAME=${MONGODB_USER}
+      - SPRING_DATA_MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=${MONGODB_AUTHENTICATION_DATABASE}
+      - BOT_TITLE=${BOT_TITLE}
+      - BOT_DESCRIPTION=${BOT_DESCRIPTION}
+      - BOT_USERNAME=${BOT_USERNAME}
+      - BOT_TOKEN=${BOT_TOKEN}
+      - BOT_CONFIG_IMAGE_PLACEHOLDER=${BOT_CONFIG_IMAGE_PLACEHOLDER}
+      - BOT_CONFIG_SHOW_SHOW_IMAGE_ID=${BOT_CONFIG_SHOW_SHOW_IMAGE_ID}
+      - BOT_CONFIG_SHOW_SERIES_IMAGE_ID=${BOT_CONFIG_SHOW_SERIES_IMAGE_ID}
+      - BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID=${BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID}
+      - BOT_CONFIG_SHOW_MOVIE_IMAGE_ID=${BOT_CONFIG_SHOW_MOVIE_IMAGE_ID}
+volumes:
+  postgres_data:
+  redis_data:
+  mongo_data:
