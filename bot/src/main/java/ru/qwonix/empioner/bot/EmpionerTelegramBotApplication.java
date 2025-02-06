@@ -8,11 +8,12 @@ import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+import ru.qwonix.empioner.bot.config.EmpionerServiceProperties;
 import ru.qwonix.empioner.bot.telegram.MoviePlayerBot;
 import ru.qwonix.empioner.bot.telegram.config.TelegramProperties;
 
 @ConfigurationPropertiesScan(basePackageClasses = {
-        TelegramProperties.class
+        TelegramProperties.class, EmpionerServiceProperties.class
 })
 @SpringBootApplication
 public class EmpionerTelegramBotApplication {
