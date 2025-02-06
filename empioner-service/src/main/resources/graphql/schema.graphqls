@@ -1,0 +1,132 @@
+scalar EpisodeId
+scalar SeasonId
+scalar SeriesId
+scalar MovieId
+scalar ShowId
+scalar VideoId
+scalar VideoGroupId
+scalar ImageId
+scalar TelegramBotUserId
+scalar TelegramFileId
+scalar TelegramFileUniqueId
+
+type Query {
+    getEpisodeById(id: EpisodeId!): Episode
+    getEpisodesBySeasonId(id: SeasonId!, limit: Int, page: Int): [Episode]
+    countEpisodesBySeasonId(id: SeasonId!): Int
+    getEpisodeByVideoGroupId(id: VideoGroupId!): Episode
+
+    getImageTelegramFileId(id: ImageId!): Image
+
+    getMovieById(id: MovieId!): Movie
+    getMoviesByShowId(id: ShowId!): [Movie]
+    getMovieByVideoGroupId(id: VideoGroupId!): Movie
+
+    getSeasonById(id: SeasonId!): Season
+    getSeasonsBySeriesId(id: SeriesId!, limit: Int, page: Int): [Season]
+    countSeasonsBySeriesId(id: SeriesId!): Int
+
+    getSeriesById(id: SeriesId!): Series
+    getSeriesByShowId(id: ShowId!): [Series]
+
+    getShowById(id: ShowId!): Show
+    getAllShows(limit: Int, page: Int): [Show]
+
+    getTelegramBotUserById(id: TelegramBotUserId!): TelegramBotUser
+
+    getVideoById(id: VideoId!): Video
+    getVideosByGroup(id: VideoGroupId!): [Video]
+    getMaxPriorityVideo(id: VideoGroupId!): Video
+}
+
+type Mutation {
+    mergeTelegramBotUser(userDetails: TelegramBotUserDetailsInput!): TelegramBotUser
+    addActivity(id: TelegramBotUserId!): Boolean
+    updateStatus(id: TelegramBotUserId!, status: UserStatus!): Boolean
+}
+
+type Episode {
+    id: EpisodeId!
+    title: String!
+    description: String!
+    number: Int!
+    previousEpisodeId: EpisodeId
+    nextEpisodeId: EpisodeId
+    videoGroupId: VideoGroupId!
+    seasonId: SeasonId!
+    imageId: ImageId
+    isAvailable: Boolean!
+}
+
+type Image {
+    id: ImageId!
+    telegramFileId: TelegramFileId!
+    telegramFileUniqueId: TelegramFileUniqueId!
+}
+
+type Movie {
+    id: MovieId!
+    title: String!
+    description: String!
+    showId: ShowId!
+    imageId: ImageId!
+    videoGroupId: VideoGroupId!
+    priority: Int!
+    isAvailable: Boolean!
+}
+
+type Season {
+    id: SeasonId!
+    description: String!
+    number: Int!
+    seriesId: SeriesId!
+    imageId: ImageId!
+    isAvailable: Boolean!
+}
+
+type Series {
+    id: SeriesId!
+    title: String!
+    description: String!
+    showId: ShowId!
+    imageId: ImageId!
+    priority: Int!
+    isAvailable: Boolean!
+}
+
+type Show {
+    id: ShowId!
+    title: String!
+    description: String!
+    imageId: ImageId!
+    priority: Int!
+    isAvailable: Boolean!
+}
+
+type TelegramBotUser {
+    id: TelegramBotUserId!
+}
+
+type Video {
+    id: VideoId!
+    videoGroupId: VideoGroupId!
+    description: String!
+    telegramFileId: TelegramFileId!
+    telegramFileUniqueId: TelegramFileUniqueId!
+    priority: Int!
+    isAvailable: Boolean!
+}
+
+input TelegramBotUserDetailsInput {
+    id: ID!
+    firstName: String
+    lastName: String
+    username: String!
+    languageCode: String
+    status: UserStatus!
+}
+
+enum UserStatus {
+    KICKED
+    MEMBER
+}
