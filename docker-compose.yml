@@ -1,7 +1,7 @@
 services:
-  empioner-redis:
+  empioner-telegram-bot-redis:
     image: redis:7.4.0-alpine
-    container_name: empioner_redis
+    container_name: empioner_telegram_bot_redis
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REDIS_USER=${REDIS_USER}
@@ -27,9 +27,9 @@ services:
     volumes:
       - redis_data:/var/lib/redis/data
 
-  empioner-mongo:
+  empioner-service-mongo:
     image: mongo:7.0
-    container_name: empioner_mongo
+    container_name: empioner_service_mongo
     ports:
       - "27017:27017"
     environment:
@@ -43,9 +43,9 @@ services:
     volumes:
       - mongo_data:/var/lib/mongo/data
 
-  empioner-postgres:
+  empioner-service-postgres:
     image: postgres:17-alpine
-    container_name: empioner_postgres
+    container_name: empioner_service_postgres
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-d", "${POSTGRES_DB}" ]
       interval: 10s
@@ -60,24 +60,16 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  empioner-bot:
-    image: qwonix/empioner-bot:latest
-    container_name: empioner_bot
+  empioner-telegram-bot:
+    image: qwonix/empioner-telegram-bot:latest
+    container_name: empioner_telegram_bot
     depends_on:
-      - empioner-postgres
-      - empioner-mongo
-      - empioner-redis
+      - empioner-service-app
+      - empioner-telegram-bot-redis
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://empioner-postgres:5432/${POSTGRES_DB}
-      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_DATA_REDIS_HOST=empioner-redis
       - SPRING_DATA_REDIS_USERNAME=${REDIS_USER}
       - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
-      - SPRING_DATA_MONGODB_HOST=empioner-mongo
-      - SPRING_DATA_MONGODB_USERNAME=${MONGODB_USER}
-      - SPRING_DATA_MONGODB_PASSWORD=${MONGODB_PASSWORD}
-      - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=${MONGODB_AUTHENTICATION_DATABASE}
       - BOT_TITLE=${BOT_TITLE}
       - BOT_DESCRIPTION=${BOT_DESCRIPTION}
       - BOT_USERNAME=${BOT_USERNAME}
@@ -87,6 +79,25 @@ services:
       - BOT_CONFIG_SHOW_SERIES_IMAGE_ID=${BOT_CONFIG_SHOW_SERIES_IMAGE_ID}
       - BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID=${BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID}
       - BOT_CONFIG_SHOW_MOVIE_IMAGE_ID=${BOT_CONFIG_SHOW_MOVIE_IMAGE_ID}
+      - EMPIONER_SERVICE_URL=http://empioner-service-app:8080/graphql
+
+  empioner-service-app:
+    image: qwonix/empioner-service-app:latest
+    container_name: empioner_service_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - empioner-service-postgres
+      - empioner-service-mongo
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://empioner-service-postgres:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_DATA_MONGODB_HOST=empioner-service-mongo
+      - SPRING_DATA_MONGODB_USERNAME=${MONGODB_USER}
+      - SPRING_DATA_MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=${MONGODB_AUTHENTICATION_DATABASE}
+
 volumes:
   postgres_data:
   redis_data:
