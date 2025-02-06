@@ -70,19 +70,23 @@ public class TelegramEpisodeService {
     }
 
     public InlineKeyboardRow createEpisodeControlButtons(Episode currentEpisode) {
-        Optional<Episode> previousEpisode = episodeService.findById(currentEpisode.previousEpisodeId());
-        Optional<Episode> nextEpisode = episodeService.findById(currentEpisode.nextEpisodeId());
+        EpisodeId previousEpisodeId = currentEpisode.previousEpisodeId();
+        EpisodeId nextEpisodeId = currentEpisode.nextEpisodeId();
         Integer totalEpisodesCountInSeason = episodeService.countAllBySeasonId(currentEpisode.seasonId());
 
         InlineKeyboardButton previous;
         InlineKeyboardButton next;
-        previous = previousEpisode
-                .map(episode -> Utils.createCallbackDataButton(new EpisodeCallbackData(episode.id()), "‹"))
-                .orElseGet(() -> Utils.createCallbackDataButton(new EmptyCallbackData(), "×"));
+        if (previousEpisodeId != null) {
+            previous = Utils.createCallbackDataButton(new EpisodeCallbackData(previousEpisodeId), "‹");
+        } else {
+            previous = Utils.createCallbackDataButton(new EmptyCallbackData(), "×");
+        }
 
-        next = nextEpisode
-                .map(episode -> Utils.createCallbackDataButton(new EpisodeCallbackData(episode.id()), "›"))
-                .orElseGet(() -> Utils.createCallbackDataButton(new EmptyCallbackData(), "×"));
+        if (nextEpisodeId != null) {
+            next = Utils.createCallbackDataButton(new EpisodeCallbackData(nextEpisodeId), "›");
+        } else {
+            next = Utils.createCallbackDataButton(new EmptyCallbackData(), "×");
+        }
 
         InlineKeyboardButton current = Utils.createCallbackDataButton(
                 new EmptyCallbackData(),
