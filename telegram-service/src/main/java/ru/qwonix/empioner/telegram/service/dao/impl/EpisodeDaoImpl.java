@@ -22,7 +22,7 @@ public class EpisodeDaoImpl implements EpisodeDao {
 
     @Override
     public Optional<Episode> findById(EpisodeId episodeId) {
-        return jdbcClient.sql("select * from episode where id = :id")
+        return jdbcClient.sql("select * from episode where id = :id and is_available = true")
                 .param("id", episodeId.value())
                 .query(mapper)
                 .optional();
@@ -30,7 +30,8 @@ public class EpisodeDaoImpl implements EpisodeDao {
 
     @Override
     public Integer countAllBySeasonId(SeasonId seasonId) {
-        return jdbcClient.sql("select count(*) as total from episode where season_id = :seasonId")
+        return jdbcClient.sql("select count(*) as total from episode where season_id = :seasonId " +
+                              "and is_available = true")
                 .param("seasonId", seasonId.value())
                 .query(rs -> {
                     rs.next();
@@ -54,6 +55,7 @@ public class EpisodeDaoImpl implements EpisodeDao {
                                                                         int limit,
                                                                         int page) {
         return jdbcClient.sql("select * from episode where season_id = :season_id " +
+                              "and is_available = true " +
                               "order by number " +
                               "limit :limit offset :page")
                 .param("season_id", seasonId.value())
@@ -65,7 +67,7 @@ public class EpisodeDaoImpl implements EpisodeDao {
 
     @Override
     public Optional<Episode> findByVideoGroupId(VideoGroupId id) {
-        return jdbcClient.sql("select * from episode where video_group_id = :id")
+        return jdbcClient.sql("select * from episode where video_group_id = :id and is_available = true")
                 .param("id", id.value())
                 .query(mapper)
                 .optional();
@@ -74,8 +76,8 @@ public class EpisodeDaoImpl implements EpisodeDao {
     @Override
     public Boolean changeAvailable(EpisodeId id, boolean isAvailable) {
         return jdbcClient.sql("update episode set is_available = :isAvailable where id = :id")
-                .param("id", id.value())
-                .param("isAvailable", isAvailable)
-                .update() == 1;
+                       .param("id", id.value())
+                       .param("isAvailable", isAvailable)
+                       .update() == 1;
     }
 }
