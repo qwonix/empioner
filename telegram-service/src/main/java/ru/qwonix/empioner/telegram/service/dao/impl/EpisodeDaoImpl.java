@@ -70,4 +70,12 @@ public class EpisodeDaoImpl implements EpisodeDao {
                 .query(mapper)
                 .optional();
     }
+
+    @Override
+    public Boolean changeAvailable(EpisodeId id, boolean isAvailable) {
+        return jdbcClient.sql("update episode set is_available = :isAvailable where id = :id")
+                .param("id", id.value())
+                .param("isAvailable", isAvailable)
+                .update() == 1;
+    }
 }

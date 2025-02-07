@@ -43,6 +43,7 @@ type Mutation {
     mergeTelegramBotUser(userDetails: TelegramBotUserDetailsInput!): TelegramBotUser
     addActivity(id: TelegramBotUserId!): Boolean
     updateStatus(id: TelegramBotUserId!, status: UserStatus!): Boolean
+    changeAvailable(id: EpisodeId!, isAvailable: Boolean!): Boolean
 }
 
 type Episode {

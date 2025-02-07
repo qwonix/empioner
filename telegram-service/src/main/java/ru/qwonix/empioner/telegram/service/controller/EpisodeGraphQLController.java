@@ -2,6 +2,7 @@ package ru.qwonix.empioner.telegram.service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
@@ -38,5 +39,10 @@ public class EpisodeGraphQLController {
     public Mono<Episode> getEpisodeByVideoGroupId(@Argument VideoGroupId id) {
         return Mono.fromCallable(() -> episodeService.findByVideoGroupId(id))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
+    }
+
+    @MutationMapping
+    public Mono<Boolean> changeAvailable(@Argument EpisodeId id, @Argument Boolean isAvailable) {
+        return Mono.fromCallable(() -> episodeService.changeAvailable(id, isAvailable));
     }
 }

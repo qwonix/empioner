@@ -18,4 +18,6 @@ public interface EpisodeService {
     List<Episode> findAllBySeasonIdOrderByNumberWithLimitAndPage(SeasonId seasonId, int limit, int page);
 
     Optional<Episode> findByVideoGroupId(VideoGroupId id);
+
+    Boolean changeAvailable(EpisodeId id, Boolean isAvailable);
 }
