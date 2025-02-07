@@ -18,4 +18,6 @@ public interface EpisodeDao {
     List<Episode> findAllBySeasonIdOrderByNumberWithLimitAndPage(SeasonId seasonId, int keyboardButtonsLimit, int page);
 
     Optional<Episode> findByVideoGroupId(VideoGroupId id);
+
+    Boolean changeAvailable(EpisodeId id, Boolean isAvailable);
 }

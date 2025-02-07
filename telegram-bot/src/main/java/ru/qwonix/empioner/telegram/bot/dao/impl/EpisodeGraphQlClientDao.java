@@ -70,6 +70,11 @@ public class EpisodeGraphQlClientDao implements EpisodeDao {
                 }
             }
             """;
+    private static final String CHANGE_AVAILABLE = """
+            mutation ChangeAvailable($id: EpisodeId!, $isAvailable: Boolean!) {
+                changeAvailable(id: $id, isAvailable: $isAvailable)
+            }
+            """;
     private final GraphQlClient graphQlClient;
 
     @Override
@@ -116,5 +121,17 @@ public class EpisodeGraphQlClientDao implements EpisodeDao {
                 .retrieve("getEpisodeByVideoGroupId")
                 .toEntity(Episode.class)
                 .blockOptional();
+    }
+
+    @Override
+    public Boolean changeAvailable(EpisodeId id, Boolean isAvailable) {
+        return graphQlClient.document(CHANGE_AVAILABLE)
+                .variables(Map.of(
+                        "id", id.value().toString(),
+                        "isAvailable", isAvailable
+                ))
+                .retrieve("changeAvailable")
+                .toEntity(Boolean.class)
+                .block();
     }
 }

@@ -42,4 +42,13 @@ public class EpisodeServiceImpl implements EpisodeService {
     public Optional<Episode> findByVideoGroupId(VideoGroupId id) {
         return episodeDao.findByVideoGroupId(id);
     }
+
+    @Override
+    public Boolean makeAvailable(EpisodeId id) {
+        return episodeDao.changeAvailable(id, Boolean.TRUE);
+    }
+    @Override
+    public Boolean makeNotAvailable(EpisodeId id) {
+        return episodeDao.changeAvailable(id, Boolean.FALSE);
+    }
 }

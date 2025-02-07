@@ -9,6 +9,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import ru.qwonix.empioner.telegram.bot.entity.TelegramBotUser;
+import ru.qwonix.empioner.telegram.bot.entity.id.EpisodeId;
+import ru.qwonix.empioner.telegram.bot.service.EpisodeService;
 import ru.qwonix.empioner.telegram.bot.service.MessageService;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.ShowShowCallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.config.BotService;
@@ -18,6 +20,7 @@ import ru.qwonix.empioner.telegram.bot.telegram.utils.ButtonOrientation;
 import ru.qwonix.empioner.telegram.bot.telegram.utils.Utils;
 
 import java.util.List;
+import java.util.UUID;
 
 import static ru.qwonix.empioner.telegram.bot.telegram.service.TelegramBotExecutionService.escapeMarkdownMessage;
 
@@ -28,6 +31,7 @@ public class ChatCommandHandler {
 
     public static final int FIRST_PAGE = 0;
 
+    private final EpisodeService episodeService;
     private final MessageService messageService;
     private final TelegramClient bot;
     private final TelegramProperties telegramProperties;
@@ -53,5 +57,27 @@ public class ChatCommandHandler {
         }
 
         messageService.deleteMessageId(user);
+    }
+
+    @ChatCommand("/open")
+    public void open(TelegramBotUser user, String[] args) {
+        if (args.length != 1) {
+            return;
+        }
+        try {
+            episodeService.makeAvailable(new EpisodeId(UUID.fromString(args[0])));
+        } catch (IllegalArgumentException e) {
+        }
+    }
+
+    @ChatCommand("/close")
+    public void close(TelegramBotUser user, String[] args) {
+        if (args.length != 1) {
+            return;
+        }
+        try {
+            episodeService.makeNotAvailable(new EpisodeId(UUID.fromString(args[0])));
+        } catch (IllegalArgumentException e) {
+        }
     }
 }
