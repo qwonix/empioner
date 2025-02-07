@@ -1,4 +1,4 @@
 rootProject.name = 'empioner'
 
-include ':bot'
+include ':telegram-bot'
 include ':empioner-service'
