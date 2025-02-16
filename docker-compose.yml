@@ -65,6 +65,7 @@ services:
   empioner-telegram-bot:
     image: qwonix/empioner-telegram-bot:latest
     container_name: empioner_telegram_bot
+    restart: always
     depends_on:
       - empioner-telegram-service
       - empioner-telegram-bot-redis
@@ -82,6 +83,7 @@ services:
       - BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID=${BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID}
       - BOT_CONFIG_SHOW_MOVIE_IMAGE_ID=${BOT_CONFIG_SHOW_MOVIE_IMAGE_ID}
       - EMPIONER_SERVICE_URL=http://empioner-telegram-service:8080/graphql
+      - BOT_SINGLE_SHOW_MODE_SHOW_ID=${BOT_SINGLE_SHOW_MODE_SHOW_ID}
 
   empioner-telegram-service:
     image: qwonix/empioner-telegram-service:latest

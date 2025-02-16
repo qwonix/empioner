@@ -10,8 +10,10 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import ru.qwonix.empioner.telegram.bot.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.bot.entity.id.EpisodeId;
+import ru.qwonix.empioner.telegram.bot.service.BotSettingsService;
 import ru.qwonix.empioner.telegram.bot.service.EpisodeService;
 import ru.qwonix.empioner.telegram.bot.service.MessageService;
+import ru.qwonix.empioner.telegram.bot.telegram.callback.data.ShowCallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.ShowShowCallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.config.BotService;
 import ru.qwonix.empioner.telegram.bot.telegram.config.ChatCommand;
@@ -31,6 +33,7 @@ public class ChatCommandHandler {
 
     public static final int FIRST_PAGE = 0;
 
+    private final BotSettingsService botSettingsService;
     private final EpisodeService episodeService;
     private final MessageService messageService;
     private final TelegramClient bot;
@@ -38,10 +41,18 @@ public class ChatCommandHandler {
 
     @ChatCommand("/start")
     public void start(TelegramBotUser user, String[] args) {
-        List<InlineKeyboardButton> buttons = List.of(
-                Utils.createSwitchInlineQueryButton("Поиск (в разработке)"),
-                Utils.createCallbackDataButton(new ShowShowCallbackData(FIRST_PAGE), "Все шоу")
-        );
+        List<InlineKeyboardButton> buttons;
+        if (botSettingsService.isEnabledSingleShowMode()) {
+            buttons = List.of(
+                    Utils.createSwitchInlineQueryButton("Поиск (в разработке)"),
+                    Utils.createCallbackDataButton(new ShowCallbackData(botSettingsService.getShowOfSingleShowMode()), "К шоу")
+            );
+        } else {
+            buttons = List.of(
+                    Utils.createSwitchInlineQueryButton("Поиск (в разработке)"),
+                    Utils.createCallbackDataButton(new ShowShowCallbackData(FIRST_PAGE), "Все шоу")
+            );
+        }
         InlineKeyboardMarkup keyboard = Utils.createOneRowCallbackKeyboard(buttons, ButtonOrientation.HORIZONTAL);
 
         SendMessage message = SendMessage.builder()
