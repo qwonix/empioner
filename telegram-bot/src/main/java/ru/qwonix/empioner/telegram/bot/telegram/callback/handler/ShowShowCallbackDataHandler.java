@@ -51,5 +51,6 @@ public class ShowShowCallbackDataHandler implements CallbackDataHandler {
         String text = telegramShowService.createText(shows);
 
         telegramBotExecutionService.send(user, text, keyboard, new ImageId(showShowImageId));
+        telegramBotExecutionService.confirmCallback(callbackQuery.getId());
     }
 }
