@@ -1,7 +1,7 @@
 package ru.qwonix.empioner.telegram.bot.telegram.callback.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import ru.qwonix.empioner.telegram.bot.entity.id.SeasonId;
+import ru.qwonix.empioner.telegram.id.SeasonId;
 
 public record SeasonCallbackData(
         @JsonProperty("i") SeasonId seasonId,

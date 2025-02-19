@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMemberUpdated;
-import ru.qwonix.empioner.telegram.bot.entity.TelegramBotUser;
-import ru.qwonix.empioner.telegram.bot.entity.UserStatus;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
+import ru.qwonix.empioner.telegram.entity.UserStatus;
 import ru.qwonix.empioner.telegram.bot.service.TelegramBotUserService;
 import ru.qwonix.empioner.telegram.bot.telegram.config.ChatCommandAnnotationBeanPostProcessor;
 

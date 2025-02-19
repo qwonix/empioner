@@ -5,7 +5,7 @@ import graphql.schema.GraphQLScalarType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;
-import ru.qwonix.empioner.telegram.service.entity.id.*;
+import ru.qwonix.empioner.telegram.id.*;
 
 import java.util.UUID;
 

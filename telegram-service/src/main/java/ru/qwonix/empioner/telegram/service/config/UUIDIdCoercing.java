@@ -6,7 +6,7 @@ import graphql.language.StringValue;
 import graphql.language.Value;
 import graphql.schema.Coercing;
 import graphql.schema.CoercingSerializeException;
-import ru.qwonix.empioner.telegram.service.entity.id.Id;
+import ru.qwonix.empioner.telegram.id.Id;
 
 import java.util.Locale;
 import java.util.UUID;

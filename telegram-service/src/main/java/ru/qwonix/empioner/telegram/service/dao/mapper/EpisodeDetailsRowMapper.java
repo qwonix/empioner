@@ -2,8 +2,8 @@ package ru.qwonix.empioner.telegram.service.dao.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import ru.qwonix.empioner.telegram.service.entity.EpisodeDetails;
-import ru.qwonix.empioner.telegram.service.entity.id.EpisodeId;
+import ru.qwonix.empioner.telegram.entity.EpisodeDetails;
+import ru.qwonix.empioner.telegram.id.EpisodeId;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

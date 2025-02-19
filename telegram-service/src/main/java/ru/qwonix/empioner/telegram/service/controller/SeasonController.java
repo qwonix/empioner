@@ -6,9 +6,9 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import ru.qwonix.empioner.telegram.service.entity.Season;
-import ru.qwonix.empioner.telegram.service.entity.id.SeasonId;
-import ru.qwonix.empioner.telegram.service.entity.id.SeriesId;
+import ru.qwonix.empioner.telegram.entity.Season;
+import ru.qwonix.empioner.telegram.id.SeasonId;
+import ru.qwonix.empioner.telegram.id.SeriesId;
 import ru.qwonix.empioner.telegram.service.service.SeasonService;
 
 @Controller

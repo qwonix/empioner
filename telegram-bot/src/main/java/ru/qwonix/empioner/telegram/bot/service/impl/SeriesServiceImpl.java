@@ -3,9 +3,9 @@ package ru.qwonix.empioner.telegram.bot.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.qwonix.empioner.telegram.bot.dao.SeriesDao;
-import ru.qwonix.empioner.telegram.bot.entity.Series;
-import ru.qwonix.empioner.telegram.bot.entity.id.SeriesId;
-import ru.qwonix.empioner.telegram.bot.entity.id.ShowId;
+import ru.qwonix.empioner.telegram.entity.Series;
+import ru.qwonix.empioner.telegram.id.SeriesId;
+import ru.qwonix.empioner.telegram.id.ShowId;
 import ru.qwonix.empioner.telegram.bot.service.SeriesService;
 
 import java.util.List;

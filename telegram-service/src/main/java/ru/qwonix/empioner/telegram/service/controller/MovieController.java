@@ -6,10 +6,10 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import ru.qwonix.empioner.telegram.service.entity.Movie;
-import ru.qwonix.empioner.telegram.service.entity.id.MovieId;
-import ru.qwonix.empioner.telegram.service.entity.id.ShowId;
-import ru.qwonix.empioner.telegram.service.entity.id.VideoGroupId;
+import ru.qwonix.empioner.telegram.entity.Movie;
+import ru.qwonix.empioner.telegram.id.MovieId;
+import ru.qwonix.empioner.telegram.id.ShowId;
+import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.service.service.MovieService;
 
 @Controller

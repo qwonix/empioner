@@ -1,8 +1,8 @@
 package ru.qwonix.empioner.telegram.service.service;
 
-import ru.qwonix.empioner.telegram.service.entity.Series;
-import ru.qwonix.empioner.telegram.service.entity.id.SeriesId;
-import ru.qwonix.empioner.telegram.service.entity.id.ShowId;
+import ru.qwonix.empioner.telegram.entity.Series;
+import ru.qwonix.empioner.telegram.id.SeriesId;
+import ru.qwonix.empioner.telegram.id.ShowId;
 
 import java.util.List;
 import java.util.Optional;

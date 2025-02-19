@@ -3,9 +3,9 @@ package ru.qwonix.empioner.telegram.service.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.qwonix.empioner.telegram.service.dao.VideoDao;
-import ru.qwonix.empioner.telegram.service.entity.Video;
-import ru.qwonix.empioner.telegram.service.entity.id.VideoGroupId;
-import ru.qwonix.empioner.telegram.service.entity.id.VideoId;
+import ru.qwonix.empioner.telegram.entity.Video;
+import ru.qwonix.empioner.telegram.id.VideoGroupId;
+import ru.qwonix.empioner.telegram.id.VideoId;
 import ru.qwonix.empioner.telegram.service.service.VideoService;
 
 import java.util.List;

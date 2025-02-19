@@ -3,9 +3,9 @@ package ru.qwonix.empioner.telegram.bot.dao.impl;
 import org.springframework.graphql.client.GraphQlClient;
 import org.springframework.stereotype.Repository;
 import ru.qwonix.empioner.telegram.bot.dao.SeasonDao;
-import ru.qwonix.empioner.telegram.bot.entity.Season;
-import ru.qwonix.empioner.telegram.bot.entity.id.SeasonId;
-import ru.qwonix.empioner.telegram.bot.entity.id.SeriesId;
+import ru.qwonix.empioner.telegram.entity.Season;
+import ru.qwonix.empioner.telegram.id.SeasonId;
+import ru.qwonix.empioner.telegram.id.SeriesId;
 
 import java.util.List;
 import java.util.Map;

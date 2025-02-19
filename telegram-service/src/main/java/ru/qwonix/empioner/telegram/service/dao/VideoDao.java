@@ -1,8 +1,8 @@
 package ru.qwonix.empioner.telegram.service.dao;
 
-import ru.qwonix.empioner.telegram.service.entity.Video;
-import ru.qwonix.empioner.telegram.service.entity.id.VideoGroupId;
-import ru.qwonix.empioner.telegram.service.entity.id.VideoId;
+import ru.qwonix.empioner.telegram.entity.Video;
+import ru.qwonix.empioner.telegram.id.VideoGroupId;
+import ru.qwonix.empioner.telegram.id.VideoId;
 
 import java.util.List;
 import java.util.Optional;

@@ -5,9 +5,9 @@ import org.springframework.graphql.client.GraphQlClient;
 import org.springframework.stereotype.Repository;
 import org.telegram.telegrambots.meta.api.objects.User;
 import ru.qwonix.empioner.telegram.bot.dao.TelegramBotUserDao;
-import ru.qwonix.empioner.telegram.bot.entity.TelegramBotUser;
-import ru.qwonix.empioner.telegram.bot.entity.UserStatus;
-import ru.qwonix.empioner.telegram.bot.entity.id.TelegramBotUserId;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
+import ru.qwonix.empioner.telegram.entity.UserStatus;
+import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 
 import java.util.Map;
 import java.util.Optional;
