@@ -3,8 +3,8 @@ package ru.qwonix.empioner.telegram.bot.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.qwonix.empioner.telegram.bot.dao.ImageDao;
-import ru.qwonix.empioner.telegram.bot.entity.Image;
-import ru.qwonix.empioner.telegram.bot.entity.id.ImageId;
+import ru.qwonix.empioner.telegram.entity.Image;
+import ru.qwonix.empioner.telegram.id.ImageId;
 import ru.qwonix.empioner.telegram.bot.service.ImageService;
 
 import java.util.Optional;

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import org.springframework.boot.jackson.JsonComponent;
-import ru.qwonix.empioner.telegram.service.entity.id.*;
+import ru.qwonix.empioner.telegram.id.*;
 
 import java.io.IOException;
 import java.util.UUID;

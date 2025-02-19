@@ -2,3 +2,4 @@ rootProject.name = 'empioner'
 
 include ':telegram-bot'
 include ':telegram-service'
+include ':telegram-shared'

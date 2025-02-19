@@ -2,7 +2,7 @@ package ru.qwonix.empioner.telegram.bot.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.qwonix.empioner.telegram.bot.entity.id.ShowId;
+import ru.qwonix.empioner.telegram.id.ShowId;
 import ru.qwonix.empioner.telegram.bot.service.BotSettingsService;
 
 import java.util.UUID;

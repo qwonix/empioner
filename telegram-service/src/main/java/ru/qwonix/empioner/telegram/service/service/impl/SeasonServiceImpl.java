@@ -3,9 +3,9 @@ package ru.qwonix.empioner.telegram.service.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.qwonix.empioner.telegram.service.dao.SeasonDao;
-import ru.qwonix.empioner.telegram.service.entity.Season;
-import ru.qwonix.empioner.telegram.service.entity.id.SeasonId;
-import ru.qwonix.empioner.telegram.service.entity.id.SeriesId;
+import ru.qwonix.empioner.telegram.entity.Season;
+import ru.qwonix.empioner.telegram.id.SeasonId;
+import ru.qwonix.empioner.telegram.id.SeriesId;
 import ru.qwonix.empioner.telegram.service.service.SeasonService;
 
 import java.util.List;

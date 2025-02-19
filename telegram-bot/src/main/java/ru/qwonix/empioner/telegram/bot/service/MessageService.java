@@ -1,7 +1,7 @@
 package ru.qwonix.empioner.telegram.bot.service;
 
 
-import ru.qwonix.empioner.telegram.bot.entity.TelegramBotUser;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 
 public interface MessageService {
     void setMessageId(TelegramBotUser user, Integer messageId);

@@ -1,6 +1,6 @@
 package ru.qwonix.empioner.telegram.bot.dao;
 
-import ru.qwonix.empioner.telegram.bot.entity.id.TelegramBotUserId;
+import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 
 import java.time.Duration;
 

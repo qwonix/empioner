@@ -3,9 +3,9 @@ package ru.qwonix.empioner.telegram.bot.dao.impl;
 import org.springframework.graphql.client.GraphQlClient;
 import org.springframework.stereotype.Repository;
 import ru.qwonix.empioner.telegram.bot.dao.SeriesDao;
-import ru.qwonix.empioner.telegram.bot.entity.Series;
-import ru.qwonix.empioner.telegram.bot.entity.id.SeriesId;
-import ru.qwonix.empioner.telegram.bot.entity.id.ShowId;
+import ru.qwonix.empioner.telegram.entity.Series;
+import ru.qwonix.empioner.telegram.id.SeriesId;
+import ru.qwonix.empioner.telegram.id.ShowId;
 
 import java.util.List;
 import java.util.Optional;

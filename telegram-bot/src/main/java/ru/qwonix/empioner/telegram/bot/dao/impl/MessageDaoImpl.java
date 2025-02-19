@@ -6,7 +6,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 import ru.qwonix.empioner.telegram.bot.dao.MessageDao;
-import ru.qwonix.empioner.telegram.bot.entity.id.TelegramBotUserId;
+import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 
 import java.time.Duration;
 

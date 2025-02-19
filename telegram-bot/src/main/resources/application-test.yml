@@ -1,0 +1,33 @@
+logging:
+  level:
+    root: info
+spring:
+  application:
+    name: Empioner Bot
+  data:
+    redis:
+      host: localhost
+      username: movie_player_bot_tg_user
+      password: movie_player_bot_tg_password
+
+bot:
+  title: 'BeMiraculous | Replay Bot'
+  description: 'Самый удобный способ смотреть Ледибаг с русскими субтитрами от BeMiraculous!'
+  username: tgMoviePlayerBot
+  token: 5321024633:AAFHeHRcEDY12BuDJYW7FkIPFoHl2XmKPho
+  keyboard_buttons_max: 13
+  single_show_mode:
+    show_id: 1d108560-e166-42f3-9bd3-ded81f5d0f71
+  config:
+    image:
+      placeholder: ec723341-9632-4212-a6d4-d690f667d544
+    show:
+      show:
+        image_id: b132d417-c674-4ff6-97c3-3e43ebea0695
+      series:
+        image_id: 69142708-c2a6-422b-b9e8-2348e40f2d55
+      movie:
+        image_id: 52574e03-5ff7-4c40-979e-a970e9de4048
+
+server:
+  port: 8081

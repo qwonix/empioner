@@ -2,11 +2,11 @@ package ru.qwonix.empioner.telegram.service.dao.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import ru.qwonix.empioner.telegram.service.entity.Video;
-import ru.qwonix.empioner.telegram.service.entity.id.TelegramFileId;
-import ru.qwonix.empioner.telegram.service.entity.id.TelegramFileUniqueId;
-import ru.qwonix.empioner.telegram.service.entity.id.VideoGroupId;
-import ru.qwonix.empioner.telegram.service.entity.id.VideoId;
+import ru.qwonix.empioner.telegram.entity.Video;
+import ru.qwonix.empioner.telegram.id.TelegramFileId;
+import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
+import ru.qwonix.empioner.telegram.id.VideoGroupId;
+import ru.qwonix.empioner.telegram.id.VideoId;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -8,8 +8,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import ru.qwonix.empioner.telegram.bot.entity.TelegramBotUser;
-import ru.qwonix.empioner.telegram.bot.entity.id.EpisodeId;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
+import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.bot.service.BotSettingsService;
 import ru.qwonix.empioner.telegram.bot.service.EpisodeService;
 import ru.qwonix.empioner.telegram.bot.service.MessageService;

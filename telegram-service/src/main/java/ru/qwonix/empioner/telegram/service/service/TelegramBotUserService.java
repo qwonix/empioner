@@ -1,9 +1,9 @@
 package ru.qwonix.empioner.telegram.service.service;
 
-import ru.qwonix.empioner.telegram.service.dao.entity.TelegramBotUserDetails;
-import ru.qwonix.empioner.telegram.service.entity.TelegramBotUser;
-import ru.qwonix.empioner.telegram.service.entity.UserStatus;
-import ru.qwonix.empioner.telegram.service.entity.id.TelegramBotUserId;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUserDetails;
+import ru.qwonix.empioner.telegram.entity.UserStatus;
+import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 
 import java.util.Optional;
 

@@ -5,8 +5,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 import ru.qwonix.empioner.telegram.service.dao.ShowDao;
-import ru.qwonix.empioner.telegram.service.entity.Show;
-import ru.qwonix.empioner.telegram.service.entity.id.ShowId;
+import ru.qwonix.empioner.telegram.entity.Show;
+import ru.qwonix.empioner.telegram.id.ShowId;
 
 import java.util.List;
 import java.util.Optional;

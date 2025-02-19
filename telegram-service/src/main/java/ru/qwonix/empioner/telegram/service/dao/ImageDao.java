@@ -1,7 +1,7 @@
 package ru.qwonix.empioner.telegram.service.dao;
 
-import ru.qwonix.empioner.telegram.service.entity.Image;
-import ru.qwonix.empioner.telegram.service.entity.id.ImageId;
+import ru.qwonix.empioner.telegram.entity.Image;
+import ru.qwonix.empioner.telegram.id.ImageId;
 
 import java.util.Optional;
 

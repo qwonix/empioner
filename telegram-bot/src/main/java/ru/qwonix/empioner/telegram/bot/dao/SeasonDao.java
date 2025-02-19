@@ -1,8 +1,8 @@
 package ru.qwonix.empioner.telegram.bot.dao;
 
-import ru.qwonix.empioner.telegram.bot.entity.Season;
-import ru.qwonix.empioner.telegram.bot.entity.id.SeasonId;
-import ru.qwonix.empioner.telegram.bot.entity.id.SeriesId;
+import ru.qwonix.empioner.telegram.entity.Season;
+import ru.qwonix.empioner.telegram.id.SeasonId;
+import ru.qwonix.empioner.telegram.id.SeriesId;
 
 import java.util.List;
 import java.util.Optional;
