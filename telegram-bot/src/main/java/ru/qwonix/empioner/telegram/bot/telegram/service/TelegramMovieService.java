@@ -9,8 +9,8 @@ import ru.qwonix.empioner.telegram.entity.Video;
 import ru.qwonix.empioner.telegram.id.MovieId;
 import ru.qwonix.empioner.telegram.id.ShowId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
-import ru.qwonix.empioner.telegram.bot.service.MovieService;
-import ru.qwonix.empioner.telegram.bot.service.VideoService;
+import ru.qwonix.empioner.telegram.bot.api.MovieApi;
+import ru.qwonix.empioner.telegram.bot.api.VideoApi;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.*;
 import ru.qwonix.empioner.telegram.bot.telegram.utils.Utils;
 
@@ -24,11 +24,11 @@ import static ru.qwonix.empioner.telegram.bot.telegram.handler.ChatCommandHandle
 @RequiredArgsConstructor
 public class TelegramMovieService {
 
-    private final MovieService movieService;
-    private final VideoService videoService;
+    private final MovieApi movieApi;
+    private final VideoApi videoApi;
 
     public List<Movie> findAllByShowId(ShowId id) {
-        return movieService.findAllByShowId(id);
+        return movieApi.findAllByShowId(id);
     }
 
     public InlineKeyboardMarkup createKeyboard(ShowId showId, List<Movie> movies) {
@@ -51,7 +51,7 @@ public class TelegramMovieService {
 
 
     public Optional<Video> findVideoFor(Movie movie) {
-        return videoService.findMaxPriorityInGroup(movie.videoGroupId());
+        return videoApi.findMaxPriorityInGroup(movie.videoGroupId());
     }
 
     public String createText(Movie movie) {
@@ -75,10 +75,10 @@ public class TelegramMovieService {
     }
 
     public Optional<Movie> findById(MovieId id) {
-        return movieService.findById(id);
+        return movieApi.findById(id);
     }
 
     public Optional<Movie> findByVideoGroupId(VideoGroupId id) {
-        return movieService.findByVideoId(id);
+        return movieApi.findByVideoId(id);
     }
 }

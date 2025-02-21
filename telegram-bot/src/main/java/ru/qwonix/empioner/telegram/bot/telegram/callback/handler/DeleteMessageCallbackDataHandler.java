@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
-import ru.qwonix.empioner.telegram.bot.service.MessageService;
+import ru.qwonix.empioner.telegram.bot.api.MessageApi;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.CallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.DeleteMessageCallbackData;
 
@@ -18,7 +18,7 @@ import ru.qwonix.empioner.telegram.bot.telegram.callback.data.DeleteMessageCallb
 public class DeleteMessageCallbackDataHandler implements CallbackDataHandler {
 
     private final TelegramClient bot;
-    private final MessageService messageService;
+    private final MessageApi messageApi;
 
     @Override
     public boolean canHandle(Class<? extends CallbackData> callbackData) {
@@ -27,8 +27,8 @@ public class DeleteMessageCallbackDataHandler implements CallbackDataHandler {
 
     @Override
     public void handle(TelegramBotUser user, CallbackQuery callbackQuery, CallbackData callbackData) {
-        if (messageService.hasMessageId(user)) {
-            Integer messageId = messageService.getMessageId(user);
+        if (messageApi.hasMessageId(user)) {
+            Integer messageId = messageApi.getMessageId(user);
             DeleteMessage deleteMessage = DeleteMessage.builder()
                     .chatId(user.id().value())
                     .messageId(messageId).build();
@@ -38,7 +38,7 @@ public class DeleteMessageCallbackDataHandler implements CallbackDataHandler {
             } catch (TelegramApiException e) {
                 throw new RuntimeException(e);
             }
-            messageService.deleteMessageId(user);
+            messageApi.deleteMessageId(user);
         }
     }
 }

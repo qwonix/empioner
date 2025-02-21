@@ -7,19 +7,19 @@ import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateC
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
-import ru.qwonix.empioner.telegram.bot.service.TelegramBotUserService;
+import ru.qwonix.empioner.telegram.bot.api.TelegramBotUserApi;
 import ru.qwonix.empioner.telegram.bot.telegram.handler.UpdateHandler;
 
 @Slf4j
 @Component
 public class MoviePlayerBot implements LongPollingSingleThreadUpdateConsumer {
 
-    private final TelegramBotUserService userService;
+    private final TelegramBotUserApi telegramBotUserApi;
     private final UpdateHandler updateHandler;
 
-    public MoviePlayerBot(TelegramBotUserService userService,
+    public MoviePlayerBot(TelegramBotUserApi telegramBotUserApi,
                           @Lazy UpdateHandler updateHandler) {
-        this.userService = userService;
+        this.telegramBotUserApi = telegramBotUserApi;
         this.updateHandler = updateHandler;
     }
 
@@ -37,8 +37,8 @@ public class MoviePlayerBot implements LongPollingSingleThreadUpdateConsumer {
             throw new IllegalArgumentException("update does not contains user");
         }
 
-        TelegramBotUser user = userService.merge(telegramUser);
-        userService.addActivity(user.id());
+        TelegramBotUser user = telegramBotUserApi.merge(telegramUser);
+        telegramBotUserApi.addActivity(user.id());
 
         if (update.hasCallbackQuery()) {
             updateHandler.onCallback(update, user);

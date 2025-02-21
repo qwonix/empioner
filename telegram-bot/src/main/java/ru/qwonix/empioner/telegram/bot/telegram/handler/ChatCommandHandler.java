@@ -10,9 +10,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.id.EpisodeId;
-import ru.qwonix.empioner.telegram.bot.service.BotSettingsService;
-import ru.qwonix.empioner.telegram.bot.service.EpisodeService;
-import ru.qwonix.empioner.telegram.bot.service.MessageService;
+import ru.qwonix.empioner.telegram.bot.api.BotSettingsApi;
+import ru.qwonix.empioner.telegram.bot.api.EpisodeApi;
+import ru.qwonix.empioner.telegram.bot.api.MessageApi;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.ShowCallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.ShowShowCallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.config.BotService;
@@ -33,19 +33,19 @@ public class ChatCommandHandler {
 
     public static final int FIRST_PAGE = 0;
 
-    private final BotSettingsService botSettingsService;
-    private final EpisodeService episodeService;
-    private final MessageService messageService;
+    private final BotSettingsApi botSettingsApi;
+    private final EpisodeApi episodeApi;
+    private final MessageApi messageApi;
     private final TelegramClient bot;
     private final TelegramProperties telegramProperties;
 
     @ChatCommand("/start")
     public void start(TelegramBotUser user, String[] args) {
         List<InlineKeyboardButton> buttons;
-        if (botSettingsService.isEnabledSingleShowMode()) {
+        if (botSettingsApi.isEnabledSingleShowMode()) {
             buttons = List.of(
                     Utils.createSwitchInlineQueryButton("Поиск (в разработке)"),
-                    Utils.createCallbackDataButton(new ShowCallbackData(botSettingsService.getShowOfSingleShowMode()), "К шоу")
+                    Utils.createCallbackDataButton(new ShowCallbackData(botSettingsApi.getShowOfSingleShowMode()), "К шоу")
             );
         } else {
             buttons = List.of(
@@ -67,7 +67,7 @@ public class ChatCommandHandler {
             throw new RuntimeException(e);
         }
 
-        messageService.deleteMessageId(user);
+        messageApi.deleteMessageId(user);
     }
 
     @ChatCommand("/open")
@@ -76,7 +76,7 @@ public class ChatCommandHandler {
             return;
         }
         try {
-            episodeService.makeAvailable(new EpisodeId(UUID.fromString(args[0])));
+            episodeApi.makeAvailable(new EpisodeId(UUID.fromString(args[0])));
         } catch (IllegalArgumentException e) {
         }
     }
@@ -87,7 +87,7 @@ public class ChatCommandHandler {
             return;
         }
         try {
-            episodeService.makeNotAvailable(new EpisodeId(UUID.fromString(args[0])));
+            episodeApi.makeNotAvailable(new EpisodeId(UUID.fromString(args[0])));
         } catch (IllegalArgumentException e) {
         }
     }

@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMemberUpdated;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.entity.UserStatus;
-import ru.qwonix.empioner.telegram.bot.service.TelegramBotUserService;
+import ru.qwonix.empioner.telegram.bot.api.TelegramBotUserApi;
 import ru.qwonix.empioner.telegram.bot.telegram.config.ChatCommandAnnotationBeanPostProcessor;
 
 import java.util.Arrays;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class DefaultUpdateHandler implements UpdateHandler {
 
     private final ChatCommandAnnotationBeanPostProcessor chatCommandAnnotationBeanPostProcessor;
-    private final TelegramBotUserService telegramBotUserService;
+    private final TelegramBotUserApi telegramBotUserApi;
     private final CallbackHandler callbackHandler;
 
     @Override
@@ -48,8 +48,8 @@ public class DefaultUpdateHandler implements UpdateHandler {
     public void onUserStatusChanged(Update update, TelegramBotUser user) {
         ChatMemberUpdated myChatMember = update.getMyChatMember();
         switch (myChatMember.getNewChatMember().getStatus()) {
-            case "kicked" -> telegramBotUserService.setStatus(user.id(), UserStatus.KICKED);
-            case "member" -> telegramBotUserService.setStatus(user.id(), UserStatus.MEMBER);
+            case "kicked" -> telegramBotUserApi.setStatus(user.id(), UserStatus.KICKED);
+            case "member" -> telegramBotUserApi.setStatus(user.id(), UserStatus.MEMBER);
         }
     }
 
