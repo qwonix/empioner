@@ -7,9 +7,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import ru.qwonix.empioner.telegram.entity.Season;
 import ru.qwonix.empioner.telegram.entity.Series;
 import ru.qwonix.empioner.telegram.id.SeasonId;
-import ru.qwonix.empioner.telegram.bot.service.EpisodeService;
-import ru.qwonix.empioner.telegram.bot.service.SeasonService;
-import ru.qwonix.empioner.telegram.bot.service.SeriesService;
+import ru.qwonix.empioner.telegram.bot.api.EpisodeApi;
+import ru.qwonix.empioner.telegram.bot.api.SeasonApi;
+import ru.qwonix.empioner.telegram.bot.api.SeriesApi;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.DeleteMessageCallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.EpisodeCallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.SeasonCallbackData;
@@ -25,19 +25,19 @@ import static ru.qwonix.empioner.telegram.bot.telegram.handler.ChatCommandHandle
 @Service
 @RequiredArgsConstructor
 public class TelegramSeasonService {
-    private final SeriesService seriesService;
-    private final SeasonService seasonService;
-    private final EpisodeService episodeService;
+    private final SeriesApi seriesApi;
+    private final SeasonApi seasonApi;
+    private final EpisodeApi episodeApi;
     private final TelegramProperties telegramProperties;
 
     public String createText(Season season) {
-        Optional<Series> optionalSeries = seriesService.findById(season.seriesId());
+        Optional<Series> optionalSeries = seriesApi.findById(season.seriesId());
         if (optionalSeries.isEmpty()) {
             return "";
         }
         Series series = optionalSeries.get();
-        int episodesCount = episodeService.countAllBySeasonId(season.id());
-        int availableEpisodesCount = episodeService.countAllAvailableBySeasonId(season.id());
+        int episodesCount = episodeApi.countAllBySeasonId(season.id());
+        int availableEpisodesCount = episodeApi.countAllAvailableBySeasonId(season.id());
 
         return """
                 *%s –* `%s сезон`
@@ -53,12 +53,12 @@ public class TelegramSeasonService {
 
 
     public InlineKeyboardMarkup createKeyboard(Season season, final int page) {
-        final int totalEpisodesCountInSeason = episodeService.countAllBySeasonId(season.id());
+        final int totalEpisodesCountInSeason = episodeApi.countAllBySeasonId(season.id());
         final int keyboardButtonsLimit = telegramProperties.keyboardButtonsMax();
         final int pagesCount = (int) Math.ceil(totalEpisodesCountInSeason / (double) keyboardButtonsLimit);
 
         List<Utils.Button> buttons =
-                episodeService.findAllBySeasonIdOrderByNumberWithLimitAndPage(season.id(), keyboardButtonsLimit, page)
+                episodeApi.findAllBySeasonIdOrderByNumberWithLimitAndPage(season.id(), keyboardButtonsLimit, page)
                         .stream().map(episode ->
                                 new Utils.Button(season.number() + "×" + episode.number() + " «" + episode.title() + "»",
                                         new EpisodeCallbackData(episode.id())))
@@ -81,10 +81,10 @@ public class TelegramSeasonService {
 
 
     public Optional<Season> findById(SeasonId seasonId) {
-        return seasonService.findById(seasonId);
+        return seasonApi.findById(seasonId);
     }
 
     public List<Season> findAll(Series series) {
-        return seasonService.findAllBySeriesIdOrderByNumberWithLimitAndPage(series.id(), 10, 0);
+        return seasonApi.findAllBySeriesIdOrderByNumberWithLimitAndPage(series.id(), 10, 0);
     }
 }

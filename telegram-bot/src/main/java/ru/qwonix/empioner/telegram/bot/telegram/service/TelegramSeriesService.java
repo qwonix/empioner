@@ -10,8 +10,8 @@ import ru.qwonix.empioner.telegram.entity.Series;
 import ru.qwonix.empioner.telegram.entity.Show;
 import ru.qwonix.empioner.telegram.id.SeriesId;
 import ru.qwonix.empioner.telegram.id.ShowId;
-import ru.qwonix.empioner.telegram.bot.service.SeasonService;
-import ru.qwonix.empioner.telegram.bot.service.SeriesService;
+import ru.qwonix.empioner.telegram.bot.api.SeasonApi;
+import ru.qwonix.empioner.telegram.bot.api.SeriesApi;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.*;
 import ru.qwonix.empioner.telegram.bot.telegram.config.TelegramProperties;
 import ru.qwonix.empioner.telegram.bot.telegram.utils.Utils;
@@ -26,25 +26,25 @@ import java.util.Optional;
 public class TelegramSeriesService {
     private static final int FIRST_PAGE = 0;
 
-    private final SeasonService seasonService;
-    private final SeriesService seriesService;
+    private final SeasonApi seasonApi;
+    private final SeriesApi seriesApi;
     private final TelegramProperties telegramProperties;
 
     public List<Series> findAllByShowId(ShowId id) {
-        return seriesService.findAllByShowId(id);
+        return seriesApi.findAllByShowId(id);
     }
 
     public Optional<Series> findById(SeriesId id) {
-        return seriesService.findById(id);
+        return seriesApi.findById(id);
     }
 
     public InlineKeyboardMarkup createKeyboard(Series series, final int page) {
         final int BUTTONS_LIMIT = telegramProperties.keyboardButtonsMax();
-        final int seasonsCount = seasonService.countAllBySeries(series.id());
+        final int seasonsCount = seasonApi.countAllBySeries(series.id());
         final int pagesCount = (int) Math.ceil(seasonsCount / (double) BUTTONS_LIMIT);
 
         List<Season> seriesSeasons
-                = seasonService.findAllBySeriesIdOrderByNumberWithLimitAndPage(series.id(), BUTTONS_LIMIT, page);
+                = seasonApi.findAllBySeriesIdOrderByNumberWithLimitAndPage(series.id(), BUTTONS_LIMIT, page);
 
         List<Utils.Button> buttons = seriesSeasons.stream().map(season -> new Utils.Button(
                         "Сезон " + season.number(),

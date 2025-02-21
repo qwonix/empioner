@@ -11,8 +11,8 @@ import ru.qwonix.empioner.telegram.entity.Video;
 import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.id.SeasonId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
-import ru.qwonix.empioner.telegram.bot.service.EpisodeService;
-import ru.qwonix.empioner.telegram.bot.service.SeasonService;
+import ru.qwonix.empioner.telegram.bot.api.EpisodeApi;
+import ru.qwonix.empioner.telegram.bot.api.SeasonApi;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.*;
 import ru.qwonix.empioner.telegram.bot.telegram.utils.Utils;
 
@@ -26,19 +26,19 @@ import static ru.qwonix.empioner.telegram.bot.telegram.handler.ChatCommandHandle
 @RequiredArgsConstructor
 public class TelegramEpisodeService {
 
-    private final EpisodeService episodeService;
-    private final SeasonService seasonService;
+    private final EpisodeApi episodeApi;
+    private final SeasonApi seasonApi;
 
     public Optional<Episode> findById(EpisodeId episodeId) {
-        return episodeService.findById(episodeId);
+        return episodeApi.findById(episodeId);
     }
 
     public List<Episode> findAll(SeasonId id) {
-        return episodeService.findAllBySeasonIdOrderByNumberWithLimitAndPage(id, 10, 0);
+        return episodeApi.findAllBySeasonIdOrderByNumberWithLimitAndPage(id, 10, 0);
     }
 
     public String createText(Episode episode) {
-        Optional<Season> optionalSeason = seasonService.findById(episode.seasonId());
+        Optional<Season> optionalSeason = seasonApi.findById(episode.seasonId());
         if (optionalSeason.isEmpty()) {
             return null;
         }
@@ -72,7 +72,7 @@ public class TelegramEpisodeService {
     public InlineKeyboardRow createEpisodeControlButtons(Episode currentEpisode) {
         EpisodeId previousEpisodeId = currentEpisode.previousEpisodeId();
         EpisodeId nextEpisodeId = currentEpisode.nextEpisodeId();
-        Integer totalEpisodesCountInSeason = episodeService.countAllBySeasonId(currentEpisode.seasonId());
+        Integer totalEpisodesCountInSeason = episodeApi.countAllBySeasonId(currentEpisode.seasonId());
 
         InlineKeyboardButton previous;
         InlineKeyboardButton next;
@@ -96,6 +96,6 @@ public class TelegramEpisodeService {
     }
 
     public Optional<Episode> findByVideoGroupId(VideoGroupId id) {
-        return episodeService.findByVideoGroupId(id);
+        return episodeApi.findByVideoGroupId(id);
     }
 }

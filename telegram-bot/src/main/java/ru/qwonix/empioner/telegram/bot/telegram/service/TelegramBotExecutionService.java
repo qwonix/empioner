@@ -18,8 +18,8 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import ru.qwonix.empioner.telegram.entity.Image;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.id.ImageId;
-import ru.qwonix.empioner.telegram.bot.service.ImageService;
-import ru.qwonix.empioner.telegram.bot.service.MessageService;
+import ru.qwonix.empioner.telegram.bot.api.ImageApi;
+import ru.qwonix.empioner.telegram.bot.api.MessageApi;
 
 import java.util.UUID;
 
@@ -28,9 +28,9 @@ import java.util.UUID;
 @Service
 public class TelegramBotExecutionService {
 
-    private final MessageService messageService;
+    private final MessageApi messageApi;
     private final TelegramClient bot;
-    private final ImageService imageService;
+    private final ImageApi imageApi;
 
     @Value("#{T(java.util.UUID).fromString('${bot.config.image.placeholder}')}")
     private UUID imagePlaceholder;
@@ -47,18 +47,18 @@ public class TelegramBotExecutionService {
     }
 
     public void send(TelegramBotUser user, String text, InlineKeyboardMarkup keyboard, ImageId imageId) {
-        Image image = imageService.findTelegramFileIdByImageId(imageId)
+        Image image = imageApi.findTelegramFileIdByImageId(imageId)
                 .orElseGet(() ->
-                        imageService.findTelegramFileIdByImageId(new ImageId(imagePlaceholder))
+                        imageApi.findTelegramFileIdByImageId(new ImageId(imagePlaceholder))
                                 .orElse(null)
                 );
 
-        if (messageService.hasMessageId(user)) {
+        if (messageApi.hasMessageId(user)) {
             if (image != null) {
                 EditMessageMedia editMedia = EditMessageMedia.builder()
                         .media(new InputMediaPhoto(image.telegramFileId().value()))
                         .chatId(user.id().value())
-                        .messageId(messageService.getMessageId(user))
+                        .messageId(messageApi.getMessageId(user))
                         .build();
                 try {
                     bot.execute(editMedia);
@@ -72,7 +72,7 @@ public class TelegramBotExecutionService {
                     .parseMode(ParseMode.MARKDOWNV2)
                     .replyMarkup(keyboard)
                     .chatId(user.id().value())
-                    .messageId(messageService.getMessageId(user))
+                    .messageId(messageApi.getMessageId(user))
                     .build();
 
             try {
@@ -92,7 +92,7 @@ public class TelegramBotExecutionService {
                         .build();
                 try {
                     Message execute = bot.execute(photo);
-                    messageService.setMessageId(user, execute.getMessageId());
+                    messageApi.setMessageId(user, execute.getMessageId());
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }

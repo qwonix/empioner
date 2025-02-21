@@ -17,7 +17,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import ru.qwonix.empioner.telegram.entity.Movie;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.entity.Video;
-import ru.qwonix.empioner.telegram.bot.service.MessageService;
+import ru.qwonix.empioner.telegram.bot.api.MessageApi;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.CallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.MovieCallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.service.TelegramBotExecutionService;
@@ -36,7 +36,7 @@ public class MovieCallbackDataHandler implements CallbackDataHandler {
     private final TelegramMovieService telegramMovieService;
     private final TelegramVideoService telegramVideoService;
     private final TelegramBotExecutionService telegramBotExecutionService;
-    private final MessageService messageService;
+    private final MessageApi messageApi;
     private final TelegramClient bot;
 
     @Override
@@ -78,8 +78,8 @@ public class MovieCallbackDataHandler implements CallbackDataHandler {
 
         InlineKeyboardMarkup keyboard = telegramMovieService.createKeyboard(movie, videos);
 
-        if (messageService.hasMessageId(user)) {
-            Integer messageId = messageService.getMessageId(user);
+        if (messageApi.hasMessageId(user)) {
+            Integer messageId = messageApi.getMessageId(user);
             EditMessageMedia editMedia = EditMessageMedia.builder()
                     .media(InputMediaVideo.builder()
                             .media(video.telegramFileId().value())
@@ -116,7 +116,7 @@ public class MovieCallbackDataHandler implements CallbackDataHandler {
 
             try {
                 Message execute = bot.execute(sendVideo);
-                messageService.setMessageId(user, execute.getMessageId());
+                messageApi.setMessageId(user, execute.getMessageId());
             } catch (TelegramApiException e) {
                 throw new RuntimeException(e);
             }

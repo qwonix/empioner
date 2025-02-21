@@ -17,7 +17,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import ru.qwonix.empioner.telegram.entity.Episode;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.entity.Video;
-import ru.qwonix.empioner.telegram.bot.service.MessageService;
+import ru.qwonix.empioner.telegram.bot.api.MessageApi;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.CallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.EpisodeCallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.service.TelegramBotExecutionService;
@@ -36,7 +36,7 @@ public class EpisodeCallbackDataHandler implements CallbackDataHandler {
     private final TelegramEpisodeService telegramEpisodeService;
     private final TelegramVideoService telegramVideoService;
     private final TelegramBotExecutionService telegramBotExecutionService;
-    private final MessageService messageService;
+    private final MessageApi messageApi;
     private final TelegramClient bot;
 
     @Override
@@ -81,8 +81,8 @@ public class EpisodeCallbackDataHandler implements CallbackDataHandler {
 
         InlineKeyboardMarkup keyboard = telegramEpisodeService.createKeyboard(episode, videos);
 
-        if (messageService.hasMessageId(user)) {
-            Integer messageId = messageService.getMessageId(user);
+        if (messageApi.hasMessageId(user)) {
+            Integer messageId = messageApi.getMessageId(user);
             EditMessageMedia editMedia = EditMessageMedia.builder()
                     .media(InputMediaVideo.builder()
                             .media(video.telegramFileId().value())
@@ -119,7 +119,7 @@ public class EpisodeCallbackDataHandler implements CallbackDataHandler {
 
             try {
                 Message execute = bot.execute(sendVideo);
-                messageService.setMessageId(user, execute.getMessageId());
+                messageApi.setMessageId(user, execute.getMessageId());
             } catch (TelegramApiException e) {
                 throw new RuntimeException(e);
             }

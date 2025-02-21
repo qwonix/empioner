@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import ru.qwonix.empioner.telegram.entity.Show;
 import ru.qwonix.empioner.telegram.id.ShowId;
-import ru.qwonix.empioner.telegram.bot.service.ShowService;
+import ru.qwonix.empioner.telegram.bot.api.ShowApi;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.*;
 import ru.qwonix.empioner.telegram.bot.telegram.config.TelegramProperties;
 import ru.qwonix.empioner.telegram.bot.telegram.utils.Utils;
@@ -21,11 +21,11 @@ import java.util.Optional;
 public class TelegramShowService {
     private static final int FIRST_PAGE = 0;
 
-    private final ShowService showService;
+    private final ShowApi showApi;
     private final TelegramProperties telegramProperties;
 
     public Optional<Show> findById(ShowId id) {
-        return showService.findById(id);
+        return showApi.findById(id);
     }
 
     public String createText(Show show) {
@@ -43,7 +43,7 @@ public class TelegramShowService {
     }
 
     public List<Show> findAllForPage(Integer page) {
-        return showService.findAllOrderByNumberWithLimitAndPage(telegramProperties.keyboardButtonsMax(), page);
+        return showApi.findAllOrderByNumberWithLimitAndPage(telegramProperties.keyboardButtonsMax(), page);
     }
 
     public String createText(List<Show> shows) {
