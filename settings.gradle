@@ -6,6 +6,6 @@ include ':telegram-shared'
 include ':telegram-service-api'
 include ':telegram-service-core'
 include ':telegram-service-spi'
-include ':telegram-service-spi-adapter-jdbc'
+include ':telegram-service-spi-adapter-spring-data'
 include ':telegram-service-api-adapter-spring-graphql'
 
