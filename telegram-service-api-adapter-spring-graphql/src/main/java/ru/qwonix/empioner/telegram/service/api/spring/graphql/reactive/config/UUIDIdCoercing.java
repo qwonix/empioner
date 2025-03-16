@@ -1,4 +1,4 @@
-package ru.qwonix.empioner.telegram.service.config;
+package ru.qwonix.empioner.telegram.service.api.spring.graphql.reactive.config;
 
 import graphql.GraphQLContext;
 import graphql.execution.CoercedVariables;
