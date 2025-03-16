@@ -1,4 +1,4 @@
-package ru.qwonix.empioner.telegram.service.spi.spring.jdbc;
+package ru.qwonix.empioner.telegram.service.spi.spring.data.jdbc;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;

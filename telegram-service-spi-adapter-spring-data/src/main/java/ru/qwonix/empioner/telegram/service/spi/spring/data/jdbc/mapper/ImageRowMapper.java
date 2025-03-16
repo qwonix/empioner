@@ -1,4 +1,4 @@
-package ru.qwonix.empioner.telegram.service.spi.spring.jdbc.mapper;
+package ru.qwonix.empioner.telegram.service.spi.spring.data.jdbc.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
