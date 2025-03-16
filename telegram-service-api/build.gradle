@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+group = 'ru.qwonix.empioner'
+version = '0.2.2'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly project(':telegram-shared')
+}
