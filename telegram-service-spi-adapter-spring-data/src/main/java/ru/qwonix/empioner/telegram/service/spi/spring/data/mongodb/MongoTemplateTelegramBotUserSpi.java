@@ -1,4 +1,4 @@
-package ru.qwonix.empioner.telegram.service.spi.spring.data;
+package ru.qwonix.empioner.telegram.service.spi.spring.data.mongodb;
 
 import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
