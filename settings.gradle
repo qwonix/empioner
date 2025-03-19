@@ -1,11 +1,11 @@
 rootProject.name = 'empioner'
 
 include ':telegram-bot'
-include ':telegram-service-microservice'
 include ':telegram-shared'
-include ':telegram-service-api'
-include ':telegram-service-core'
-include ':telegram-service-spi'
-include ':telegram-service-spi-adapter-spring-data'
-include ':telegram-service-api-adapter-spring-graphql'
+include 'telegram-service:telegram-service-microservice'
+include 'telegram-service:telegram-service-api'
+include 'telegram-service:telegram-service-core'
+include 'telegram-service:telegram-service-spi'
+include 'telegram-service:telegram-service-spi-adapter-spring-data'
+include 'telegram-service:telegram-service-api-adapter-spring-graphql'
 
