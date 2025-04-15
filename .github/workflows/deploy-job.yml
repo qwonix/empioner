@@ -32,7 +32,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: "{{defaultContext}}:telegram-bot"
+          context: ./telegram-bot/telegram-service-microservice
           push: true
           tags: ${{ steps.meta.outputs.tags }}
 
@@ -64,7 +64,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: "{{defaultContext}}:telegram-service"
+          context: ./telegram-service/telegram-service-microservice
           push: true
           tags: ${{ steps.meta.outputs.tags }}
 
