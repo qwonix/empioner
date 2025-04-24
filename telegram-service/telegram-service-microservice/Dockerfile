@@ -1,5 +1,5 @@
 FROM gradle:8.4-jdk21-alpine AS build
-COPY --chown=gradle:gradle . /home/gradle/src
+COPY --chown=gradle:gradle ./telegram-service/telegram-service-microservice/ /home/gradle/src
 WORKDIR /home/gradle/src/telegram-service/telegram-service-microservice
 RUN gradle bootJar
 
