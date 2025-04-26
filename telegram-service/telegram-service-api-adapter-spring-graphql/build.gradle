@@ -23,7 +23,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     compileOnly 'org.projectlombok:lombok'
 
-    implementation project(':telegram-shared')
+    implementation project(':telegram-service:telegram-service-shared')
     implementation project(':telegram-service:telegram-service-api')
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'

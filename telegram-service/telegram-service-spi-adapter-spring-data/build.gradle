@@ -24,6 +24,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.liquibase:liquibase-core'
 
-    implementation project(':telegram-shared')
+    implementation project(':telegram-service:telegram-service-shared')
     implementation project(':telegram-service:telegram-service-spi')
 }

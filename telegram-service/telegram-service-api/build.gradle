@@ -10,5 +10,5 @@ repositories {
 }
 
 dependencies {
-    implementation project(':telegram-shared')
+    implementation project('::telegram-service:telegram-service-shared')
 }
