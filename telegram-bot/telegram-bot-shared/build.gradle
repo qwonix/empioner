@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+group = 'ru.qwonix.empioner'
+version = '0.2.4'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+}
