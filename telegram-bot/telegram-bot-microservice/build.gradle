@@ -41,7 +41,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-json'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    implementation project(':telegram-shared')
+    implementation project(':telegram-bot:telegram-bot-shared')
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
