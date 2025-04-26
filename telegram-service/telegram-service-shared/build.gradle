@@ -2,12 +2,8 @@ plugins {
     id 'java'
 }
 
-group = 'ru.qwonix.empioner.telegram'
+group = 'ru.qwonix.empioner'
 version = '0.2.4'
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-}
 
 repositories {
     mavenCentral()
