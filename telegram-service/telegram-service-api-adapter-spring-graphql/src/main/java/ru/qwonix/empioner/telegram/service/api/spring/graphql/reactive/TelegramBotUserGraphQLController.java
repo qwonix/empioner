@@ -38,4 +38,9 @@ public class TelegramBotUserGraphQLController {
     public Mono<Void> updateStatus(@Argument TelegramBotUserId id, @Argument UserStatus status) {
         return Mono.fromRunnable(() -> telegramBotUserApi.setStatus(id, status));
     }
+
+    @MutationMapping
+    public Mono<Void> makeAdmin(@Argument TelegramBotUserId id) {
+        return Mono.fromRunnable(() -> telegramBotUserApi.makeAdmin(id));
+    }
 }

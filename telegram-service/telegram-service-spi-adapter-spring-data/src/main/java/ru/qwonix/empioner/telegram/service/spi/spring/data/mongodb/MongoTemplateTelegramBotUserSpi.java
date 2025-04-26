@@ -4,12 +4,10 @@ import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-import ru.qwonix.empioner.telegram.entity.Activity;
-import ru.qwonix.empioner.telegram.entity.TelegramBotUserDetails;
+import ru.qwonix.empioner.telegram.entity.*;
 import ru.qwonix.empioner.telegram.service.spi.TelegramBotUserSpi;
-import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
-import ru.qwonix.empioner.telegram.entity.UserStatus;
 import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 
 import java.time.Instant;
@@ -64,6 +62,18 @@ public class MongoTemplateTelegramBotUserSpi implements TelegramBotUserSpi {
                 .first();
         if (!first.wasAcknowledged()) {
             log.error("User with id {} not found, can't update status", id);
+        }
+    }
+
+    @Override
+    public void makeAdmin(TelegramBotUserId id) {
+        UpdateResult result = mongoTemplate.update(TelegramBotUserDetails.class)
+                .inCollection(USER_COLLECTION)
+                .matching(query(where("id").is(id.value())))
+                .apply(new Update().addToSet("role", UserRole.ADMIN))
+                .first();
+        if (!result.wasAcknowledged()) {
+            log.error("User with id {} not found, can't make admin", id);
         }
     }
 }
