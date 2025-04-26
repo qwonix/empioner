@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+import ru.qwonix.empioner.telegram.bot.api.TelegramBotUserApi;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.bot.api.BotSettingsApi;
@@ -20,6 +21,7 @@ import ru.qwonix.empioner.telegram.bot.telegram.config.ChatCommand;
 import ru.qwonix.empioner.telegram.bot.telegram.config.TelegramProperties;
 import ru.qwonix.empioner.telegram.bot.telegram.utils.ButtonOrientation;
 import ru.qwonix.empioner.telegram.bot.telegram.utils.Utils;
+import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,6 +38,7 @@ public class ChatCommandHandler {
     private final BotSettingsApi botSettingsApi;
     private final EpisodeApi episodeApi;
     private final MessageApi messageApi;
+    private final TelegramBotUserApi telegramBotUserApi;
     private final TelegramClient bot;
     private final TelegramProperties telegramProperties;
 
@@ -88,6 +91,17 @@ public class ChatCommandHandler {
         }
         try {
             episodeApi.makeNotAvailable(new EpisodeId(UUID.fromString(args[0])));
+        } catch (IllegalArgumentException e) {
+        }
+    }
+
+    @ChatCommand("/make_admin")
+    public void makeAdmin(TelegramBotUser user, String[] args) {
+        if (args.length != 1) {
+            return;
+        }
+        try {
+            telegramBotUserApi.makeAdmin(new TelegramBotUserId(Long.parseLong(args[0])));
         } catch (IllegalArgumentException e) {
         }
     }

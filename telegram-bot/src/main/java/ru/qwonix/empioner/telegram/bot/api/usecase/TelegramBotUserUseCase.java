@@ -41,4 +41,9 @@ public class TelegramBotUserUseCase implements TelegramBotUserApi {
     public void setStatus(TelegramBotUserId userId, UserStatus status) {
         telegramBotUserDao.updateStatus(userId, status);
     }
+
+    @Override
+    public void makeAdmin(TelegramBotUserId id) {
+        telegramBotUserDao.makeAdmin(id);
+    }
 }

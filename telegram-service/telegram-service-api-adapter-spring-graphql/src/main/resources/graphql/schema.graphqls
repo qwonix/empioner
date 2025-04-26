@@ -44,6 +44,8 @@ type Mutation {
     addActivity(id: TelegramBotUserId!): Boolean
     updateStatus(id: TelegramBotUserId!, status: UserStatus!): Boolean
     changeAvailable(id: EpisodeId!, isAvailable: Boolean!): Boolean
+    makeAdmin(id: TelegramBotUserId!): Boolean
+
 }
 
 type Episode {
@@ -125,9 +127,14 @@ input TelegramBotUserDetailsInput {
     username: String!
     languageCode: String
     status: UserStatus!
+    roles: [UserRole!]!
 }
 
 enum UserStatus {
     KICKED
     MEMBER
+}
+
+enum UserRole {
+    ADMIN
 }

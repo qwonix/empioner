@@ -41,6 +41,12 @@ public class GraphQlClientTelegramBotUserSpi implements TelegramBotUserSpi {
             }
             """;
 
+    private static final String MAKE_ADMIN_MUTATION = """
+            mutation MakeAdmin($id: TelegramBotUserId!) {
+                makeAdmin(id: $id)
+            }
+            """;
+
     private final GraphQlClient graphQlClient;
 
     @Override
@@ -85,6 +91,17 @@ public class GraphQlClientTelegramBotUserSpi implements TelegramBotUserSpi {
                         "status", status.name()
                 ))
                 .retrieve("updateStatus")
+                .toEntity(Boolean.class)
+                .block();
+    }
+
+    @Override
+    public void makeAdmin(TelegramBotUserId id) {
+        graphQlClient.document(MAKE_ADMIN_MUTATION)
+                .variables(Map.of(
+                        "id", id.value().toString()
+                ))
+                .retrieve("makeAdmin")
                 .toEntity(Boolean.class)
                 .block();
     }

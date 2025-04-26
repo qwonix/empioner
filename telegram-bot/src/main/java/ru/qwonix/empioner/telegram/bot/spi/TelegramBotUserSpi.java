@@ -15,4 +15,6 @@ public interface TelegramBotUserSpi {
     void addActivity(TelegramBotUserId id);
 
     void updateStatus(TelegramBotUserId id, UserStatus status);
+
+    void makeAdmin(TelegramBotUserId id);
 }
