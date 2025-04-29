@@ -16,7 +16,6 @@ public record Episode(
 
         VideoGroupId videoGroupId,
         SeasonId seasonId,
-        ImageId imageId,
         Boolean isAvailable
 ) {
 }

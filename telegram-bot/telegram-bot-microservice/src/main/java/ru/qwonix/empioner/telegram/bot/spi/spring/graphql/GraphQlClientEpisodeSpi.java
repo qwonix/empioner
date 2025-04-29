@@ -28,7 +28,6 @@ public class GraphQlClientEpisodeSpi implements EpisodeSpi {
                     nextEpisodeId
                     videoGroupId
                     seasonId
-                    imageId
                     isAvailable
                 }
             }
@@ -49,7 +48,6 @@ public class GraphQlClientEpisodeSpi implements EpisodeSpi {
                     nextEpisodeId
                     videoGroupId
                     seasonId
-                    imageId
                     isAvailable
                 }
             }
@@ -65,7 +63,6 @@ public class GraphQlClientEpisodeSpi implements EpisodeSpi {
                     nextEpisodeId
                     videoGroupId
                     seasonId
-                    imageId
                     isAvailable
                 }
             }

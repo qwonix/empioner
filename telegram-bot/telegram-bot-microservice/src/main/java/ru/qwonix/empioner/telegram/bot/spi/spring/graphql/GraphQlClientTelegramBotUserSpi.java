@@ -9,6 +9,7 @@ import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.entity.UserStatus;
 import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -67,6 +68,7 @@ public class GraphQlClientTelegramBotUserSpi implements TelegramBotUserSpi {
                         "lastName", String.valueOf(telegramUser.getLastName()),
                         "username", String.valueOf(telegramUser.getUserName()),
                         "languageCode", String.valueOf(telegramUser.getLanguageCode()),
+                        "roles", Collections.emptySet(),
                         "status", String.valueOf(UserStatus.MEMBER)
                 ))
                 .retrieve("mergeTelegramBotUser")
