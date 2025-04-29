@@ -1,0 +1,4 @@
+extend type Query {
+    getSeriesById(id: SeriesId!): SeriesInput
+    getSeriesByShowId(id: ShowId!): [SeriesInput]
+}

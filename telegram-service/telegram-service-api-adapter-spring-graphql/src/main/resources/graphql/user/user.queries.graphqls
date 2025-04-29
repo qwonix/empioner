@@ -1,0 +1,3 @@
+extend type Query {
+    getTelegramBotUserById(id: TelegramBotUserId!): TelegramBotUserInput
+}

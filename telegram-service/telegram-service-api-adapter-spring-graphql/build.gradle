@@ -1,7 +1,11 @@
+import com.kobylynskyi.graphql.codegen.model.ApiNamePrefixStrategy
+import com.kobylynskyi.graphql.codegen.model.ApiRootInterfaceStrategy
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.2'
     id 'io.spring.dependency-management' version '1.1.3'
+    id "io.github.kobylynskyi.graphql.codegen" version "5.10.0"
 }
 
 group = 'ru.qwonix.empioner'
@@ -10,6 +14,9 @@ version = '0.2.4'
 bootJar {
     enabled = false
 }
+compileJava.dependsOn 'graphqlCodegen'
+
+sourceSets.main.java.srcDir "$buildDir/generated"
 
 repositories {
     mavenCentral()
@@ -19,8 +26,35 @@ ext {
     graphqlExtendedScalarsVersion = '22.0'
 }
 
+graphqlCodegen {
+    graphqlSchemas.recursive = true
+    outputDir = new File("$buildDir/generated")
+    apiPackageName = "ru.qwonix.empioner.telegram.service.api.graphql.api"
+    modelPackageName = "ru.qwonix.empioner.telegram.service.api.graphql.model"
+    apiRootInterfaceStrategy = ApiRootInterfaceStrategy.INTERFACE_PER_SCHEMA
+    apiNamePrefixStrategy = ApiNamePrefixStrategy.FOLDER_NAME_AS_PREFIX
+    modelValidationAnnotation = ""
+    apiReturnType = "reactor.core.publisher.Mono"
+    apiReturnListType = "reactor.core.publisher.Flux"
+    customTypesMapping = ["EpisodeId"           : "ru.qwonix.empioner.telegram.id.EpisodeId",
+                          "ImageId"             : "ru.qwonix.empioner.telegram.id.ImageId",
+                          "MovieId"             : "ru.qwonix.empioner.telegram.id.MovieId",
+                          "SeasonId"            : "ru.qwonix.empioner.telegram.id.SeasonId",
+                          "SeriesId"            : "ru.qwonix.empioner.telegram.id.SeriesId",
+                          "ShowId"              : "ru.qwonix.empioner.telegram.id.ShowId",
+                          "TelegramBotUserId"   : "ru.qwonix.empioner.telegram.id.TelegramBotUserId",
+                          "TelegramFileId"      : "ru.qwonix.empioner.telegram.id.TelegramFileId",
+                          "TelegramFileUniqueId": "ru.qwonix.empioner.telegram.id.TelegramFileUniqueId",
+                          "VideoGroupId"        : "ru.qwonix.empioner.telegram.id.VideoGroupId",
+                          "VideoId"             : "ru.qwonix.empioner.telegram.id.VideoId",
+                          "UserStatus"          : "ru.qwonix.empioner.telegram.entity.UserStatus",
+                          "UserRole"            : "ru.qwonix.empioner.telegram.entity.UserRole"]
+}
+
 dependencies {
     annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     compileOnly 'org.projectlombok:lombok'
 
     implementation project(':telegram-service:telegram-service-shared')
@@ -30,4 +64,5 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-graphql'
     implementation "com.graphql-java:graphql-java-extended-scalars:${graphqlExtendedScalarsVersion}"
 
+    implementation 'org.mapstruct:mapstruct:1.6.3'
 }

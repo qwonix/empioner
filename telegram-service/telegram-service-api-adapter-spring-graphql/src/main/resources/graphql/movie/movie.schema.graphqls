@@ -1,0 +1,12 @@
+scalar MovieId
+
+type MovieInput {
+    id: MovieId!
+    title: String!
+    description: String!
+    showId: ShowId!
+    imageId: ImageId!
+    videoGroupId: VideoGroupId!
+    priority: Int!
+    isAvailable: Boolean!
+}

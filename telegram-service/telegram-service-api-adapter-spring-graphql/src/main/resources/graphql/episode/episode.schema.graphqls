@@ -1,0 +1,13 @@
+scalar EpisodeId
+
+type EpisodeInput {
+    id: EpisodeId!
+    title: String!
+    description: String!
+    number: Int!
+    previousEpisodeId: EpisodeId
+    nextEpisodeId: EpisodeId
+    videoGroupId: VideoGroupId!
+    seasonId: SeasonId!
+    isAvailable: Boolean!
+}

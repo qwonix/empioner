@@ -1,0 +1,5 @@
+extend type Query {
+    getMovieById(id: MovieId!): MovieInput
+    getMoviesByShowId(id: ShowId!): [MovieInput]
+    getMovieByVideoGroupId(id: VideoGroupId!): MovieInput
+}

@@ -1,0 +1,10 @@
+scalar ShowId
+
+type ShowInput {
+    id: ShowId!
+    title: String!
+    description: String!
+    imageId: ImageId!
+    priority: Int!
+    isAvailable: Boolean!
+}

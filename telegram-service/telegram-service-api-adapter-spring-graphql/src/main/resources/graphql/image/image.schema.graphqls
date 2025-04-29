@@ -1,0 +1,7 @@
+scalar ImageId
+
+type ImageInput {
+    id: ImageId!
+    telegramFileId: TelegramFileId!
+    telegramFileUniqueId: TelegramFileUniqueId!
+}

@@ -1,0 +1,14 @@
+scalar VideoId
+scalar VideoGroupId
+scalar TelegramFileId
+scalar TelegramFileUniqueId
+
+type VideoInput {
+    id: VideoId!
+    videoGroupId: VideoGroupId!
+    description: String!
+    telegramFileId: TelegramFileId!
+    telegramFileUniqueId: TelegramFileUniqueId!
+    priority: Int!
+    isAvailable: Boolean!
+}

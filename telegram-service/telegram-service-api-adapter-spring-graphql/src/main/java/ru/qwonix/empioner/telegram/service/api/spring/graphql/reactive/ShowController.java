@@ -6,24 +6,31 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import ru.qwonix.empioner.telegram.entity.Show;
 import ru.qwonix.empioner.telegram.id.ShowId;
 import ru.qwonix.empioner.telegram.service.api.ShowApi;
+import ru.qwonix.empioner.telegram.service.api.graphql.api.ShowQueryResolver;
+import ru.qwonix.empioner.telegram.service.api.graphql.model.ShowInput;
+import ru.qwonix.empioner.telegram.service.api.mapper.ShowMapper;
 
 @Controller
 @RequiredArgsConstructor
-public class ShowController {
+public class ShowController implements ShowQueryResolver {
 
     private final ShowApi showApi;
+    private final ShowMapper mapper;
 
     @QueryMapping
-    public Mono<Show> getShowById(@Argument ShowId id) {
+    @Override
+    public Mono<ShowInput> getShowById(@Argument ShowId id) {
         return Mono.fromCallable(() -> showApi.findById(id))
+                .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
     }
 
     @QueryMapping
-    public Flux<Show> getAllShows(@Argument int limit, @Argument int page) {
-        return Flux.defer(() -> Flux.fromIterable(showApi.findAllOrderByNumberWithLimitAndPage(limit, page)));
+    @Override
+    public Flux<ShowInput> getAllShows(@Argument Integer limit, @Argument Integer page) {
+        return Flux.defer(() -> Flux.fromIterable(showApi.findAllOrderByNumberWithLimitAndPage(limit, page)))
+                .map(mapper::toInput);
     }
 }
