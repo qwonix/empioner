@@ -1,0 +1,6 @@
+extend type Mutation {
+    mergeTelegramBotUser(userDetails: TelegramBotUserDetailsInput!): TelegramBotUserInput
+    addActivity(id: TelegramBotUserId!): Boolean
+    updateStatus(id: TelegramBotUserId!, status: UserStatus!): Boolean
+    makeAdmin(id: TelegramBotUserId!): Boolean
+}

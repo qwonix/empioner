@@ -1,0 +1,3 @@
+extend type Mutation {
+    changeAvailable(id: EpisodeId!, isAvailable: Boolean!): Boolean
+}

@@ -1,0 +1,24 @@
+scalar TelegramBotUserId
+
+enum UserStatus {
+    KICKED
+    MEMBER
+}
+
+enum UserRole {
+    ADMIN
+}
+
+type TelegramBotUserInput {
+    id: TelegramBotUserId!
+}
+
+input TelegramBotUserDetailsInput {
+    id: ID!
+    firstName: String
+    lastName: String
+    username: String!
+    languageCode: String
+    status: UserStatus!
+    roles: [UserRole!]!
+}

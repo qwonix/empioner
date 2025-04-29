@@ -1,0 +1,10 @@
+scalar SeasonId
+
+type SeasonInput {
+    id: SeasonId!
+    description: String!
+    number: Int!
+    seriesId: SeriesId!
+    imageId: ImageId!
+    isAvailable: Boolean!
+}

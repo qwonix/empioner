@@ -1,0 +1,11 @@
+scalar SeriesId
+
+type SeriesInput {
+    id: SeriesId!
+    title: String!
+    description: String!
+    showId: ShowId!
+    imageId: ImageId!
+    priority: Int!
+    isAvailable: Boolean!
+}
