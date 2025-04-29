@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 @Component
-public class MovieMapper implements RowMapper<Movie> {
+public class MovieRowMapper implements RowMapper<Movie> {
     @Override
     public Movie mapRow(ResultSet rs, int rowNum) throws SQLException {
         UUID id = rs.getObject("id", UUID.class);
