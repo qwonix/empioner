@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 @Component
-public class SeasonMapper implements RowMapper<Season> {
+public class SeasonRowMapper implements RowMapper<Season> {
     @Override
     public Season mapRow(ResultSet rs, int rowNum) throws SQLException {
         UUID id = rs.getObject("id", UUID.class);

@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 @Component
-public class VideoMapper implements RowMapper<Video> {
+public class VideoRowMapper implements RowMapper<Video> {
     @Override
     public Video mapRow(ResultSet rs, int rowNum) throws SQLException {
         UUID id = rs.getObject("id", UUID.class);
