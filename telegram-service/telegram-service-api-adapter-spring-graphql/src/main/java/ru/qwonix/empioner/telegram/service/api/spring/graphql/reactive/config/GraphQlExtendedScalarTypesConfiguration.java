@@ -76,31 +76,19 @@ public class GraphQlExtendedScalarTypesConfiguration {
                 .scalar(GraphQLScalarType.newScalar().name("TelegramFileId").coercing(new StringIdCoercing<>() {
                     @Override
                     public TelegramFileId parseValue(String id) throws CoercingParseValueException {
-                        try {
                             return new TelegramFileId(id);
-                        } catch (IllegalArgumentException e) {
-                            throw new CoercingParseValueException(e.getLocalizedMessage(), e);
-                        }
                     }
                 }).build())
                 .scalar(GraphQLScalarType.newScalar().name("TelegramFileUniqueId").coercing(new StringIdCoercing<>() {
                     @Override
                     public TelegramFileUniqueId parseValue(String id) throws CoercingParseValueException {
-                        try {
                             return new TelegramFileUniqueId(id);
-                        } catch (IllegalArgumentException e) {
-                            throw new CoercingParseValueException(e.getLocalizedMessage(), e);
-                        }
                     }
                 }).build())
                 .scalar(GraphQLScalarType.newScalar().name("TelegramFileUniqueId").coercing(new StringIdCoercing<>() {
                     @Override
                     public TelegramFileUniqueId parseValue(String id) throws CoercingParseValueException {
-                        try {
                             return new TelegramFileUniqueId(id);
-                        } catch (IllegalArgumentException e) {
-                            throw new CoercingParseValueException(e.getLocalizedMessage(), e);
-                        }
                     }
                 }).build())
                 .build();
