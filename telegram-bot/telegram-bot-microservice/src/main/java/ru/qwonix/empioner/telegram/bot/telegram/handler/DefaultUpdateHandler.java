@@ -4,11 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.Video;
 import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMemberUpdated;
+import ru.qwonix.empioner.telegram.bot.api.TelegramBotUserApi;
+import ru.qwonix.empioner.telegram.bot.api.VideoApi;
+import ru.qwonix.empioner.telegram.bot.spi.spring.graphql.model.AddVideoInput;
+import ru.qwonix.empioner.telegram.bot.telegram.config.ChatCommandAnnotationBeanPostProcessor;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.entity.UserStatus;
-import ru.qwonix.empioner.telegram.bot.api.TelegramBotUserApi;
-import ru.qwonix.empioner.telegram.bot.telegram.config.ChatCommandAnnotationBeanPostProcessor;
+import ru.qwonix.empioner.telegram.id.TelegramFileId;
+import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
 
 import java.util.Arrays;
 
@@ -20,6 +25,7 @@ public class DefaultUpdateHandler implements UpdateHandler {
     private final ChatCommandAnnotationBeanPostProcessor chatCommandAnnotationBeanPostProcessor;
     private final TelegramBotUserApi telegramBotUserApi;
     private final CallbackHandler callbackHandler;
+    private final VideoApi videoApi;
 
     @Override
     public void onCallback(Update update, TelegramBotUser user) {
@@ -55,6 +61,17 @@ public class DefaultUpdateHandler implements UpdateHandler {
 
     @Override
     public void onVideo(Update update, TelegramBotUser user) {
+        Video video = update.getMessage().getVideo();
 
+        videoApi.createVideo(new AddVideoInput(
+                new TelegramFileId(video.getFileId()),
+                new TelegramFileUniqueId(video.getFileUniqueId()),
+                video.getWidth(),
+                video.getHeight(),
+                video.getDuration(),
+                video.getMimeType(),
+                Math.toIntExact(video.getFileSize()),
+                video.getFileName()
+        ));
     }
 }

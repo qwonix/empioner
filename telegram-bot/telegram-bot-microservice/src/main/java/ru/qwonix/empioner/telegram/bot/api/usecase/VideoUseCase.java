@@ -2,11 +2,12 @@ package ru.qwonix.empioner.telegram.bot.api.usecase;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.qwonix.empioner.telegram.bot.api.VideoApi;
 import ru.qwonix.empioner.telegram.bot.spi.VideoSpi;
+import ru.qwonix.empioner.telegram.bot.spi.spring.graphql.model.AddVideoInput;
 import ru.qwonix.empioner.telegram.entity.Video;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.id.VideoId;
-import ru.qwonix.empioner.telegram.bot.api.VideoApi;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,5 +31,10 @@ public class VideoUseCase implements VideoApi {
     @Override
     public List<Video> findAllByVideoGroupId(VideoGroupId videoGroupId) {
         return videoDao.findAllByVideoGroupId(videoGroupId);
+    }
+
+    @Override
+    public VideoId createVideo(AddVideoInput addVideoInput) {
+        return videoDao.createVideo(addVideoInput);
     }
 }
