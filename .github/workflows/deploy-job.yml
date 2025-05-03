@@ -32,7 +32,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          file: ./telegram-bot/Dockerfile
+          file: ./telegram-bot/telegram-bot-microservice/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
 
