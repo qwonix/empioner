@@ -12,3 +12,14 @@ type VideoInput {
     priority: Int!
     isAvailable: Boolean!
 }
+
+input AddVideoInput {
+    telegramFileId: TelegramFileId!
+    telegramFileUniqueId: TelegramFileUniqueId!
+    width: Int
+    height: Int
+    duration: Int
+    mimeType: String
+    fileSize: Int
+    fileName: String
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <changeSet id="2025-04-30--02-add-uuid-defaults" author="qwonix">
+        <comment>Add default gen_random_uuid() to uuid PK columns</comment>
+
+        <sql>CREATE
+        EXTENSION IF NOT EXISTS pgcrypto;</sql>
+
+        <addDefaultValue tableName="image" columnName="id" defaultValueComputed="gen_random_uuid()"/>
+
+        <addDefaultValue tableName="video_group" columnName="id" defaultValueComputed="gen_random_uuid()"/>
+
+        <addDefaultValue tableName="video" columnName="id" defaultValueComputed="gen_random_uuid()"/>
+
+        <addDefaultValue tableName="show" columnName="id" defaultValueComputed="gen_random_uuid()"/>
+
+        <addDefaultValue tableName="series" columnName="id" defaultValueComputed="gen_random_uuid()"/>
+
+        <addDefaultValue tableName="movie" columnName="id" defaultValueComputed="gen_random_uuid()"/>
+
+        <addDefaultValue tableName="season" columnName="id" defaultValueComputed="gen_random_uuid()"/>
+
+        <addDefaultValue tableName="episode" columnName="id" defaultValueComputed="gen_random_uuid()"/>
+    </changeSet>
+</databaseChangeLog>
