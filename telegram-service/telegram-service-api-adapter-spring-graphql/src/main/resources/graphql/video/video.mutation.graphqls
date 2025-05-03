@@ -1,0 +1,3 @@
+extend type Mutation {
+    create(video: AddVideoInput!, needCreateNewVideoGroup: Boolean!): VideoId!
+}
