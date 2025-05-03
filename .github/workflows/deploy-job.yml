@@ -12,7 +12,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/empioner-telegram-bot
+            ${{ secrets.DOCKERHUB_USERNAME }}/empioner-telegram-bot/
           tags: |
             type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
@@ -32,7 +32,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          file: ./telegram-bot/Dockerfile
+          file: ./telegram-bot/telegram-bot-microservice/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
 
