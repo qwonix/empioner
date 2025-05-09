@@ -1,60 +1,53 @@
 package ru.qwonix.empioner.telegram.service.api.spring.graphql.reactive;
 
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.InputArgument;
 import lombok.RequiredArgsConstructor;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.id.SeasonId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.service.api.EpisodeApi;
-import ru.qwonix.empioner.telegram.service.api.graphql.api.EpisodeMutationResolver;
-import ru.qwonix.empioner.telegram.service.api.graphql.api.EpisodeQueryResolver;
 import ru.qwonix.empioner.telegram.service.api.graphql.model.EpisodeInput;
 import ru.qwonix.empioner.telegram.service.api.mapper.EpisodeMapper;
 
-@Controller
+@DgsComponent
 @RequiredArgsConstructor
-public class EpisodeGraphQLController implements EpisodeQueryResolver, EpisodeMutationResolver {
+public class EpisodeGraphQLController {
 
     private final EpisodeApi episodeApi;
     private final EpisodeMapper mapper;
 
-    @QueryMapping
-    @Override
-    public Mono<EpisodeInput> getEpisodeById(@Argument EpisodeId id) {
+    @DgsQuery
+    public Mono<EpisodeInput> getEpisodeById(@InputArgument EpisodeId id) {
         return Mono.fromCallable(() -> episodeApi.findById(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
     }
 
-    @QueryMapping
-    @Override
-    public Flux<EpisodeInput> getEpisodesBySeasonId(@Argument SeasonId id, @Argument Integer limit, @Argument Integer page) {
+    @DgsQuery
+    public Flux<EpisodeInput> getEpisodesBySeasonId(@InputArgument SeasonId id, @InputArgument Integer limit, @InputArgument Integer page) {
         return Flux.defer(() -> Flux.fromIterable(episodeApi.findAllBySeasonIdOrderByNumberWithLimitAndPage(id, limit, page)))
                 .map(mapper::toInput);
     }
 
-    @QueryMapping
-    @Override
-    public Mono<Integer> countEpisodesBySeasonId(@Argument SeasonId id) {
+    @DgsQuery
+    public Mono<Integer> countEpisodesBySeasonId(@InputArgument SeasonId id) {
         return Mono.fromCallable(() -> episodeApi.countAllBySeasonId(id));
     }
 
-    @QueryMapping
-    @Override
-    public Mono<EpisodeInput> getEpisodeByVideoGroupId(@Argument VideoGroupId id) {
+    @DgsQuery
+    public Mono<EpisodeInput> getEpisodeByVideoGroupId(@InputArgument VideoGroupId id) {
         return Mono.fromCallable(() -> episodeApi.findByVideoGroupId(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
     }
 
-    @MutationMapping
-    @Override
-    public Mono<Boolean> changeAvailable(@Argument EpisodeId id, @Argument boolean isAvailable) {
+    @DgsMutation
+    public Mono<Boolean> changeAvailable(@InputArgument EpisodeId id, @InputArgument Boolean isAvailable) {
         return Mono.fromCallable(() -> episodeApi.changeAvailable(id, isAvailable));
     }
 }
