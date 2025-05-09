@@ -11,7 +11,7 @@ import ru.qwonix.empioner.telegram.id.Id;
 import java.util.Locale;
 import java.util.UUID;
 
-abstract class UUIDIdCoercing<T> implements Coercing<T, String> {
+public abstract class UUIDIdCoercing<T> implements Coercing<T, String> {
     @Override
     public String serialize(Object dataFetcherResult, GraphQLContext graphQLContext, Locale locale) {
         if (dataFetcherResult == null) return null;

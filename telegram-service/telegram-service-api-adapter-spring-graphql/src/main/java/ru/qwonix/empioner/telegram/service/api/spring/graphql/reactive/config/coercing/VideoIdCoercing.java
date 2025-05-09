@@ -1,0 +1,15 @@
+package ru.qwonix.empioner.telegram.service.api.spring.graphql.reactive.config.coercing;
+
+import com.netflix.graphql.dgs.DgsScalar;
+import ru.qwonix.empioner.telegram.id.VideoId;
+import ru.qwonix.empioner.telegram.service.api.spring.graphql.reactive.config.UUIDIdCoercing;
+
+import java.util.UUID;
+
+@DgsScalar(name = "VideoId")
+public class VideoIdCoercing extends UUIDIdCoercing<VideoId> {
+    @Override
+    public VideoId parseValue(UUID input) {
+        return new VideoId(input);
+    }
+}
