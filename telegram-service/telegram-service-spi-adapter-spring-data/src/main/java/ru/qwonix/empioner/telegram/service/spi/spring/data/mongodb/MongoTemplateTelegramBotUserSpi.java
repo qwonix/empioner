@@ -34,7 +34,6 @@ public class MongoTemplateTelegramBotUserSpi implements TelegramBotUserSpi {
                 .matching(query(where("id").is(id.value())))
                 .one()
                 .map(TelegramBotUserDetails::id)
-                .map(TelegramBotUserId::new)
                 .map(TelegramBotUser::new);
     }
 
@@ -43,7 +42,7 @@ public class MongoTemplateTelegramBotUserSpi implements TelegramBotUserSpi {
         mongoTemplate.insert(TelegramBotUserDetails.class)
                 .inCollection(USER_COLLECTION)
                 .one(user);
-        return new TelegramBotUser(new TelegramBotUserId(user.id()));
+        return new TelegramBotUser(user.id());
     }
 
     @Override
