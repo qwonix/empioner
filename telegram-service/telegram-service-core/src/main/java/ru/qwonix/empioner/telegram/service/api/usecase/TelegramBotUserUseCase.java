@@ -28,7 +28,7 @@ public class TelegramBotUserUseCase implements TelegramBotUserApi {
 
     @Override
     public TelegramBotUser merge(TelegramBotUserDetails userDetails) {
-        return this.findUser(new TelegramBotUserId(userDetails.id()))
+        return this.findUser(userDetails.id())
                 .orElseGet(() -> this.registerNewUser(userDetails));
     }
 
