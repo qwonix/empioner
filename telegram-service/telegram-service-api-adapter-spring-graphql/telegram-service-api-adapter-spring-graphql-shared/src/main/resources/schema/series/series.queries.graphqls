@@ -1,4 +1,4 @@
 extend type Query {
-    getSeriesById(id: SeriesId!): SeriesInput
-    getSeriesByShowId(id: ShowId!): [SeriesInput]
+    seriesById(id: SeriesId!): SeriesInput
+    seriesByShowId(id: ShowId!): [SeriesInput]
 }

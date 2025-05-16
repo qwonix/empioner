@@ -28,11 +28,11 @@ public class DgsClientSeasonSpi implements SeasonSpi {
 
     @Override
     public Optional<Season> findById(SeasonId seasonId) {
-        return Optional.ofNullable(dgsClient.request(GetSeasonByIdGraphQLQuery.newRequest()
+        return Optional.ofNullable(dgsClient.request(SeasonByIdGraphQLQuery.newRequest()
                         .id(seasonId)
                         .build())
                 .coercing(SeasonId.class, seasonIdCoercing)
-                .projection(new GetSeasonByIdProjectionRoot<>()
+                .projection(new SeasonByIdProjectionRoot<>()
                         .id()
                         .number()
                         .description()
@@ -57,13 +57,13 @@ public class DgsClientSeasonSpi implements SeasonSpi {
 
     @Override
     public List<Season> findAllBySeriesIdOrderByNumberWithLimitAndPage(SeriesId seriesId, int limit, int page) {
-        return dgsClient.request(GetSeasonsBySeriesIdGraphQLQuery.newRequest()
+        return dgsClient.request(SeasonsBySeriesIdGraphQLQuery.newRequest()
                         .id(seriesId)
                         .page(page)
                         .limit(limit)
                         .build())
                 .coercing(SeriesId.class, seriesIdCoercing)
-                .projection(new GetSeasonsBySeriesIdProjectionRoot<>()
+                .projection(new SeasonsBySeriesIdProjectionRoot<>()
                         .id()
                         .number()
                         .description()

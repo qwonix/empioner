@@ -30,11 +30,11 @@ public class DgsClientMovieSpi implements MovieSpi {
 
     @Override
     public Optional<Movie> findById(MovieId id) {
-        return Optional.ofNullable(dgsClient.request(GetMovieByIdGraphQLQuery.newRequest()
+        return Optional.ofNullable(dgsClient.request(MovieByIdGraphQLQuery.newRequest()
                         .id(id)
                         .build())
                 .coercing(MovieId.class, movieIdCoercing)
-                .projection(new GetMovieByIdProjectionRoot<>()
+                .projection(new MovieByIdProjectionRoot<>()
                         .id()
                         .title()
                         .description()
@@ -49,12 +49,12 @@ public class DgsClientMovieSpi implements MovieSpi {
 
     @Override
     public List<Movie> findAllByShowId(ShowId id) {
-        return dgsClient.request(GetMoviesByShowIdGraphQLQuery.newRequest()
+        return dgsClient.request(MoviesByShowIdGraphQLQuery.newRequest()
                         .id(id)
                         .build())
                 .coercing(MovieId.class, movieIdCoercing)
                 .coercing(ShowId.class, showIdCoercing)
-                .projection(new GetMoviesByShowIdProjectionRoot<>()
+                .projection(new MoviesByShowIdProjectionRoot<>()
                         .id()
                         .title()
                         .description()
@@ -69,12 +69,12 @@ public class DgsClientMovieSpi implements MovieSpi {
 
     @Override
     public Optional<Movie> findByVideoId(VideoGroupId id) {
-        return Optional.ofNullable(dgsClient.request(GetMovieByVideoGroupIdGraphQLQuery.newRequest()
+        return Optional.ofNullable(dgsClient.request(MovieByVideoGroupIdGraphQLQuery.newRequest()
                         .id(id)
                         .build())
                 .coercing(MovieId.class, movieIdCoercing)
                 .coercing(VideoGroupId.class, videoGroupIdCoercing)
-                .projection(new GetMovieByVideoGroupIdProjectionRoot<>()
+                .projection(new MovieByVideoGroupIdProjectionRoot<>()
                         .id()
                         .title()
                         .description()

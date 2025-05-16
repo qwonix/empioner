@@ -8,9 +8,10 @@ import ru.qwonix.empioner.telegram.bot.config.coercing.ShowIdCoercing;
 import ru.qwonix.empioner.telegram.bot.spi.ShowSpi;
 import ru.qwonix.empioner.telegram.entity.Show;
 import ru.qwonix.empioner.telegram.id.ShowId;
-import ru.qwonix.empioner.telegram.service.api.graphql.api.GetAllShowsGraphQLQuery;
-import ru.qwonix.empioner.telegram.service.api.graphql.api.GetShowByIdGraphQLQuery;
-import ru.qwonix.empioner.telegram.service.api.graphql.api.GetShowByIdProjectionRoot;
+import ru.qwonix.empioner.telegram.service.api.graphql.api.ShowByIdGraphQLQuery;
+import ru.qwonix.empioner.telegram.service.api.graphql.api.ShowByIdProjectionRoot;
+import ru.qwonix.empioner.telegram.service.api.graphql.api.ShowsGraphQLQuery;
+import ru.qwonix.empioner.telegram.service.api.graphql.api.ShowsProjectionRoot;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +27,11 @@ public class DgsClientShowSpi implements ShowSpi {
 
     @Override
     public Optional<Show> findById(ShowId showId) {
-        return Optional.ofNullable(dgsClient.request(GetShowByIdGraphQLQuery.newRequest()
+        return Optional.ofNullable(dgsClient.request(ShowByIdGraphQLQuery.newRequest()
                         .id(showId)
                         .build())
                 .coercing(ShowId.class, showIdCoercing)
-                .projection(new GetShowByIdProjectionRoot<>()
+                .projection(new ShowByIdProjectionRoot<>()
                         .id()
                         .title()
                         .description()
@@ -43,12 +44,12 @@ public class DgsClientShowSpi implements ShowSpi {
 
     @Override
     public List<Show> findAllOrderByNumberWithLimitAndPage(int limit, int page) {
-        return dgsClient.request(GetAllShowsGraphQLQuery.newRequest()
+        return dgsClient.request(ShowsGraphQLQuery.newRequest()
                         .limit(limit)
                         .page(page)
                         .build())
                 .coercing(ShowId.class, showIdCoercing)
-                .projection(new GetShowByIdProjectionRoot<>()
+                .projection(new ShowsProjectionRoot<>()
                         .id()
                         .title()
                         .description()

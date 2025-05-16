@@ -8,8 +8,8 @@ import ru.qwonix.empioner.telegram.bot.config.coercing.ImageIdCoercing;
 import ru.qwonix.empioner.telegram.bot.spi.ImageSpi;
 import ru.qwonix.empioner.telegram.entity.Image;
 import ru.qwonix.empioner.telegram.id.ImageId;
-import ru.qwonix.empioner.telegram.service.api.graphql.api.GetImageTelegramFileIdGraphQLQuery;
-import ru.qwonix.empioner.telegram.service.api.graphql.api.GetImageTelegramFileIdProjectionRoot;
+import ru.qwonix.empioner.telegram.service.api.graphql.api.ImageByIdGraphQLQuery;
+import ru.qwonix.empioner.telegram.service.api.graphql.api.ImageByIdProjectionRoot;
 
 import java.util.Optional;
 
@@ -24,11 +24,11 @@ public class DgsClientImageSpi implements ImageSpi {
 
     @Override
     public Optional<Image> findTelegramFileIdByImageId(ImageId id) {
-        return Optional.ofNullable(dgsClient.request(GetImageTelegramFileIdGraphQLQuery.newRequest()
+        return Optional.ofNullable(dgsClient.request(ImageByIdGraphQLQuery.newRequest()
                         .id(id)
                         .build())
                 .coercing(ImageId.class, imageIdCoercing)
-                .projection(new GetImageTelegramFileIdProjectionRoot<>()
+                .projection(new ImageByIdProjectionRoot<>()
                         .id()
                         .telegramFileId()
                         .telegramFileUniqueId())
