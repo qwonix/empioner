@@ -9,7 +9,6 @@ import ru.qwonix.empioner.telegram.bot.config.coercing.EpisodeIdCoercing;
 import ru.qwonix.empioner.telegram.bot.config.coercing.SeasonIdCoercing;
 import ru.qwonix.empioner.telegram.bot.config.coercing.VideoGroupIdCoercing;
 import ru.qwonix.empioner.telegram.bot.spi.EpisodeSpi;
-import ru.qwonix.empioner.telegram.bot.spi.spring.graphql.GraphQlClientEpisodeSpi;
 import ru.qwonix.empioner.telegram.entity.Episode;
 import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.id.SeasonId;
@@ -32,11 +31,11 @@ public class DgsClientEpisodeSpi implements EpisodeSpi {
 
     @Override
     public Optional<Episode> findById(EpisodeId id) {
-        Episode episode = dgsClient.request(GetEpisodeByIdGraphQLQuery.newRequest()
+        Episode episode = dgsClient.request(EpisodeByIdGraphQLQuery.newRequest()
                         .id(id)
                         .build())
                 .coercing(EpisodeId.class, episodeIdCoercing)
-                .projection(new GetEpisodeByIdProjectionRoot<>()
+                .projection(new EpisodeByIdProjectionRoot<>()
                         .id()
                         .title()
                         .description()
@@ -57,7 +56,8 @@ public class DgsClientEpisodeSpi implements EpisodeSpi {
                         .id(seasonId)
                         .build())
                 .coercing(SeasonId.class, seasonIdCoercing)
-                .projection(new BaseProjectionNode() {})
+                .projection(new BaseProjectionNode() {
+                })
                 .retrieveSync()
                 .toEntity(Integer.class);
     }
@@ -69,13 +69,13 @@ public class DgsClientEpisodeSpi implements EpisodeSpi {
 
     @Override
     public List<Episode> findAllBySeasonIdOrderByNumberWithLimitAndPage(SeasonId seasonId, int keyboardButtonsLimit, int page) {
-        return dgsClient.request(GetEpisodesBySeasonIdGraphQLQuery.newRequest()
+        return dgsClient.request(EpisodesBySeasonIdGraphQLQuery.newRequest()
                         .id(seasonId)
                         .limit(keyboardButtonsLimit)
                         .page(page)
                         .build())
                 .coercing(SeasonId.class, seasonIdCoercing)
-                .projection(new GetEpisodesBySeasonIdProjectionRoot<>()
+                .projection(new EpisodesBySeasonIdProjectionRoot<>()
                         .id()
                         .title()
                         .description()
@@ -91,11 +91,11 @@ public class DgsClientEpisodeSpi implements EpisodeSpi {
 
     @Override
     public Optional<Episode> findByVideoGroupId(VideoGroupId id) {
-        Episode episode = dgsClient.request(GetEpisodeByVideoGroupIdGraphQLQuery.newRequest()
+        Episode episode = dgsClient.request(EpisodeByVideoGroupIdGraphQLQuery.newRequest()
                         .id(id)
                         .build())
                 .coercing(VideoGroupId.class, videoGroupIdCoercing)
-                .projection(new GetEpisodeByVideoGroupIdProjectionRoot<>()
+                .projection(new EpisodeByVideoGroupIdProjectionRoot<>()
                         .id()
                         .title()
                         .description()
@@ -117,7 +117,8 @@ public class DgsClientEpisodeSpi implements EpisodeSpi {
                         .isAvailable(isAvailable)
                         .build())
                 .coercing(EpisodeId.class, episodeIdCoercing)
-                .projection(new BaseProjectionNode() {})
+                .projection(new BaseProjectionNode() {
+                })
                 .retrieveSync()
                 .toEntity(Boolean.class);
     }

@@ -1,6 +1,6 @@
 extend type Query {
-    getEpisodeById(id: EpisodeId!): EpisodeInput
-    getEpisodesBySeasonId(id: SeasonId!, limit: Int, page: Int): [EpisodeInput]
+    episodeById(id: EpisodeId!): EpisodeInput
+    episodesBySeasonId(id: SeasonId!, limit: Int, page: Int): [EpisodeInput]
     countEpisodesBySeasonId(id: SeasonId!): Int
-    getEpisodeByVideoGroupId(id: VideoGroupId!): EpisodeInput
+    episodeByVideoGroupId(id: VideoGroupId!): EpisodeInput
 }

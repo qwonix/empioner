@@ -1,4 +1,4 @@
 extend type Query {
-    getShowById(id: ShowId!): ShowInput
-    getAllShows(limit: Int, page: Int): [ShowInput]
+    showById(id: ShowId!): ShowInput
+    shows(limit: Int, page: Int): [ShowInput]
 }

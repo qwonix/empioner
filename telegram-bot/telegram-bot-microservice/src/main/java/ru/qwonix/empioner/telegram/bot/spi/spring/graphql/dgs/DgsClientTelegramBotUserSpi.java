@@ -13,7 +13,6 @@ import ru.qwonix.empioner.telegram.entity.UserStatus;
 import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 import ru.qwonix.empioner.telegram.service.api.graphql.api.*;
 import ru.qwonix.empioner.telegram.service.api.graphql.model.TelegramBotUserDetailsInput;
-import ru.qwonix.empioner.telegram.service.api.graphql.model.TelegramBotUserInput;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -29,11 +28,11 @@ public class DgsClientTelegramBotUserSpi implements TelegramBotUserSpi {
 
     @Override
     public Optional<TelegramBotUser> findUser(TelegramBotUserId id) {
-        return Optional.ofNullable(dgsClient.request(GetTelegramBotUserByIdGraphQLQuery.newRequest()
+        return Optional.ofNullable(dgsClient.request(TelegramBotUserByIdGraphQLQuery.newRequest()
                         .id(id)
                         .build())
                 .coercing(TelegramBotUserId.class, telegramBotUserIdCoercing)
-                .projection(new GetTelegramBotUserByIdProjectionRoot<>()
+                .projection(new TelegramBotUserByIdProjectionRoot<>()
                         .id())
                 .retrieveSync()
                 .toEntity(TelegramBotUser.class));
@@ -65,7 +64,8 @@ public class DgsClientTelegramBotUserSpi implements TelegramBotUserSpi {
                         .id(id)
                         .build())
                 .coercing(TelegramBotUserId.class, telegramBotUserIdCoercing)
-                .projection(new BaseProjectionNode() {})
+                .projection(new BaseProjectionNode() {
+                })
                 .retrieveSync();
     }
 
@@ -76,7 +76,8 @@ public class DgsClientTelegramBotUserSpi implements TelegramBotUserSpi {
                         .status(ru.qwonix.empioner.telegram.service.api.graphql.model.UserStatus.MEMBER)
                         .build())
                 .coercing(TelegramBotUserId.class, telegramBotUserIdCoercing)
-                .projection(new BaseProjectionNode() {})
+                .projection(new BaseProjectionNode() {
+                })
                 .retrieveSync();
     }
 
@@ -86,7 +87,8 @@ public class DgsClientTelegramBotUserSpi implements TelegramBotUserSpi {
                         .id(id)
                         .build())
                 .coercing(TelegramBotUserId.class, telegramBotUserIdCoercing)
-                .projection(new BaseProjectionNode() {})
+                .projection(new BaseProjectionNode() {
+                })
                 .retrieveSync();
     }
 }

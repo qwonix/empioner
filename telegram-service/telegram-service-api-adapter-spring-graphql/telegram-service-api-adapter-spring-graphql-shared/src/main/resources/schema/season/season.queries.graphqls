@@ -1,5 +1,5 @@
 extend type Query {
-    getSeasonById(id: SeasonId!): SeasonInput
-    getSeasonsBySeriesId(id: SeriesId!, limit: Int, page: Int): [SeasonInput]
+    seasonById(id: SeasonId!): SeasonInput
+    seasonsBySeriesId(id: SeriesId!, limit: Int, page: Int): [SeasonInput]
     countSeasonsBySeriesId(id: SeriesId!): Int
 }

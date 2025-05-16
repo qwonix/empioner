@@ -38,11 +38,11 @@ public class DgsClientVideoSpi implements VideoSpi {
 
     @Override
     public Optional<Video> findMaxPriorityInGroup(VideoGroupId videoGroupId) {
-        return Optional.ofNullable(dgsClient.request(GetMaxPriorityVideoGraphQLQuery.newRequest()
+        return Optional.ofNullable(dgsClient.request(MaxPriorityVideoGraphQLQuery.newRequest()
                         .id(videoGroupId)
                         .build())
                 .coercing(VideoGroupId.class, videoGroupIdCoercing)
-                .projection(new GetMaxPriorityVideoProjectionRoot<>()
+                .projection(new MaxPriorityVideoProjectionRoot<>()
                         .id()
                         .videoGroupId()
                         .description()
@@ -56,10 +56,10 @@ public class DgsClientVideoSpi implements VideoSpi {
 
     @Override
     public Optional<Video> findById(VideoId videoId) {
-        return Optional.ofNullable(dgsClient.request(GetVideoByIdGraphQLQuery.newRequest()
+        return Optional.ofNullable(dgsClient.request(VideoByIdGraphQLQuery.newRequest()
                         .id(videoId).build())
                 .coercing(VideoId.class, videoIdCoercing)
-                .projection(new GetVideoByIdProjectionRoot<>()
+                .projection(new VideoByIdProjectionRoot<>()
                         .id()
                         .description()
                         .videoGroupId()
@@ -74,11 +74,11 @@ public class DgsClientVideoSpi implements VideoSpi {
 
     @Override
     public List<Video> findAllByVideoGroupId(VideoGroupId videoGroupId) {
-        return dgsClient.request(GetVideosByGroupGraphQLQuery.newRequest()
+        return dgsClient.request(VideosByGroupGraphQLQuery.newRequest()
                         .id(videoGroupId).build())
                 .coercing(VideoId.class, videoIdCoercing)
                 .coercing(VideoGroupId.class, videoGroupIdCoercing)
-                .projection(new GetVideoByIdProjectionRoot<>()
+                .projection(new VideoByIdProjectionRoot<>()
                         .id()
                         .description()
                         .videoGroupId()
@@ -97,7 +97,8 @@ public class DgsClientVideoSpi implements VideoSpi {
                         .build())
                 .coercing(TelegramFileId.class, telegramFileIdCoercing)
                 .coercing(TelegramFileUniqueId.class, telegramFileUniqueIdCoercing)
-                .projection(new BaseProjectionNode() {})
+                .projection(new BaseProjectionNode() {
+                })
                 .retrieveSync()
                 .toEntity(VideoId.class);
     }
