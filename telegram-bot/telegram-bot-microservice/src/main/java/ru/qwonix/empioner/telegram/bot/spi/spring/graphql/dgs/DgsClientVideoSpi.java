@@ -74,7 +74,7 @@ public class DgsClientVideoSpi implements VideoSpi {
 
     @Override
     public List<Video> findAllByVideoGroupId(VideoGroupId videoGroupId) {
-        return dgsClient.request(VideosByGroupGraphQLQuery.newRequest()
+        return dgsClient.request(VideosByVideoGroupIdGraphQLQuery.newRequest()
                         .id(videoGroupId).build())
                 .coercing(VideoId.class, videoIdCoercing)
                 .coercing(VideoGroupId.class, videoGroupIdCoercing)

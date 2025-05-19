@@ -20,14 +20,14 @@ public class SeriesController {
     private final SeriesMapper mapper;
 
     @DgsQuery
-    public Mono<SeriesInput> getSeriesById(@InputArgument SeriesId id) {
+    public Mono<SeriesInput> seriesById(@InputArgument SeriesId id) {
         return Mono.fromCallable(() -> seriesApi.findById(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
     }
 
     @DgsQuery
-    public Flux<SeriesInput> getSeriesByShowId(@InputArgument ShowId id) {
+    public Flux<SeriesInput> seriesByShowId(@InputArgument ShowId id) {
         return Flux.defer(() -> Flux.fromIterable(seriesApi.findAllByShowId(id)))
                 .map(mapper::toInput);
     }

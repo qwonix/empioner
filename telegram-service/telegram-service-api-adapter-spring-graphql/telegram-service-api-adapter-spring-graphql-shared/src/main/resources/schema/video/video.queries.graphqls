@@ -1,5 +1,5 @@
 extend type Query {
     videoById(id: VideoId!): VideoInput
-    videosByGroup(id: VideoGroupId!): [VideoInput]
+    videosByVideoGroupId(id: VideoGroupId!): [VideoInput]
     maxPriorityVideo(id: VideoGroupId!): VideoInput
 }

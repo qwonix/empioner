@@ -18,7 +18,7 @@ public class ImageController {
     private final ImageMapper mapper;
 
     @DgsQuery
-    public Mono<ImageInput> getImageTelegramFileId(@InputArgument ImageId id) {
+    public Mono<ImageInput> imageById(@InputArgument ImageId id) {
         return Mono.fromCallable(() -> imageApi.findTelegramFileIdByImageId(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));

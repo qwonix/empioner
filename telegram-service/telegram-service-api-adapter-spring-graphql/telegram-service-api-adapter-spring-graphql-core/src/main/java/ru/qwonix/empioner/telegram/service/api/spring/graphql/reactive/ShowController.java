@@ -19,14 +19,14 @@ public class ShowController {
     private final ShowMapper mapper;
 
     @DgsQuery
-    public Mono<ShowInput> getShowById(@InputArgument ShowId id) {
+    public Mono<ShowInput> showById(@InputArgument ShowId id) {
         return Mono.fromCallable(() -> showApi.findById(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
     }
 
     @DgsQuery
-    public Flux<ShowInput> getAllShows(@InputArgument Integer limit, @InputArgument Integer page) {
+    public Flux<ShowInput> shows(@InputArgument Integer limit, @InputArgument Integer page) {
         return Flux.defer(() -> Flux.fromIterable(showApi.findAllOrderByNumberWithLimitAndPage(limit, page)))
                 .map(mapper::toInput);
     }

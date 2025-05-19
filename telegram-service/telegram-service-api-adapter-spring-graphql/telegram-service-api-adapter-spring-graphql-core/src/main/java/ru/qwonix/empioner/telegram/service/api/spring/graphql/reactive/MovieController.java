@@ -21,20 +21,20 @@ public class MovieController {
     private final MovieMapper mapper;
 
     @DgsQuery
-    public Mono<MovieInput> getMovieById(@InputArgument MovieId id) {
+    public Mono<MovieInput> movieById(@InputArgument MovieId id) {
         return Mono.fromCallable(() -> movieApi.findById(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
     }
 
     @DgsQuery
-    public Flux<MovieInput> getMoviesByShowId(@InputArgument ShowId id) {
+    public Flux<MovieInput> moviesByShowId(@InputArgument ShowId id) {
         return Flux.defer(() -> Flux.fromIterable(movieApi.findAllByShowId(id)))
                 .map(mapper::toInput);
     }
 
     @DgsQuery
-    public Mono<MovieInput> getMovieByVideoGroupId(@InputArgument VideoGroupId id) {
+    public Mono<MovieInput> movieByVideoGroupId(@InputArgument VideoGroupId id) {
         return Mono.fromCallable(() -> movieApi.findByVideoId(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
