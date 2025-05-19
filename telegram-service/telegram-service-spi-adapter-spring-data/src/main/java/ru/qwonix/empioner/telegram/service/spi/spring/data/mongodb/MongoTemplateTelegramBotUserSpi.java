@@ -31,7 +31,7 @@ public class MongoTemplateTelegramBotUserSpi implements TelegramBotUserSpi {
     public Optional<TelegramBotUser> findUser(TelegramBotUserId id) {
         return mongoTemplate.query(TelegramBotUserDetails.class)
                 .inCollection(USER_COLLECTION)
-                .matching(query(where("id").is(id.value())))
+                .matching(query(where("id").is(id)))
                 .one()
                 .map(TelegramBotUserDetails::id)
                 .map(TelegramBotUser::new);
@@ -56,7 +56,7 @@ public class MongoTemplateTelegramBotUserSpi implements TelegramBotUserSpi {
     public void updateStatus(TelegramBotUserId id, UserStatus status) {
         UpdateResult first = mongoTemplate.update(TelegramBotUserDetails.class)
                 .inCollection(USER_COLLECTION)
-                .matching(query(where("id").is(id.value())))
+                .matching(query(where("id").is(id)))
                 .apply(update("status", status))
                 .first();
         if (!first.wasAcknowledged()) {
@@ -68,7 +68,7 @@ public class MongoTemplateTelegramBotUserSpi implements TelegramBotUserSpi {
     public void makeAdmin(TelegramBotUserId id) {
         UpdateResult result = mongoTemplate.update(TelegramBotUserDetails.class)
                 .inCollection(USER_COLLECTION)
-                .matching(query(where("id").is(id.value())))
+                .matching(query(where("id").is(id)))
                 .apply(new Update().addToSet("role", UserRole.ADMIN))
                 .first();
         if (!result.wasAcknowledged()) {
