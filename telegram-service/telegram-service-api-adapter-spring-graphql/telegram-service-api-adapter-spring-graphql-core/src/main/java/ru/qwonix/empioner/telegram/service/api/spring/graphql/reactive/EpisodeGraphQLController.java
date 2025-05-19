@@ -22,14 +22,14 @@ public class EpisodeGraphQLController {
     private final EpisodeMapper mapper;
 
     @DgsQuery
-    public Mono<EpisodeInput> getEpisodeById(@InputArgument EpisodeId id) {
+    public Mono<EpisodeInput> episodeById(@InputArgument EpisodeId id) {
         return Mono.fromCallable(() -> episodeApi.findById(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
     }
 
     @DgsQuery
-    public Flux<EpisodeInput> getEpisodesBySeasonId(@InputArgument SeasonId id, @InputArgument Integer limit, @InputArgument Integer page) {
+    public Flux<EpisodeInput> episodesBySeasonId(@InputArgument SeasonId id, @InputArgument Integer limit, @InputArgument Integer page) {
         return Flux.defer(() -> Flux.fromIterable(episodeApi.findAllBySeasonIdOrderByNumberWithLimitAndPage(id, limit, page)))
                 .map(mapper::toInput);
     }
@@ -40,7 +40,7 @@ public class EpisodeGraphQLController {
     }
 
     @DgsQuery
-    public Mono<EpisodeInput> getEpisodeByVideoGroupId(@InputArgument VideoGroupId id) {
+    public Mono<EpisodeInput> episodeByVideoGroupId(@InputArgument VideoGroupId id) {
         return Mono.fromCallable(() -> episodeApi.findByVideoGroupId(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));

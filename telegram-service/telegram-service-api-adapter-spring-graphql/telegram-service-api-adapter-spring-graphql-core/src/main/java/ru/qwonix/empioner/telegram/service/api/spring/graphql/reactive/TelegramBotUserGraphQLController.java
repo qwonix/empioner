@@ -25,7 +25,7 @@ public class TelegramBotUserGraphQLController {
     private final TelegramBotUserMapper mapper;
 
     @DgsQuery
-    public Mono<TelegramBotUserInput> getTelegramBotUserById(@InputArgument TelegramBotUserId id) {
+    public Mono<TelegramBotUserInput> telegramBotUserById(@InputArgument TelegramBotUserId id) {
         return Mono.fromCallable(() -> telegramBotUserApi.findUser(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));

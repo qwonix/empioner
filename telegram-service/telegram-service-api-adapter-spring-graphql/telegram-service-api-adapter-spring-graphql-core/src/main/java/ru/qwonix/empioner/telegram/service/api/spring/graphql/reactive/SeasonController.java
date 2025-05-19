@@ -20,14 +20,14 @@ public class SeasonController {
     private final SeasonMapper mapper;
 
     @DgsQuery
-    public Mono<SeasonInput> getSeasonById(@InputArgument SeasonId id) {
+    public Mono<SeasonInput> seasonById(@InputArgument SeasonId id) {
         return Mono.fromCallable(() -> seasonApi.findById(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
     }
 
     @DgsQuery
-    public Flux<SeasonInput> getSeasonsBySeriesId(@InputArgument SeriesId id, @InputArgument Integer limit, @InputArgument Integer page) {
+    public Flux<SeasonInput> seasonsBySeriesId(@InputArgument SeriesId id, @InputArgument Integer limit, @InputArgument Integer page) {
         return Flux.defer(() -> Flux.fromIterable(seasonApi.findAllBySeriesIdOrderByNumberWithLimitAndPage(id, limit, page)))
                 .map(mapper::toInput);
     }

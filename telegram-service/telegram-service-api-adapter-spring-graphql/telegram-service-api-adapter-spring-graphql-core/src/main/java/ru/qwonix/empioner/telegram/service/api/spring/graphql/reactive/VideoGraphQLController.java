@@ -23,21 +23,21 @@ public class VideoGraphQLController {
     private final VideoMapper mapper;
 
     @DgsQuery
-    public Mono<VideoInput> getMaxPriorityVideo(@InputArgument VideoGroupId id) {
+    public Mono<VideoInput> maxPriorityVideo(@InputArgument VideoGroupId id) {
         return Mono.fromCallable(() -> videoApi.findMaxPriorityInGroup(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
     }
 
     @DgsQuery
-    public Mono<VideoInput> getVideoById(@InputArgument VideoId id) {
+    public Mono<VideoInput> videoById(@InputArgument VideoId id) {
         return Mono.fromCallable(() -> videoApi.findById(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
     }
 
     @DgsQuery
-    public Flux<VideoInput> getVideosByGroup(@InputArgument VideoGroupId id) {
+    public Flux<VideoInput> videosByVideoGroupId(@InputArgument VideoGroupId id) {
         return Flux.defer(() -> Flux.fromIterable(videoApi.findAllByVideoGroupId(id)))
                 .map(mapper::toInput);
     }
