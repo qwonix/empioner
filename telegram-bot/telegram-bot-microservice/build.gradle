@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'ru.qwonix.empioner.telegram.bot'
-version = '0.2.8'
+version = '0.2.9'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
