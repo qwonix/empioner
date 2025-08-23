@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 import ru.qwonix.empioner.telegram.bot.spi.VideoSpi;
 import ru.qwonix.empioner.telegram.bot.spi.spring.graphql.model.AddVideoInput;
 import ru.qwonix.empioner.telegram.entity.Video;
+import ru.qwonix.empioner.telegram.id.TelegramFileId;
+import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.id.VideoId;
 
@@ -103,5 +105,10 @@ public class GraphQlClientVideoSpi implements VideoSpi {
                 .retrieve("create")
                 .toEntity(VideoId.class)
                 .block();
+    }
+
+    @Override
+    public void updateTelegramFileIdByTelegramFileUniqueId(TelegramFileUniqueId telegramFileUniqueId, TelegramFileId telegramFileId) {
+
     }
 }

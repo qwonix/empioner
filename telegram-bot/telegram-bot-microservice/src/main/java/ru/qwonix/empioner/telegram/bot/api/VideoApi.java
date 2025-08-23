@@ -2,6 +2,8 @@ package ru.qwonix.empioner.telegram.bot.api;
 
 import ru.qwonix.empioner.telegram.bot.spi.spring.graphql.model.AddVideoInput;
 import ru.qwonix.empioner.telegram.entity.Video;
+import ru.qwonix.empioner.telegram.id.TelegramFileId;
+import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.id.VideoId;
 
@@ -16,4 +18,8 @@ public interface VideoApi {
     List<Video> findAllByVideoGroupId(VideoGroupId videoGroupId);
 
     VideoId createVideo(AddVideoInput addVideoInput);
+
+    void updateTelegramFileIdByTelegramFileUniqueId(
+            TelegramFileUniqueId telegramFileUniqueId,
+            TelegramFileId telegramFileId);
 }

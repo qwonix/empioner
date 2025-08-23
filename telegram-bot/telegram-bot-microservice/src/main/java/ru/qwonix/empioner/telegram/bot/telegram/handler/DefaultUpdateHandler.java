@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.api.objects.Video;
 import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMemberUpdated;
 import ru.qwonix.empioner.telegram.bot.api.TelegramBotUserApi;
 import ru.qwonix.empioner.telegram.bot.api.VideoApi;
-import ru.qwonix.empioner.telegram.bot.spi.spring.graphql.model.AddVideoInput;
 import ru.qwonix.empioner.telegram.bot.telegram.config.ChatCommandAnnotationBeanPostProcessor;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.entity.UserStatus;
@@ -63,15 +62,9 @@ public class DefaultUpdateHandler implements UpdateHandler {
     public void onVideo(Update update, TelegramBotUser user) {
         Video video = update.getMessage().getVideo();
 
-        videoApi.createVideo(new AddVideoInput(
-                new TelegramFileId(video.getFileId()),
+        videoApi.updateTelegramFileIdByTelegramFileUniqueId(
                 new TelegramFileUniqueId(video.getFileUniqueId()),
-                video.getWidth(),
-                video.getHeight(),
-                video.getDuration(),
-                video.getMimeType(),
-                Math.toIntExact(video.getFileSize()),
-                video.getFileName()
-        ));
+                new TelegramFileId(video.getFileId())
+        );
     }
 }

@@ -6,6 +6,8 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 import ru.qwonix.empioner.telegram.entity.Video;
 import ru.qwonix.empioner.telegram.entity.VideoDetails;
+import ru.qwonix.empioner.telegram.id.TelegramFileId;
+import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.id.VideoId;
 import ru.qwonix.empioner.telegram.service.spi.VideoSpi;
@@ -41,6 +43,19 @@ public class JdbcClientVideoSpi implements VideoSpi {
                 .param("id", videoId.value())
                 .query(mapper)
                 .optional();
+    }
+
+    @Override
+    public void updateTelegramFileIdByTelegramFileUniqueId(
+            TelegramFileUniqueId telegramFileUniqueId,
+            TelegramFileId telegramFileId) {
+        jdbcClient.sql("""
+                        update video set telegram_file_id = :telegramFileId
+                        where telegram_file_unique_id = :telegramFileUniqueId
+                        """)
+                .param("telegramFileId", telegramFileId.value())
+                .param("telegramFileUniqueId", telegramFileUniqueId.value())
+                .update();
     }
 
     @Override

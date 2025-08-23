@@ -1,6 +1,8 @@
 package ru.qwonix.empioner.telegram.service.api;
 
 import ru.qwonix.empioner.telegram.entity.Video;
+import ru.qwonix.empioner.telegram.id.TelegramFileId;
+import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.id.VideoId;
 import ru.qwonix.empioner.telegram.service.model.CreateVideoRequest;
@@ -14,6 +16,10 @@ public interface VideoApi {
     Optional<Video> findById(VideoId videoId);
 
     List<Video> findAllByVideoGroupId(VideoGroupId videoGroupId);
+
+    boolean updateTelegramFileIdByTelegramFileUniqueId(
+            TelegramFileUniqueId telegramFileUniqueId,
+            TelegramFileId telegramFileId);
 
     VideoId create(CreateVideoRequest video, boolean needCreateNewVideoGroup);
 }

@@ -6,6 +6,8 @@ import ru.qwonix.empioner.telegram.bot.api.VideoApi;
 import ru.qwonix.empioner.telegram.bot.spi.VideoSpi;
 import ru.qwonix.empioner.telegram.bot.spi.spring.graphql.model.AddVideoInput;
 import ru.qwonix.empioner.telegram.entity.Video;
+import ru.qwonix.empioner.telegram.id.TelegramFileId;
+import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.id.VideoId;
 
@@ -36,5 +38,12 @@ public class VideoUseCase implements VideoApi {
     @Override
     public VideoId createVideo(AddVideoInput addVideoInput) {
         return videoDao.createVideo(addVideoInput);
+    }
+
+    @Override
+    public void updateTelegramFileIdByTelegramFileUniqueId(
+            TelegramFileUniqueId telegramFileUniqueId,
+            TelegramFileId telegramFileId) {
+        videoDao.updateTelegramFileIdByTelegramFileUniqueId(telegramFileUniqueId, telegramFileId);
     }
 }
