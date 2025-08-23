@@ -102,4 +102,17 @@ public class DgsClientVideoSpi implements VideoSpi {
                 .retrieveSync()
                 .toEntity(VideoId.class);
     }
+
+    @Override
+    public void updateTelegramFileIdByTelegramFileUniqueId(TelegramFileUniqueId telegramFileUniqueId, TelegramFileId telegramFileId) {
+        dgsClient.request(UpdateTelegramFileIdGraphQLQuery.newRequest()
+                        .id(telegramFileUniqueId)
+                        .newTelegramFileId(telegramFileId)
+                        .build())
+                .coercing(TelegramFileId.class, telegramFileIdCoercing)
+                .coercing(TelegramFileUniqueId.class, telegramFileUniqueIdCoercing)
+                .projection(new BaseProjectionNode() {
+                })
+                .retrieveSync();
+    }
 }

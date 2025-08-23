@@ -2,6 +2,8 @@ package ru.qwonix.empioner.telegram.service.spi;
 
 import ru.qwonix.empioner.telegram.entity.Video;
 import ru.qwonix.empioner.telegram.entity.VideoDetails;
+import ru.qwonix.empioner.telegram.id.TelegramFileId;
+import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.id.VideoId;
 
@@ -20,4 +22,8 @@ public interface VideoSpi {
     VideoId createVideo(VideoGroupId videoGroupId, Video video);
 
     void createVideoDetails(VideoDetails videoDetails);
+
+    void updateTelegramFileIdByTelegramFileUniqueId(
+            TelegramFileUniqueId telegramFileUniqueId,
+            TelegramFileId telegramFileId);
 }

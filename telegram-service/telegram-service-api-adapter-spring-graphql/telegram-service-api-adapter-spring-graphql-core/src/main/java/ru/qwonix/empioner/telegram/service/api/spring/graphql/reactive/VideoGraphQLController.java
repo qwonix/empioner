@@ -5,9 +5,10 @@ import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import ru.qwonix.empioner.telegram.id.TelegramFileId;
+import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.id.VideoId;
 import ru.qwonix.empioner.telegram.service.api.VideoApi;
@@ -45,5 +46,15 @@ public class VideoGraphQLController {
     @DgsMutation
     public Mono<VideoId> create(@InputArgument AddVideoInput video, @InputArgument Boolean needCreateNewVideoGroup) {
         return Mono.fromCallable(() -> videoApi.create(mapper.toRequest(video), needCreateNewVideoGroup));
+    }
+
+    @DgsMutation
+    public Mono<Boolean> updateTelegramFileId(
+            @InputArgument TelegramFileUniqueId id,
+            @InputArgument TelegramFileId newTelegramFileId) {
+        return Mono.fromCallable(() -> videoApi.updateTelegramFileIdByTelegramFileUniqueId(
+                id,
+                newTelegramFileId
+        ));
     }
 }

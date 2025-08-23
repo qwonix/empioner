@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.qwonix.empioner.telegram.entity.Video;
 import ru.qwonix.empioner.telegram.entity.VideoDetails;
+import ru.qwonix.empioner.telegram.id.TelegramFileId;
+import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.id.VideoId;
 import ru.qwonix.empioner.telegram.service.api.VideoApi;
@@ -34,6 +36,14 @@ public class VideoUseCase implements VideoApi {
     @Override
     public List<Video> findAllByVideoGroupId(VideoGroupId videoGroupId) {
         return videoDao.findAllByVideoGroupId(videoGroupId);
+    }
+
+    @Override
+    public boolean updateTelegramFileIdByTelegramFileUniqueId(
+            TelegramFileUniqueId telegramFileUniqueId,
+            TelegramFileId telegramFileId) {
+        videoDao.updateTelegramFileIdByTelegramFileUniqueId(telegramFileUniqueId, telegramFileId);
+        return true;
     }
 
     @Override
