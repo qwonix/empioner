@@ -6,13 +6,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import ru.qwonix.empioner.telegram.entity.Show;
-import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
-import ru.qwonix.empioner.telegram.id.ImageId;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.CallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.ShowShowCallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.service.TelegramBotExecutionService;
 import ru.qwonix.empioner.telegram.bot.telegram.service.TelegramShowService;
+import ru.qwonix.empioner.telegram.entity.Show;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
+import ru.qwonix.empioner.telegram.id.ImageId;
 
 import java.util.List;
 import java.util.UUID;

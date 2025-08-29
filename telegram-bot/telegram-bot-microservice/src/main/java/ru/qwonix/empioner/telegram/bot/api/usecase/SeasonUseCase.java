@@ -2,11 +2,11 @@ package ru.qwonix.empioner.telegram.bot.api.usecase;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.qwonix.empioner.telegram.bot.api.SeasonApi;
 import ru.qwonix.empioner.telegram.bot.spi.SeasonSpi;
 import ru.qwonix.empioner.telegram.entity.Season;
 import ru.qwonix.empioner.telegram.id.SeasonId;
 import ru.qwonix.empioner.telegram.id.SeriesId;
-import ru.qwonix.empioner.telegram.bot.api.SeasonApi;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,20 +15,20 @@ import java.util.Optional;
 @Service
 public class SeasonUseCase implements SeasonApi {
 
-    private final SeasonSpi seasonDao;
+    private final SeasonSpi seasonSpi;
 
     @Override
     public Optional<Season> findById(SeasonId seasonId) {
-        return seasonDao.findById(seasonId);
+        return seasonSpi.findById(seasonId);
     }
 
     @Override
     public int countAllBySeries(SeriesId seriesId) {
-        return seasonDao.countAllBySeries(seriesId);
+        return seasonSpi.countAllBySeries(seriesId);
     }
 
     @Override
     public List<Season> findAllBySeriesIdOrderByNumberWithLimitAndPage(SeriesId seriesId, int limit, int page) {
-        return seasonDao.findAllBySeriesIdOrderByNumberWithLimitAndPage(seriesId, limit, page);
+        return seasonSpi.findAllBySeriesIdOrderByNumberWithLimitAndPage(seriesId, limit, page);
     }
 }

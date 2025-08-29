@@ -4,9 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
-import ru.qwonix.empioner.telegram.entity.Season;
-import ru.qwonix.empioner.telegram.entity.Series;
-import ru.qwonix.empioner.telegram.id.SeasonId;
 import ru.qwonix.empioner.telegram.bot.api.EpisodeApi;
 import ru.qwonix.empioner.telegram.bot.api.SeasonApi;
 import ru.qwonix.empioner.telegram.bot.api.SeriesApi;
@@ -16,6 +13,9 @@ import ru.qwonix.empioner.telegram.bot.telegram.callback.data.SeasonCallbackData
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.SeriesCallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.config.TelegramProperties;
 import ru.qwonix.empioner.telegram.bot.telegram.utils.Utils;
+import ru.qwonix.empioner.telegram.entity.Season;
+import ru.qwonix.empioner.telegram.entity.Series;
+import ru.qwonix.empioner.telegram.id.SeasonId;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,9 +41,9 @@ public class TelegramSeasonService {
 
         return """
                 *%s –* `%s сезон`
-                                
+                
                 _%s_
-                                
+                
                 *Количество эпизодов*: `%d` / *%s*""".formatted(series.title(),
                 season.number(),
                 season.description(),

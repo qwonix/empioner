@@ -2,8 +2,8 @@ package ru.qwonix.empioner.telegram.bot.config.coercing;
 
 import com.netflix.graphql.dgs.DgsScalar;
 import graphql.schema.CoercingParseValueException;
-import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 import ru.qwonix.empioner.telegram.bot.config.StringIdCoercing;
+import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 
 @DgsScalar(name = "TelegramBotUserId")
 public class TelegramBotUserIdCoercing extends StringIdCoercing<TelegramBotUserId> {

@@ -5,16 +5,16 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
-import ru.qwonix.empioner.telegram.entity.Season;
-import ru.qwonix.empioner.telegram.entity.Series;
-import ru.qwonix.empioner.telegram.entity.Show;
-import ru.qwonix.empioner.telegram.id.SeriesId;
-import ru.qwonix.empioner.telegram.id.ShowId;
 import ru.qwonix.empioner.telegram.bot.api.SeasonApi;
 import ru.qwonix.empioner.telegram.bot.api.SeriesApi;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.*;
 import ru.qwonix.empioner.telegram.bot.telegram.config.TelegramProperties;
 import ru.qwonix.empioner.telegram.bot.telegram.utils.Utils;
+import ru.qwonix.empioner.telegram.entity.Season;
+import ru.qwonix.empioner.telegram.entity.Series;
+import ru.qwonix.empioner.telegram.entity.Show;
+import ru.qwonix.empioner.telegram.id.SeriesId;
+import ru.qwonix.empioner.telegram.id.ShowId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,8 +69,8 @@ public class TelegramSeriesService {
 
     public String createText(Series series) {
         return String.format("*%s*\n", series.title())
-               + '\n'
-               + String.format("_%s_", series.description());
+                + '\n'
+                + String.format("_%s_", series.description());
     }
 
     public InlineKeyboardMarkup createKeyboard(Show show, List<Series> seriesList) {

@@ -1,7 +1,6 @@
 package ru.qwonix.empioner.telegram.entity;
 
 import ru.qwonix.empioner.telegram.id.EpisodeId;
-import ru.qwonix.empioner.telegram.id.ImageId;
 import ru.qwonix.empioner.telegram.id.SeasonId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 

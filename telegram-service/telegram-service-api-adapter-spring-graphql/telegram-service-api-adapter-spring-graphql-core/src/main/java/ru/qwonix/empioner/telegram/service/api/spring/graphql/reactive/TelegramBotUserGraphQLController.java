@@ -5,7 +5,6 @@ import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 import ru.qwonix.empioner.telegram.entity.UserRole;
 import ru.qwonix.empioner.telegram.entity.UserStatus;

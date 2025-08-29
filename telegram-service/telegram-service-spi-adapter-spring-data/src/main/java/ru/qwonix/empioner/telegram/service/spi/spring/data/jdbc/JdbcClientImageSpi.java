@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
-import ru.qwonix.empioner.telegram.service.spi.ImageSpi;
 import ru.qwonix.empioner.telegram.entity.Image;
 import ru.qwonix.empioner.telegram.id.ImageId;
+import ru.qwonix.empioner.telegram.service.spi.ImageSpi;
 
 import java.util.Optional;
 

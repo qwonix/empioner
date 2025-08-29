@@ -2,11 +2,11 @@ package ru.qwonix.empioner.telegram.service.api.usecase;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.qwonix.empioner.telegram.service.spi.SeriesSpi;
 import ru.qwonix.empioner.telegram.entity.Series;
 import ru.qwonix.empioner.telegram.id.SeriesId;
 import ru.qwonix.empioner.telegram.id.ShowId;
 import ru.qwonix.empioner.telegram.service.api.SeriesApi;
+import ru.qwonix.empioner.telegram.service.spi.SeriesSpi;
 
 import java.util.List;
 import java.util.Optional;

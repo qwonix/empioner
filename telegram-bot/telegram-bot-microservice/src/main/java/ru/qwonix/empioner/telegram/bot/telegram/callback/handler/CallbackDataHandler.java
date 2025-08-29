@@ -1,8 +1,8 @@
 package ru.qwonix.empioner.telegram.bot.telegram.callback.handler;
 
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.CallbackData;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 
 public interface CallbackDataHandler {
     boolean canHandle(Class<? extends CallbackData> callbackData);
