@@ -18,7 +18,7 @@ import ru.qwonix.empioner.telegram.service.api.graphql.api.SeriesByShowIdProject
 import java.util.List;
 import java.util.Optional;
 
-@Primary
+
 @Component
 @RequiredArgsConstructor
 public class DgsClientSeriesSpi implements SeriesSpi {

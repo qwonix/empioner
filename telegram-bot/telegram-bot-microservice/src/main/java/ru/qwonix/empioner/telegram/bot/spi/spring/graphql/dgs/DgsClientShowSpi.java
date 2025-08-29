@@ -16,7 +16,7 @@ import ru.qwonix.empioner.telegram.service.api.graphql.api.ShowsProjectionRoot;
 import java.util.List;
 import java.util.Optional;
 
-@Primary
+
 @Component
 @RequiredArgsConstructor
 public class DgsClientShowSpi implements ShowSpi {

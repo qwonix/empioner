@@ -13,7 +13,7 @@ import ru.qwonix.empioner.telegram.service.api.graphql.api.ImageByIdProjectionRo
 
 import java.util.Optional;
 
-@Primary
+
 @Component
 @RequiredArgsConstructor
 public class DgsClientImageSpi implements ImageSpi {

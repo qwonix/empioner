@@ -18,7 +18,7 @@ import ru.qwonix.empioner.telegram.service.api.graphql.api.*;
 import java.util.List;
 import java.util.Optional;
 
-@Primary
+
 @Component
 @RequiredArgsConstructor
 public class DgsClientEpisodeSpi implements EpisodeSpi {
