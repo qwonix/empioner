@@ -5,12 +5,12 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
-import ru.qwonix.empioner.telegram.entity.Show;
-import ru.qwonix.empioner.telegram.id.ShowId;
 import ru.qwonix.empioner.telegram.bot.api.ShowApi;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.*;
 import ru.qwonix.empioner.telegram.bot.telegram.config.TelegramProperties;
 import ru.qwonix.empioner.telegram.bot.telegram.utils.Utils;
+import ru.qwonix.empioner.telegram.entity.Show;
+import ru.qwonix.empioner.telegram.id.ShowId;
 
 import java.util.ArrayList;
 import java.util.List;

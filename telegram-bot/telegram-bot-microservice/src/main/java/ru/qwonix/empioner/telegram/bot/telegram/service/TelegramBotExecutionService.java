@@ -15,11 +15,11 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+import ru.qwonix.empioner.telegram.bot.api.ImageApi;
+import ru.qwonix.empioner.telegram.bot.api.MessageApi;
 import ru.qwonix.empioner.telegram.entity.Image;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.id.ImageId;
-import ru.qwonix.empioner.telegram.bot.api.ImageApi;
-import ru.qwonix.empioner.telegram.bot.api.MessageApi;
 
 import java.util.UUID;
 

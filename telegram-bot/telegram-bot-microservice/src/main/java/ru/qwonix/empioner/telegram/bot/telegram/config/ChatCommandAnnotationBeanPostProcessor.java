@@ -31,9 +31,9 @@ public class ChatCommandAnnotationBeanPostProcessor implements ApplicationContex
         Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length != 2) {
             throw new IllegalStateException("Number of parameters is not valid. command " + command +
-                                            " from " + annotation.getClass() +
-                                            " must take as its first parameter " + TelegramBotUser.class.getName() +
-                                            " and " + String[].class.getName() + " as second"
+                    " from " + annotation.getClass() +
+                    " must take as its first parameter " + TelegramBotUser.class.getName() +
+                    " and " + String[].class.getName() + " as second"
             );
         }
         return parameterTypes;
@@ -51,28 +51,28 @@ public class ChatCommandAnnotationBeanPostProcessor implements ApplicationContex
                     String command = StringUtils.defaultIfEmpty(annotation.command(), annotation.value());
                     if (COMMAND_TO_METHOD.get(command) != null) {
                         throw new IllegalStateException("bot command already exists. Command " + command +
-                                                        " is already defined in class " + annotation.getClass()
+                                " is already defined in class " + annotation.getClass()
                         );
                     }
                     if (method.getModifiers() != Modifier.PUBLIC) {
                         throw new IllegalStateException("method " + method.getName() +
-                                                        " from " + method.getDeclaringClass() +
-                                                        " annotated by @ChatCommand must be public"
+                                " from " + method.getDeclaringClass() +
+                                " annotated by @ChatCommand must be public"
                         );
                     }
                     Class<?>[] parameterTypes = extractParameters(method, command, annotation);
                     if (!parameterTypes[0].isAssignableFrom(TelegramBotUser.class)) {
                         throw new IllegalStateException("first parameter is not valid. command " + command +
-                                                        " from " + annotation.getClass() +
-                                                        " must take as its first parameter " + TelegramBotUser.class.getName() +
-                                                        " and " + String[].class.getName() + " as second"
+                                " from " + annotation.getClass() +
+                                " must take as its first parameter " + TelegramBotUser.class.getName() +
+                                " and " + String[].class.getName() + " as second"
                         );
                     }
                     if (!parameterTypes[1].isAssignableFrom(String[].class)) {
                         throw new IllegalStateException("second parameter is not valid. command " + command +
-                                                        " from " + annotation.getClass() +
-                                                        " must take as its first parameter " + TelegramBotUser.class.getName() +
-                                                        " and " + String[].class.getName() + " as second"
+                                " from " + annotation.getClass() +
+                                " must take as its first parameter " + TelegramBotUser.class.getName() +
+                                " and " + String[].class.getName() + " as second"
                         );
                     }
                     COMMAND_TO_METHOD.put(command, method);

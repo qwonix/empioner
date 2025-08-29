@@ -2,7 +2,6 @@ package ru.qwonix.empioner.telegram.bot.spi.spring.graphql.dgs;
 
 import com.netflix.graphql.dgs.client.codegen.BaseProjectionNode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.graphql.client.DgsGraphQlClient;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.User;

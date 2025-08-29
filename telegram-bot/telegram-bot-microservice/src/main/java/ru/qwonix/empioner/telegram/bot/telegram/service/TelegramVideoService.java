@@ -2,11 +2,11 @@ package ru.qwonix.empioner.telegram.bot.telegram.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.qwonix.empioner.telegram.bot.api.VideoApi;
+import ru.qwonix.empioner.telegram.bot.telegram.config.TelegramProperties;
 import ru.qwonix.empioner.telegram.entity.Video;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.id.VideoId;
-import ru.qwonix.empioner.telegram.bot.api.VideoApi;
-import ru.qwonix.empioner.telegram.bot.telegram.config.TelegramProperties;
 
 import java.util.List;
 import java.util.Optional;

@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
-import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.bot.api.TelegramBotUserApi;
 import ru.qwonix.empioner.telegram.bot.telegram.handler.UpdateHandler;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 
 @Slf4j
 @Component

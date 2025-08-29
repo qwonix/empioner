@@ -1,7 +1,6 @@
 package ru.qwonix.empioner.telegram.bot.spi.spring.graphql.dgs;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.graphql.client.DgsGraphQlClient;
 import org.springframework.stereotype.Component;
 import ru.qwonix.empioner.telegram.bot.config.coercing.ImageIdCoercing;

@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
-import ru.qwonix.empioner.telegram.service.spi.EpisodeSpi;
 import ru.qwonix.empioner.telegram.entity.Episode;
 import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.id.SeasonId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
+import ru.qwonix.empioner.telegram.service.spi.EpisodeSpi;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +31,7 @@ public class JdbcClientEpisodeSpi implements EpisodeSpi {
     @Override
     public Integer countAllBySeasonId(SeasonId seasonId) {
         return jdbcClient.sql("select count(*) as total from episode where season_id = :seasonId " +
-                              "and is_available = true")
+                        "and is_available = true")
                 .param("seasonId", seasonId.value())
                 .query(rs -> {
                     rs.next();
@@ -42,7 +42,7 @@ public class JdbcClientEpisodeSpi implements EpisodeSpi {
     @Override
     public Integer countAllAvailableBySeasonId(SeasonId seasonId) {
         return jdbcClient.sql("select count(*) as total from episode where season_id = :seasonId " +
-                              "and is_available is true")
+                        "and is_available is true")
                 .param("seasonId", seasonId.value())
                 .query(rs -> {
                     rs.next();
@@ -55,9 +55,9 @@ public class JdbcClientEpisodeSpi implements EpisodeSpi {
                                                                         int limit,
                                                                         int page) {
         return jdbcClient.sql("select * from episode where season_id = :season_id " +
-                              "and is_available = true " +
-                              "order by number " +
-                              "limit :limit offset :page")
+                        "and is_available = true " +
+                        "order by number " +
+                        "limit :limit offset :page")
                 .param("season_id", seasonId.value())
                 .param("limit", limit)
                 .param("page", page * limit)
@@ -76,8 +76,8 @@ public class JdbcClientEpisodeSpi implements EpisodeSpi {
     @Override
     public Boolean changeAvailable(EpisodeId id, boolean isAvailable) {
         return jdbcClient.sql("update episode set is_available = :isAvailable where id = :id")
-                       .param("id", id.value())
-                       .param("isAvailable", isAvailable)
-                       .update() == 1;
+                .param("id", id.value())
+                .param("isAvailable", isAvailable)
+                .update() == 1;
     }
 }

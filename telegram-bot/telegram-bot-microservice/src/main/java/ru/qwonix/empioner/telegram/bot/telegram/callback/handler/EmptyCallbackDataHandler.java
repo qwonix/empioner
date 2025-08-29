@@ -7,9 +7,9 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.CallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.EmptyCallbackData;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 
 
 @RequiredArgsConstructor

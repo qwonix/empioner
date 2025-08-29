@@ -18,32 +18,32 @@ import java.util.Optional;
 @Service
 public class VideoUseCase implements VideoApi {
 
-    private final VideoSpi videoDao;
+    private final VideoSpi videoSpi;
 
     @Override
     public Optional<Video> findMaxPriorityInGroup(VideoGroupId videoGroupId) {
-        return videoDao.findMaxPriorityInGroup(videoGroupId);
+        return videoSpi.findMaxPriorityInGroup(videoGroupId);
     }
 
     @Override
     public Optional<Video> findById(VideoId videoId) {
-        return videoDao.findById(videoId);
+        return videoSpi.findById(videoId);
     }
 
     @Override
     public List<Video> findAllByVideoGroupId(VideoGroupId videoGroupId) {
-        return videoDao.findAllByVideoGroupId(videoGroupId);
+        return videoSpi.findAllByVideoGroupId(videoGroupId);
     }
 
     @Override
     public VideoId createVideo(AddVideoInput addVideoInput) {
-        return videoDao.createVideo(addVideoInput);
+        return videoSpi.createVideo(addVideoInput);
     }
 
     @Override
     public void updateTelegramFileIdByTelegramFileUniqueId(
             TelegramFileUniqueId telegramFileUniqueId,
             TelegramFileId telegramFileId) {
-        videoDao.updateTelegramFileIdByTelegramFileUniqueId(telegramFileUniqueId, telegramFileId);
+        videoSpi.updateTelegramFileIdByTelegramFileUniqueId(telegramFileUniqueId, telegramFileId);
     }
 }

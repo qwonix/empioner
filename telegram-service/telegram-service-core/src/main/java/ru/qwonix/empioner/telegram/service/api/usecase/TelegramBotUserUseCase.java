@@ -2,12 +2,12 @@ package ru.qwonix.empioner.telegram.service.api.usecase;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.qwonix.empioner.telegram.entity.TelegramBotUserDetails;
-import ru.qwonix.empioner.telegram.service.spi.TelegramBotUserSpi;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUserDetails;
 import ru.qwonix.empioner.telegram.entity.UserStatus;
 import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 import ru.qwonix.empioner.telegram.service.api.TelegramBotUserApi;
+import ru.qwonix.empioner.telegram.service.spi.TelegramBotUserSpi;
 
 import java.util.Optional;
 

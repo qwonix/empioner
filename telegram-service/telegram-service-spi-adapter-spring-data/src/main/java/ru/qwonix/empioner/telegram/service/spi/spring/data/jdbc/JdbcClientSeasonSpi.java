@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
-import ru.qwonix.empioner.telegram.service.spi.SeasonSpi;
 import ru.qwonix.empioner.telegram.entity.Season;
 import ru.qwonix.empioner.telegram.id.SeasonId;
 import ru.qwonix.empioner.telegram.id.SeriesId;
+import ru.qwonix.empioner.telegram.service.spi.SeasonSpi;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,8 +40,8 @@ public class JdbcClientSeasonSpi implements SeasonSpi {
     @Override
     public List<Season> findAllBySeriesIdOrderByNumberWithLimitAndPage(SeriesId seriesId, int limit, int page) {
         return jdbcClient.sql("select * from season where series_id = :seriesId " +
-                              "order by number " +
-                              "limit :limit offset :page")
+                        "order by number " +
+                        "limit :limit offset :page")
                 .param("seriesId", seriesId.value())
                 .param("limit", limit)
                 .param("page", page)

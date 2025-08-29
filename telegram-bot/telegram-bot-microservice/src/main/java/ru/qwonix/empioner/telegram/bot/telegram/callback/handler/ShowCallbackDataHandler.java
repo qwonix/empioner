@@ -5,12 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import ru.qwonix.empioner.telegram.entity.Show;
-import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.CallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.ShowCallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.service.TelegramBotExecutionService;
 import ru.qwonix.empioner.telegram.bot.telegram.service.TelegramShowService;
+import ru.qwonix.empioner.telegram.entity.Show;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 
 import java.util.Optional;
 

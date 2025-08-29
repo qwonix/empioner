@@ -4,5 +4,6 @@ import ru.qwonix.empioner.telegram.id.ShowId;
 
 public interface BotSettingsApi {
     boolean isEnabledSingleShowMode();
+
     ShowId getShowOfSingleShowMode();
 }

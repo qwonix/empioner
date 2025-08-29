@@ -1,8 +1,8 @@
 package ru.qwonix.empioner.telegram.bot.config.coercing;
 
 import com.netflix.graphql.dgs.DgsScalar;
-import ru.qwonix.empioner.telegram.id.SeriesId;
 import ru.qwonix.empioner.telegram.bot.config.UUIDIdCoercing;
+import ru.qwonix.empioner.telegram.id.SeriesId;
 
 import java.util.UUID;
 

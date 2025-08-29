@@ -7,8 +7,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import ru.qwonix.empioner.telegram.entity.*;
-import ru.qwonix.empioner.telegram.service.spi.TelegramBotUserSpi;
 import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
+import ru.qwonix.empioner.telegram.service.spi.TelegramBotUserSpi;
 
 import java.time.Instant;
 import java.util.Optional;

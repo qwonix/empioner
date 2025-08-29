@@ -1,17 +1,17 @@
 plugins {
     id 'java'
-    id "com.netflix.dgs.codegen" version "8.0.2"
+    id "com.netflix.dgs.codegen" version "8.1.1"
 }
 
 group = 'ru.qwonix.empioner'
-version = '0.2.9'
+version = '0.2.10'
 
 repositories {
     mavenCentral()
 }
 
 ext {
-    graphqlExtendedScalarsVersion = '22.0'
+    graphqlExtendedScalarsVersion = '24.0'
 }
 
 generateJava {

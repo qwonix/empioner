@@ -6,9 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.data.CallbackData;
 import ru.qwonix.empioner.telegram.bot.telegram.callback.handler.CallbackDataHandler;
+import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 
 import java.util.Set;
 
@@ -18,9 +18,6 @@ import java.util.Set;
 public class CallbackHandler {
     private final Set<CallbackDataHandler> callbackHandlers;
     private final ObjectMapper objectMapper;
-
-    private record Callback(CallbackQuery callbackQuery, CallbackData callbackData) {
-    }
 
     private Callback extractCallbackDataFromUpdate(Update update) {
         try {
@@ -45,5 +42,8 @@ public class CallbackHandler {
             return;
         }
         this.onCallback(result, user);
+    }
+
+    private record Callback(CallbackQuery callbackQuery, CallbackData callbackData) {
     }
 }

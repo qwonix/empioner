@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
-import ru.qwonix.empioner.telegram.service.spi.MovieSpi;
 import ru.qwonix.empioner.telegram.entity.Movie;
 import ru.qwonix.empioner.telegram.id.MovieId;
 import ru.qwonix.empioner.telegram.id.ShowId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
+import ru.qwonix.empioner.telegram.service.spi.MovieSpi;
 
 import java.util.List;
 import java.util.Optional;

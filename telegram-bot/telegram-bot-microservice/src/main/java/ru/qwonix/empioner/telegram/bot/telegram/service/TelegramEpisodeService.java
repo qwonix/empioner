@@ -5,16 +5,16 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
+import ru.qwonix.empioner.telegram.bot.api.EpisodeApi;
+import ru.qwonix.empioner.telegram.bot.api.SeasonApi;
+import ru.qwonix.empioner.telegram.bot.telegram.callback.data.*;
+import ru.qwonix.empioner.telegram.bot.telegram.utils.Utils;
 import ru.qwonix.empioner.telegram.entity.Episode;
 import ru.qwonix.empioner.telegram.entity.Season;
 import ru.qwonix.empioner.telegram.entity.Video;
 import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.id.SeasonId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
-import ru.qwonix.empioner.telegram.bot.api.EpisodeApi;
-import ru.qwonix.empioner.telegram.bot.api.SeasonApi;
-import ru.qwonix.empioner.telegram.bot.telegram.callback.data.*;
-import ru.qwonix.empioner.telegram.bot.telegram.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +46,9 @@ public class TelegramEpisodeService {
 
         return String.format("""
                 _%s сезон %s серия_ – `%s`
-                                
+                
                 _%s_
-                                
+                
                 """, season.number(), episode.number(), episode.title(), episode.description());
     }
 
