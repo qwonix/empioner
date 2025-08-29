@@ -17,7 +17,7 @@ import ru.qwonix.empioner.telegram.service.api.graphql.model.TelegramBotUserDeta
 import java.util.Collections;
 import java.util.Optional;
 
-@Primary
+
 @Component
 @RequiredArgsConstructor
 public class DgsClientTelegramBotUserSpi implements TelegramBotUserSpi {
