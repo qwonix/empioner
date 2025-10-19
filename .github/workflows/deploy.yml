@@ -1,0 +1,85 @@
+name: Deploy Docker Compose
+
+on:
+  workflow_call:
+    secrets:
+      REDIS_USER_PASSWORD:
+        required: true
+      POSTGRES_DB:
+        required: true
+      POSTGRES_USER:
+        required: true
+      POSTGRES_PASSWORD:
+        required: true
+      MONGODB_USER:
+        required: true
+      MONGODB_PASSWORD:
+        required: true
+      MONGODB_AUTHENTICATION_DATABASE:
+        required: true
+      BOT_TITLE:
+        required: true
+      BOT_DESCRIPTION:
+        required: true
+      BOT_USERNAME:
+        required: true
+      BOT_TOKEN:
+        required: true
+      BOT_CONFIG_IMAGE_PLACEHOLDER:
+        required: true
+      BOT_CONFIG_SHOW_SHOW_IMAGE_ID:
+        required: true
+      BOT_CONFIG_SHOW_SERIES_IMAGE_ID:
+        required: true
+      BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID:
+        required: true
+      BOT_CONFIG_SHOW_MOVIE_IMAGE_ID:
+        required: true
+      BOT_SINGLE_SHOW_MODE_SHOW_ID:
+        required: true
+
+    inputs:
+      redeploy:
+        type: boolean
+        description: "Если true, только обновить контейнеры"
+        required: false
+        default: false
+
+jobs:
+  prepare-environment:
+    runs-on: self-hosted
+    steps:
+      - name: Stop containers
+        if: ${{ inputs.redeploy == 'true' }}
+        run: docker compose stop
+
+      - name: Pull latest images
+        run: docker compose pull
+
+  deploy:
+    runs-on: self-hosted
+    needs: prepare-environment
+    env:
+      REDIS_USER: ${{ secrets.REDIS_USER}}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      REDIS_USER_PASSWORD: ${{ secrets.REDIS_USER_PASSWORD}}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB}}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER}}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD}}
+      MONGODB_USER: ${{ secrets.MONGODB_USER}}
+      MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD}}
+      MONGODB_AUTHENTICATION_DATABASE: ${{ secrets.MONGODB_AUTHENTICATION_DATABASE}}
+      BOT_TITLE: ${{secrets.BOT_TITLE}}
+      BOT_DESCRIPTION: ${{secrets.BOT_DESCRIPTION}}
+      BOT_USERNAME: ${{secrets.BOT_USERNAME}}
+      BOT_TOKEN: ${{secrets.BOT_TOKEN}}
+      BOT_CONFIG_IMAGE_PLACEHOLDER: ${{secrets.BOT_CONFIG_IMAGE_PLACEHOLDER}}
+      BOT_CONFIG_SHOW_SHOW_IMAGE_ID: ${{secrets.BOT_CONFIG_SHOW_SHOW_IMAGE_ID}}
+      BOT_CONFIG_SHOW_SERIES_IMAGE_ID: ${{secrets.BOT_CONFIG_SHOW_SERIES_IMAGE_ID}}
+      BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID: ${{secrets.BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID}}
+      BOT_CONFIG_SHOW_MOVIE_IMAGE_ID: ${{secrets.BOT_CONFIG_SHOW_MOVIE_IMAGE_ID}}
+      BOT_SINGLE_SHOW_MODE_SHOW_ID: ${{secrets.BOT_SINGLE_SHOW_MODE_SHOW_ID}}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start containers
+        run: docker compose up -d

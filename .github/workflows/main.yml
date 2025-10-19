@@ -1,0 +1,38 @@
+name: Master Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Что сделать?"
+        required: true
+        type: choice
+        options:
+          - build
+          - deploy
+          - redeploy
+          - clear
+
+jobs:
+  build:
+    if: ${{ github.event.inputs.action == 'build' }}
+    uses: ./.github/workflows/build.yml
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  deploy:
+    if: ${{ github.event.inputs.action == 'deploy' }}
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+
+  redeploy:
+    if: ${{ github.event.inputs.action == 'redeploy' }}
+    uses: ./.github/workflows/deploy.yml
+    with:
+      redeploy: true
+    secrets: inherit
+
+  clear:
+    if: ${{ github.event.inputs.action == 'clear' }}
+    uses: ./.github/workflows/clear.yml

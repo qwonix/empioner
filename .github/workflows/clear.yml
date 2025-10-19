@@ -1,0 +1,10 @@
+name: Clear Docker System
+
+on:
+  workflow_call:
+
+jobs:
+  cleanup:
+    runs-on: self-hosted
+    steps:
+      - run: docker system prune -a -f
