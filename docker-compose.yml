@@ -182,6 +182,7 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=redis-datasource,grafana-mongodb-datasource
     depends_on:
       prometheus:
         condition: service_healthy
@@ -189,6 +190,7 @@ services:
       - observability-net
     volumes:
       - grafana-storage:/var/lib/grafana
+      - ./monitoring/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
     healthcheck:
       test: [ "CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health" ]
       interval: 10s
