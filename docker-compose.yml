@@ -1,8 +1,8 @@
 name: empioner
 services:
-  empioner-telegram-bot-redis:
+  redis:
     image: redis:7.4.0-alpine
-    container_name: empioner_telegram_bot_redis
+    container_name: redis
     restart: unless-stopped
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
@@ -28,10 +28,12 @@ services:
       retries: 5
     volumes:
       - redis_data:/data
+    networks:
+      - observability-net
 
-  empioner-telegram-service-mongo:
+  mongo:
     image: mongo:7.0
-    container_name: empioner_telegram_service_mongo
+    container_name: mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
@@ -39,17 +41,19 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh empioner-telegram-service-mongo:27017/test --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh mongo:27017/test --quiet
       interval: 10s
       timeout: 10s
       retries: 5
     volumes:
       - mongo_data_db:/data/db
       - mongo_data_configdb:/data/configdb
+    networks:
+      - observability-net
 
-  empioner-telegram-service-postgres:
+  postgres:
     image: postgres:17-alpine
-    container_name: empioner_telegram_service_postgres
+    container_name: postgres
     restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-d", "${POSTGRES_DB}" ]
@@ -67,15 +71,15 @@ services:
     networks:
       - observability-net
 
-  empioner-telegram-bot:
+  bot:
     image: qwonix/empioner-telegram-bot:latest
-    container_name: empioner_telegram_bot
+    container_name: bot
     restart: unless-stopped
     depends_on:
-      - empioner-telegram-service
-      - empioner-telegram-bot-redis
+      - service
+      - redis
     environment:
-      - SPRING_DATA_REDIS_HOST=empioner-telegram-bot-redis
+      - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_USERNAME=${REDIS_USER}
       - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
       - BOT_TITLE=${BOT_TITLE}
@@ -87,25 +91,25 @@ services:
       - BOT_CONFIG_SHOW_SERIES_IMAGE_ID=${BOT_CONFIG_SHOW_SERIES_IMAGE_ID}
       - BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID=${BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID}
       - BOT_CONFIG_SHOW_MOVIE_IMAGE_ID=${BOT_CONFIG_SHOW_MOVIE_IMAGE_ID}
-      - EMPIONER_SERVICE_URL=http://empioner-telegram-service:8080/graphql
+      - EMPIONER_SERVICE_URL=http://service:8080/graphql
       - BOT_SINGLE_SHOW_MODE_SHOW_ID=${BOT_SINGLE_SHOW_MODE_SHOW_ID}
     networks:
       - observability-net
 
-  empioner-telegram-service:
+  service:
     image: qwonix/empioner-telegram-service:latest
-    container_name: empioner_telegram_service
+    container_name: service
     restart: unless-stopped
     ports:
       - "8080:8080"
     depends_on:
-      - empioner-telegram-service-postgres
-      - empioner-telegram-service-mongo
+      - postgres
+      - mongo
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://empioner-telegram-service-postgres:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - SPRING_DATA_MONGODB_HOST=empioner-telegram-service-mongo
+      - SPRING_DATA_MONGODB_HOST=mongo
       - SPRING_DATA_MONGODB_USERNAME=${MONGODB_USER}
       - SPRING_DATA_MONGODB_PASSWORD=${MONGODB_PASSWORD}
       - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=${MONGODB_AUTHENTICATION_DATABASE}
@@ -163,6 +167,11 @@ services:
       - /etc/alloy/config.alloy
     networks:
       - observability-net
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:9080/healthz" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   grafana:
     image: grafana/grafana-oss:12.1.0
@@ -193,9 +202,9 @@ services:
     ports:
       - "9187:9187"
     environment:
-      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@empioner-telegram-service-postgres:5432/${POSTGRES_DB}?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
     depends_on:
-      empioner-telegram-service-postgres:
+      postgres:
         condition: service_healthy
     networks:
       - observability-net
@@ -212,17 +221,12 @@ services:
     ports:
       - "9216:9216"
     environment:
-      MONGODB_URI: "mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@empioner-telegram-service-mongo:27017/admin?authSource=admin"
+      MONGODB_URI: "mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@mongo:27017/admin?authSource=admin"
     depends_on:
-      empioner-telegram-service-mongo:
+      mongo:
         condition: service_healthy
     networks:
       - observability-net
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9216/metrics"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   redis-exporter:
     image: oliver006/redis_exporter:v1.78.0
@@ -231,10 +235,10 @@ services:
     ports:
       - "9121:9121"
     environment:
-      - REDIS_ADDR=redis://empioner-telegram-bot-redis:6379
+      - REDIS_ADDR=redis://redis:6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     depends_on:
-      empioner-telegram-bot-redis:
+      redis:
         condition: service_healthy
     networks:
       - observability-net

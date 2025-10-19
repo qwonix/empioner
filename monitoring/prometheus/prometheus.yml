@@ -7,15 +7,15 @@ scrape_configs:
     static_configs:
       - targets: ['prometheus:9090']
 
-  - job_name: 'empioner-telegram-service'
+  - job_name: 'service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['empioner-telegram-service:8080']
+      - targets: ['service:8080']
 
-  - job_name: 'empioner-telegram-bot'
+  - job_name: 'bot'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['empioner-telegram-bot:8080']
+      - targets: ['bot:8080']
 
   - job_name: 'postgres'
     static_configs:
