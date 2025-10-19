@@ -167,14 +167,9 @@ services:
       - /etc/alloy/config.alloy
     networks:
       - observability-net
-    healthcheck:
-      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:9080/healthz" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   grafana:
-    image: grafana/grafana-oss:12.1.0
+    image: grafana/grafana:12.1.0
     container_name: grafana
     restart: unless-stopped
     ports:
