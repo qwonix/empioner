@@ -3,19 +3,15 @@
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
                 <timestamp/>
-                <pattern>
-                    <pattern>
-                        {
-                        "level": "%level",
-                        "logger": "%logger",
-                        "thread": "%thread",
-                        "message": "%message",
-                        "uid": "%X{uid}",
-                        "subject": "%X{subject}",
-                        "description": "%X{description}"
-                        }
-                    </pattern>
-                </pattern>
+                <logLevel/>
+                <loggerName/>
+                <threadName/>
+                <message/>
+
+                <mdc>
+                    <includeMdcKeyName>updateId</includeMdcKeyName>
+                    <includeMdcKeyName>userId</includeMdcKeyName>
+                </mdc>
             </providers>
         </encoder>
     </appender>

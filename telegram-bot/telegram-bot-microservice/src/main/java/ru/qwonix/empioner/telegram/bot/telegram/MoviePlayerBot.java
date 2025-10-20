@@ -1,6 +1,7 @@
 package ru.qwonix.empioner.telegram.bot.telegram;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
@@ -25,6 +26,7 @@ public class MoviePlayerBot implements LongPollingSingleThreadUpdateConsumer {
 
     @Override
     public void consume(Update update) {
+        MDC.put("updateId", String.valueOf(update.getUpdateId()));
         log.info("New update {}", update);
         User telegramUser;
         if (update.hasMyChatMember()) {
@@ -36,6 +38,7 @@ public class MoviePlayerBot implements LongPollingSingleThreadUpdateConsumer {
         } else {
             throw new IllegalArgumentException("update does not contains user");
         }
+        MDC.put("userId", String.valueOf(telegramUser.getId()));
 
         TelegramBotUser user = telegramBotUserApi.merge(telegramUser);
         telegramBotUserApi.addActivity(user.id());
