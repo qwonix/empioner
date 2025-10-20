@@ -22,23 +22,61 @@ public class DeleteMessageCallbackDataHandler implements CallbackDataHandler {
 
     @Override
     public boolean canHandle(Class<? extends CallbackData> callbackData) {
-        return DeleteMessageCallbackData.class.isAssignableFrom(callbackData);
+        boolean canHandle = DeleteMessageCallbackData.class.isAssignableFrom(callbackData);
+        log.atTrace()
+                .addKeyValue("callbackData", callbackData.getSimpleName())
+                .addKeyValue("canHandle", canHandle)
+                .log("Checking handler compatibility");
+        return canHandle;
     }
 
     @Override
     public void handle(TelegramBotUser user, CallbackQuery callbackQuery, CallbackData callbackData) {
+        log.atInfo()
+                .addKeyValue("userId", user.id().value())
+                .addKeyValue("callbackQueryId", callbackQuery.getId())
+                .log("Handling DeleteMessageCallbackData");
+
         if (messageApi.hasMessageId(user)) {
             Integer messageId = messageApi.getMessageId(user);
+            log.atDebug()
+                    .addKeyValue("userId", user.id().value())
+                    .addKeyValue("messageId", messageId)
+                    .log("Found messageId for user");
+
             DeleteMessage deleteMessage = DeleteMessage.builder()
                     .chatId(user.id().value())
-                    .messageId(messageId).build();
+                    .messageId(messageId)
+                    .build();
 
             try {
+                log.atInfo()
+                        .addKeyValue("userId", user.id().value())
+                        .addKeyValue("messageId", messageId)
+                        .log("Attempting to delete message");
                 bot.execute(deleteMessage);
+                log.atInfo()
+                        .addKeyValue("userId", user.id().value())
+                        .addKeyValue("messageId", messageId)
+                        .log("Message deleted successfully");
             } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
+                log.atError()
+                        .addKeyValue("userId", user.id().value())
+                        .addKeyValue("messageId", messageId)
+                        .setCause(e)
+                        .log("Failed to delete message");
+                throw new RuntimeException("Error while deleting message for user " + user.id().value(), e);
             }
+
             messageApi.deleteMessageId(user);
+            log.atDebug()
+                    .addKeyValue("userId", user.id().value())
+                    .log("Removed messageId reference from MessageApi");
+        } else {
+            log.atWarn()
+                    .addKeyValue("userId", user.id().value())
+                    .log("No messageId found for user, skipping deletion");
         }
     }
 }
+

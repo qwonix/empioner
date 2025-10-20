@@ -9,6 +9,7 @@
                 <message/>
 
                 <mdc>
+                    <includeMdcKeyName>traceId</includeMdcKeyName>
                     <includeMdcKeyName>updateId</includeMdcKeyName>
                     <includeMdcKeyName>userId</includeMdcKeyName>
                 </mdc>
