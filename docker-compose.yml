@@ -55,11 +55,7 @@ services:
     image: postgres:17-alpine
     container_name: postgres
     restart: unless-stopped
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-d", "${POSTGRES_DB}" ]
-      interval: 10s
-      timeout: 10s
-      retries: 5
+    user: postgres
     ports:
       - "5432:5432"
     environment:
@@ -70,6 +66,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - observability-net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
   bot:
     image: qwonix/empioner-telegram-bot:latest
@@ -95,6 +96,11 @@ services:
       - BOT_SINGLE_SHOW_MODE_SHOW_ID=${BOT_SINGLE_SHOW_MODE_SHOW_ID}
     networks:
       - observability-net
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   service:
     image: qwonix/empioner-telegram-service:latest
@@ -115,6 +121,11 @@ services:
       - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=${MONGODB_AUTHENTICATION_DATABASE}
     networks:
       - observability-net
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   prometheus:
     image: prom/prometheus:v3.6.0
@@ -233,7 +244,8 @@ services:
       - "9121:9121"
     environment:
       - REDIS_ADDR=redis://redis:6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_USER=${REDIS_USER}
+      - REDIS_USER_PASSWORD=${REDIS_USER_PASSWORD}
     depends_on:
       redis:
         condition: service_healthy
