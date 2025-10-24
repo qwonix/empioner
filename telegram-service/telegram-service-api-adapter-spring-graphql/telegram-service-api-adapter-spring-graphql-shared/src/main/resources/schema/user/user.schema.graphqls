@@ -17,7 +17,7 @@ input TelegramBotUserDetailsInput {
     id: TelegramBotUserId!
     firstName: String
     lastName: String
-    username: String!
+    username: String
     languageCode: String
     status: UserStatus!
     roles: [UserRole!]!
