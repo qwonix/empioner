@@ -1,4 +1,18 @@
-rootProject.name = 'empioner'
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            from(files("libs.versions.toml"))
+        }
+    }
+}
+
 
 include 'telegram-bot:telegram-bot-microservice'
 include 'telegram-bot:telegram-bot-shared'

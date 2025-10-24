@@ -1,14 +1,11 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.5'
-    id 'io.spring.dependency-management' version '1.1.3'
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dep.management)
 }
 
-group = 'ru.qwonix.empioner.telegram.service'
-version = '0.3.1'
-
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.toVersion(libs.versions.java.get())
 }
 
 configurations {
@@ -17,29 +14,21 @@ configurations {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
-ext {
-    graphqlExtendedScalarsVersion = '24.0'
-}
-
 dependencies {
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    annotationProcessor libs.spring.boot.configuration.processor
 
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
-    implementation 'io.micrometer:micrometer-registry-prometheus'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation libs.spring.boot.starter.actuator
+    implementation libs.spring.boot.starter.validation
+    implementation libs.logstash
+    implementation libs.micrometer.prometheus
 
     implementation project(':telegram-service:telegram-service-api-adapter-spring-graphql:telegram-service-api-adapter-spring-graphql-core')
     implementation project(':telegram-service:telegram-service-spi-adapter-spring-data')
     implementation project(':telegram-service:telegram-service-core')
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation libs.spring.boot.starter.test
 }
 
-tasks.named('test') {
+tasks.test {
     useJUnitPlatform()
 }

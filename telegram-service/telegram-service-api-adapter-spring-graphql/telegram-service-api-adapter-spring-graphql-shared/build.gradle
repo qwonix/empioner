@@ -1,17 +1,10 @@
 plugins {
     id 'java'
-    id "com.netflix.dgs.codegen" version "8.1.1"
+    alias(libs.plugins.netflix.dgs.codegen)
 }
 
-group = 'ru.qwonix.empioner'
-version = '0.3.1'
-
-repositories {
-    mavenCentral()
-}
-
-ext {
-    graphqlExtendedScalarsVersion = '24.0'
+java {
+    sourceCompatibility = JavaVersion.toVersion(libs.versions.java.get())
 }
 
 generateJava {
@@ -20,17 +13,19 @@ generateJava {
     subPackageNameClient = 'api'
     subPackageNameTypes = 'model'
     generateClient = true
-    typeMapping = ["EpisodeId"           : "ru.qwonix.empioner.telegram.id.EpisodeId",
-                   "ImageId"             : "ru.qwonix.empioner.telegram.id.ImageId",
-                   "MovieId"             : "ru.qwonix.empioner.telegram.id.MovieId",
-                   "SeasonId"            : "ru.qwonix.empioner.telegram.id.SeasonId",
-                   "SeriesId"            : "ru.qwonix.empioner.telegram.id.SeriesId",
-                   "ShowId"              : "ru.qwonix.empioner.telegram.id.ShowId",
-                   "TelegramBotUserId"   : "ru.qwonix.empioner.telegram.id.TelegramBotUserId",
-                   "TelegramFileId"      : "ru.qwonix.empioner.telegram.id.TelegramFileId",
-                   "TelegramFileUniqueId": "ru.qwonix.empioner.telegram.id.TelegramFileUniqueId",
-                   "VideoGroupId"        : "ru.qwonix.empioner.telegram.id.VideoGroupId",
-                   "VideoId"             : "ru.qwonix.empioner.telegram.id.VideoId"]
+    typeMapping = [
+            "EpisodeId"           : "ru.qwonix.empioner.telegram.id.EpisodeId",
+            "ImageId"             : "ru.qwonix.empioner.telegram.id.ImageId",
+            "MovieId"             : "ru.qwonix.empioner.telegram.id.MovieId",
+            "SeasonId"            : "ru.qwonix.empioner.telegram.id.SeasonId",
+            "SeriesId"            : "ru.qwonix.empioner.telegram.id.SeriesId",
+            "ShowId"              : "ru.qwonix.empioner.telegram.id.ShowId",
+            "TelegramBotUserId"   : "ru.qwonix.empioner.telegram.id.TelegramBotUserId",
+            "TelegramFileId"      : "ru.qwonix.empioner.telegram.id.TelegramFileId",
+            "TelegramFileUniqueId": "ru.qwonix.empioner.telegram.id.TelegramFileUniqueId",
+            "VideoGroupId"        : "ru.qwonix.empioner.telegram.id.VideoGroupId",
+            "VideoId"             : "ru.qwonix.empioner.telegram.id.VideoId"
+    ]
     snakeCaseConstantNames = true
 }
 

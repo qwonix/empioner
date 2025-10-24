@@ -1,8 +1,11 @@
+spring:
+  application:
+    name: Empioner Bot
 management:
   endpoints:
     web:
       exposure:
-        include: health, info, prometheus
+        include: health, prometheus
   prometheus:
     metrics:
       export:
