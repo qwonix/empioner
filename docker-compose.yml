@@ -37,9 +37,6 @@ services:
     restart: unless-stopped
     ports:
       - "27017:27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh mongo:27017/test --quiet
       interval: 10s
@@ -116,9 +113,6 @@ services:
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_DATA_MONGODB_HOST=mongo
-      - SPRING_DATA_MONGODB_USERNAME=${MONGODB_USER}
-      - SPRING_DATA_MONGODB_PASSWORD=${MONGODB_PASSWORD}
-      - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=${MONGODB_AUTHENTICATION_DATABASE}
     networks:
       - observability-net
     healthcheck:
