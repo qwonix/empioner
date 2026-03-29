@@ -32,7 +32,7 @@ services:
       - observability-net
 
   mongo:
-    image: mongo:7.0
+    image: mongo:7.0.25
     container_name: mongo
     restart: unless-stopped
     ports:
