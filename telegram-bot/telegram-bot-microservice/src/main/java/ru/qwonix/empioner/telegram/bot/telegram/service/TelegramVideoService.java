@@ -22,6 +22,12 @@ public class TelegramVideoService {
                 .filter(video -> Boolean.TRUE.equals(video.isAvailable())).toList();
     }
 
+    public List<Video> findOtherVideos(Video selected) {
+        return findAllVideoInGroup(selected.videoGroupId()).stream()
+                .filter(video -> !video.id().equals(selected.id()))
+                .toList();
+    }
+
     public Optional<Video> findById(VideoId videoId) {
         return videoApi.findById(videoId).filter(video -> Boolean.TRUE.equals(video.isAvailable()));
     }
