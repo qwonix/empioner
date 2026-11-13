@@ -21,6 +21,26 @@ import java.util.Optional;
 @Repository
 public class JdbcClientEpisodeSpi implements EpisodeSpi {
 
+    // Navigation uses published episodes in published seasons of the same series.
+    // UUIDs provide a deterministic order if legacy data contains duplicate numbers.
+    private static final String WITH_NEIGHBOURS = """
+            select e.*, previous.id as navigation_previous_episode_id, next.id as navigation_next_episode_id
+            from episode e
+            join season s on s.id = e.season_id
+            left join lateral (
+              select candidate.id from season cs join episode candidate on candidate.season_id = cs.id
+              where cs.series_id = s.series_id and cs.is_available = true and candidate.is_available = true
+                and (cs.number, cs.id, candidate.number, candidate.id) < (s.number, s.id, e.number, e.id)
+              order by cs.number desc, cs.id desc, candidate.number desc, candidate.id desc limit 1
+            ) previous on true
+            left join lateral (
+              select candidate.id from season cs join episode candidate on candidate.season_id = cs.id
+              where cs.series_id = s.series_id and cs.is_available = true and candidate.is_available = true
+                and (cs.number, cs.id, candidate.number, candidate.id) > (s.number, s.id, e.number, e.id)
+              order by cs.number, cs.id, candidate.number, candidate.id limit 1
+            ) next on true
+            """;
+
     private final JdbcClient jdbcClient;
     private final RowMapper<Episode> mapper;
 
@@ -44,7 +64,7 @@ public class JdbcClientEpisodeSpi implements EpisodeSpi {
         return jdbcClient.sql("""
                         insert into episode (id, title, description, number, season_id, video_group_id, is_available)
                         values (:id, :title, :description, :number, :seasonId, :videoGroupId, false)
-                        returning *
+                        returning *, null::uuid as navigation_previous_episode_id, null::uuid as navigation_next_episode_id
                         """)
                 .param("id", episode.id().value()).param("title", episode.title())
                 .param("description", episode.description()).param("number", episode.number())
@@ -54,7 +74,7 @@ public class JdbcClientEpisodeSpi implements EpisodeSpi {
 
     @Override
     public Optional<Episode> findById(EpisodeId episodeId) {
-        return jdbcClient.sql("select * from episode where id = :id and is_available = true")
+        return jdbcClient.sql(WITH_NEIGHBOURS + " where e.id = :id and e.is_available = true")
                 .param("id", episodeId.value())
                 .query(mapper)
                 .optional();
@@ -86,9 +106,9 @@ public class JdbcClientEpisodeSpi implements EpisodeSpi {
     public List<Episode> findAllBySeasonIdOrderByNumberWithLimitAndPage(SeasonId seasonId,
                                                                         int limit,
                                                                         int page) {
-        return jdbcClient.sql("select * from episode where season_id = :season_id " +
-                        "and is_available = true " +
-                        "order by number " +
+        return jdbcClient.sql(WITH_NEIGHBOURS + " where e.season_id = :season_id " +
+                        "and e.is_available = true " +
+                        "order by e.number, e.id " +
                         "limit :limit offset :page")
                 .param("season_id", seasonId.value())
                 .param("limit", limit)
@@ -99,7 +119,7 @@ public class JdbcClientEpisodeSpi implements EpisodeSpi {
 
     @Override
     public Optional<Episode> findByVideoGroupId(VideoGroupId id) {
-        return jdbcClient.sql("select * from episode where video_group_id = :id and is_available = true")
+        return jdbcClient.sql(WITH_NEIGHBOURS + " where e.video_group_id = :id and e.is_available = true")
                 .param("id", id.value())
                 .query(mapper)
                 .optional();

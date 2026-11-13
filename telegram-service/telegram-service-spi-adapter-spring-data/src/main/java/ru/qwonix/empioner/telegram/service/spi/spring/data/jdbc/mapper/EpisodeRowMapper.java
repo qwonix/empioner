@@ -21,8 +21,8 @@ public class EpisodeRowMapper implements RowMapper<Episode> {
         String title = rs.getString("title");
         String description = rs.getString("description");
         int number = rs.getInt("number");
-        UUID previousEpisodeId = rs.getObject("previous_episode_id", UUID.class);
-        UUID nextEpisodeId = rs.getObject("next_episode_id", UUID.class);
+        UUID previousEpisodeId = rs.getObject("navigation_previous_episode_id", UUID.class);
+        UUID nextEpisodeId = rs.getObject("navigation_next_episode_id", UUID.class);
         UUID seasonId = rs.getObject("season_id", UUID.class);
         UUID imageId = rs.getObject("preview_image_id", UUID.class);
         UUID videoGroupId = rs.getObject("video_group_id", UUID.class);
