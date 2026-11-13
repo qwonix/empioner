@@ -14,6 +14,7 @@ generateJava {
     subPackageNameTypes = 'model'
     generateClient = true
     typeMapping = [
+            "Long" : "java.lang.Long",
             "EpisodeId"           : "ru.qwonix.empioner.telegram.id.EpisodeId",
             "ImageId"             : "ru.qwonix.empioner.telegram.id.ImageId",
             "MovieId"             : "ru.qwonix.empioner.telegram.id.MovieId",

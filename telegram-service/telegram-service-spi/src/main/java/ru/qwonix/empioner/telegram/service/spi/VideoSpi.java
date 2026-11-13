@@ -1,6 +1,7 @@
 package ru.qwonix.empioner.telegram.service.spi;
 
 import ru.qwonix.empioner.telegram.entity.Video;
+import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.entity.VideoDetails;
 import ru.qwonix.empioner.telegram.id.TelegramFileId;
 import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
@@ -11,6 +12,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface VideoSpi {
+    Video createForEpisode(EpisodeId episodeId, Video video, VideoDetails details);
+
+    Video update(VideoId id, Video patch, VideoDetails details);
+
+    Optional<VideoDetails> findDetails(VideoId id);
+
     Optional<Video> findMaxPriorityInGroup(VideoGroupId videoGroupId);
 
     Optional<Video> findById(VideoId videoId);
