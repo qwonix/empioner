@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.ReplyParameters;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageCaption;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
@@ -97,6 +100,26 @@ public class TelegramBotExecutionService {
                     throw new RuntimeException(e);
                 }
             }
+        }
+    }
+
+    public void replyWithVideoFileIds(Message message) {
+        var video = message.getVideo();
+        SendMessage reply = SendMessage.builder()
+                .chatId(message.getChatId())
+                .replyParameters(ReplyParameters.builder()
+                        .messageId(message.getMessageId())
+                        .allowSendingWithoutReply(true)
+                        .build())
+                .parseMode(ParseMode.HTML)
+                .text("file_id:\n<code>" + HtmlUtils.htmlEscape(video.getFileId())
+                        + "</code>\n\nfile_unique_id:\n<code>"
+                        + HtmlUtils.htmlEscape(video.getFileUniqueId()) + "</code>")
+                .build();
+        try {
+            bot.execute(reply);
+        } catch (TelegramApiException e) {
+            log.error("Error while replying with video file IDs", e);
         }
     }
 
