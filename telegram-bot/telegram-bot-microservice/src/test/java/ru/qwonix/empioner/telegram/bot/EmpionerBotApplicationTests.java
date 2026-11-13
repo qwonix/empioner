@@ -28,6 +28,6 @@ class EmpionerBotApplicationTests {
 
     @Test
     void contextLoadsWithLongScalar() {
-        assertNotNull(graphQlSource.schema().getScalarType("Long"));
+        assertNotNull(graphQlSource.schema().getType("Long"));
     }
 }
