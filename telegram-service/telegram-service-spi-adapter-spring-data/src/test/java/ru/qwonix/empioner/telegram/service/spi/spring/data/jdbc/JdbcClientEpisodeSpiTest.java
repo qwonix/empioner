@@ -14,6 +14,15 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.qwonix.empioner.telegram.entity.Episode;
+import ru.qwonix.empioner.telegram.entity.Video;
+import ru.qwonix.empioner.telegram.entity.VideoDetails;
+import ru.qwonix.empioner.telegram.id.VideoId;
+import ru.qwonix.empioner.telegram.id.TelegramFileId;
+import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
+import ru.qwonix.empioner.telegram.service.spi.VideoSpi;
+import ru.qwonix.empioner.telegram.service.spi.spring.data.jdbc.mapper.VideoRowMapper;
+import ru.qwonix.empioner.telegram.exception.EpisodeNotFoundException;
+import ru.qwonix.empioner.telegram.exception.VideoNotFoundException;
 import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.id.SeasonId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
@@ -113,6 +122,53 @@ class JdbcClientEpisodeSpiTest {
         }
     }
 
+    @Test
+    void addsMultipleVideoVariantsAndUpdatesOneWithoutChangingItsGroup() {
+        Episode episode = episodes.create(episode(season, 1, "Pilot"));
+        VideoSpi videos = context.getBean(VideoSpi.class);
+        Video low = videos.createForEpisode(episode.id(), video("720p", 1, true), null);
+        Video high = videos.createForEpisode(episode.id(), video("1080p", 2, false),
+                new VideoDetails(null, 1920, 1080, 100, "video/mp4", 3_000_000_000L, "episode.mp4"));
+        assertNotEquals(low.id(), high.id());
+        assertEquals(episode.videoGroupId(), low.videoGroupId());
+        assertEquals(low.videoGroupId(), high.videoGroupId());
+        assertEquals(2, videos.findAllByVideoGroupId(episode.videoGroupId()).size());
+        assertEquals(low.id(), videos.findMaxPriorityInGroup(episode.videoGroupId()).orElseThrow().id());
+        assertEquals(3_000_000_000L, videos.findDetails(high.id()).orElseThrow().fileSize());
+        Video patch = new Video(high.id(), null, "4K", null, null, 3, true);
+        Video updated = videos.update(high.id(), patch,
+                new VideoDetails(high.id(), 3840, 2160, 100, "video/mp4", 4_000_000_000L, "4k.mp4"));
+        assertEquals("4K", updated.description());
+        assertEquals(high.telegramFileId(), updated.telegramFileId());
+        assertEquals(episode.videoGroupId(), updated.videoGroupId());
+        assertEquals(high.id(), videos.findMaxPriorityInGroup(episode.videoGroupId()).orElseThrow().id());
+        assertEquals(high.id(), videos.findAllByVideoGroupId(episode.videoGroupId()).getFirst().id());
+        assertEquals(4_000_000_000L, videos.findDetails(high.id()).orElseThrow().fileSize());
+        assertEquals("720p", videos.findById(low.id()).orElseThrow().description());
+    }
+
+    @Test
+    void invalidVideoOrMetadataRollsBackAndMissingIdsAreReported() {
+        Episode episode = episodes.create(episode(season, 1, "Pilot"));
+        VideoSpi videos = context.getBean(VideoSpi.class);
+        assertThrows(EpisodeNotFoundException.class,
+                () -> videos.createForEpisode(new EpisodeId(UUID.randomUUID()), video("HD", 1, true), null));
+        assertThrows(RuntimeException.class, () -> videos.createForEpisode(episode.id(), video("HD", 1, true),
+                new VideoDetails(null, 1, 1, 1, null, 10L, "bad.mp4")));
+        assertTrue(videos.findAllByVideoGroupId(episode.videoGroupId()).isEmpty());
+        Video created = videos.createForEpisode(episode.id(), video("HD", 1, true), null);
+        Video patch = new Video(created.id(), null, "new description", null, null, null, null);
+        assertThrows(RuntimeException.class, () -> videos.update(created.id(), patch,
+                new VideoDetails(created.id(), 1, 1, 1, null, 10L, "bad.mp4")));
+        assertEquals("HD", videos.findById(created.id()).orElseThrow().description());
+        assertThrows(VideoNotFoundException.class, () -> videos.update(new VideoId(UUID.randomUUID()), patch, null));
+    }
+
+    private static Video video(String description, int priority, boolean available) {
+        return new Video(null, null, description, new TelegramFileId("file-" + priority),
+                new TelegramFileUniqueId("unique-" + priority), priority, available);
+    }
+
     private static Episode episode(UUID season, int number, String title) {
         return new Episode(new EpisodeId(UUID.randomUUID()), title, "Description", number, null, null,
                 new VideoGroupId(UUID.randomUUID()), new SeasonId(season), null, false);
@@ -126,6 +182,7 @@ class JdbcClientEpisodeSpiTest {
         }
         @Bean JdbcClient jdbcClient(DataSource ds) { return JdbcClient.create(ds); }
         @Bean PlatformTransactionManager transactionManager(DataSource ds) { return new DataSourceTransactionManager(ds); }
+        @Bean VideoSpi videos(JdbcClient client) { return new JdbcClientVideoSpi(client, new VideoRowMapper()); }
         @Bean EpisodeSpi episodes(JdbcClient client) { return new JdbcClientEpisodeSpi(client, new EpisodeRowMapper()); }
     }
 }

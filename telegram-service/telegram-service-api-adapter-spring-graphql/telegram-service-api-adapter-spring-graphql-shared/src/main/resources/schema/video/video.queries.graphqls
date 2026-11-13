@@ -1,4 +1,5 @@
 extend type Query {
+    videoDetailsById(id: VideoId!): EpisodeVideoDetails
     videoById(id: VideoId!): VideoInput
     videosByVideoGroupId(id: VideoGroupId!): [VideoInput]
     maxPriorityVideo(id: VideoGroupId!): VideoInput

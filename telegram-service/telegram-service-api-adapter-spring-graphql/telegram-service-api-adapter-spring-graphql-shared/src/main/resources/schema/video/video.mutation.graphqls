@@ -1,4 +1,6 @@
 extend type Mutation {
+    addVideoToEpisode(episodeId: EpisodeId!, input: CreateEpisodeVideoInput!): VideoInput!
+    updateVideo(id: VideoId!, input: UpdateVideoInput!): VideoInput!
     create(video: AddVideoInput!, needCreateNewVideoGroup: Boolean!): VideoId!
     updateTelegramFileId(id: TelegramFileUniqueId!, newTelegramFileId: TelegramFileId!): Boolean
 }

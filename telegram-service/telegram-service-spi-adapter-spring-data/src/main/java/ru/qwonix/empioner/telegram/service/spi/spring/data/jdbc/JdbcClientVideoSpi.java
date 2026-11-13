@@ -4,6 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import ru.qwonix.empioner.telegram.id.EpisodeId;
+import ru.qwonix.empioner.telegram.exception.EpisodeNotFoundException;
+import ru.qwonix.empioner.telegram.exception.VideoNotFoundException;
+import java.sql.Types;
 import ru.qwonix.empioner.telegram.entity.Video;
 import ru.qwonix.empioner.telegram.entity.VideoDetails;
 import ru.qwonix.empioner.telegram.id.TelegramFileId;
@@ -24,13 +29,64 @@ public class JdbcClientVideoSpi implements VideoSpi {
     private final RowMapper<Video> mapper;
 
     @Override
+    @Transactional
+    public Video createForEpisode(EpisodeId episodeId, Video video, VideoDetails details) {
+        UUID group = jdbcClient.sql("select video_group_id from episode where id = :id and video_group_id is not null for update")
+                .param("id", episodeId.value()).query(UUID.class).optional().orElseThrow(EpisodeNotFoundException::new);
+        VideoGroupId groupId = new VideoGroupId(group);
+        VideoId id = createVideo(groupId, video);
+        if (details != null) upsertDetails(id, details);
+        return findById(id).orElseThrow(VideoNotFoundException::new);
+    }
+
+    @Override
+    @Transactional
+    public Video update(VideoId id, Video patch, VideoDetails details) {
+        Video updated = jdbcClient.sql("""
+                        update video set description = coalesce(:description, description),
+                          telegram_file_id = coalesce(:fileId, telegram_file_id),
+                          telegram_file_unique_id = coalesce(:uniqueId, telegram_file_unique_id),
+                          priority = coalesce(:priority, priority), is_available = coalesce(:available, is_available)
+                        where id = :id returning *
+                        """)
+                .param("id", id.value()).param("description", patch.description(), Types.VARCHAR)
+                .param("fileId", patch.telegramFileId() == null ? null : patch.telegramFileId().value(), Types.VARCHAR)
+                .param("uniqueId", patch.telegramFileUniqueId() == null ? null : patch.telegramFileUniqueId().value(), Types.VARCHAR)
+                .param("priority", patch.priority(), Types.INTEGER).param("available", patch.isAvailable(), Types.BOOLEAN)
+                .query(mapper).optional().orElseThrow(VideoNotFoundException::new);
+        if (details != null) upsertDetails(id, details);
+        return updated;
+    }
+
+    private void upsertDetails(VideoId id, VideoDetails d) {
+        jdbcClient.sql("""
+                insert into video_details(video_id, width, height, duration, mime_type, file_size, file_name)
+                values(:id, :width, :height, :duration, :mimeType, :fileSize, :fileName)
+                on conflict (video_id) do update set width = excluded.width, height = excluded.height,
+                  duration = excluded.duration, mime_type = excluded.mime_type,
+                  file_size = excluded.file_size, file_name = excluded.file_name
+                """)
+                .param("id", id.value()).param("width", d.width()).param("height", d.height())
+                .param("duration", d.duration()).param("mimeType", d.mimeType())
+                .param("fileSize", d.fileSize()).param("fileName", d.fileName()).update();
+    }
+
+    @Override
+    public Optional<VideoDetails> findDetails(VideoId id) {
+        return jdbcClient.sql("select * from video_details where video_id = :id").param("id", id.value())
+                .query((rs, row) -> new VideoDetails(id, rs.getInt("width"), rs.getInt("height"),
+                        rs.getInt("duration"), rs.getString("mime_type"), rs.getLong("file_size"), rs.getString("file_name")))
+                .optional();
+    }
+
+    @Override
     public Optional<Video> findMaxPriorityInGroup(VideoGroupId videoGroupId) {
         return jdbcClient.sql("""
                         select v.*
                         from video v
                                  join public.video_group vg on vg.id = v.video_group_id
-                        where vg.id = :videoGroupId
-                        order by priority DESC
+                        where vg.id = :videoGroupId and v.is_available = true
+                        order by priority DESC, v.id
                             fetch first 1 rows only""")
                 .param("videoGroupId", videoGroupId.value())
                 .query(mapper)
@@ -60,7 +116,7 @@ public class JdbcClientVideoSpi implements VideoSpi {
 
     @Override
     public List<Video> findAllByVideoGroupId(VideoGroupId videoGroupId) {
-        return jdbcClient.sql("select * from video where video_group_id = :videoGroupId")
+        return jdbcClient.sql("select * from video where video_group_id = :videoGroupId order by priority desc, id")
                 .param("videoGroupId", videoGroupId.value())
                 .query(mapper)
                 .list();

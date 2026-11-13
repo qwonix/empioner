@@ -1,3 +1,4 @@
+scalar Long
 scalar VideoId
 scalar VideoGroupId
 scalar TelegramFileId
@@ -22,4 +23,40 @@ input AddVideoInput {
     mimeType: String
     fileSize: Int
     fileName: String
+}
+
+input EpisodeVideoDetailsInput {
+    width: Int!
+    height: Int!
+    duration: Int!
+    mimeType: String!
+    fileSize: Long!
+    fileName: String!
+}
+
+type EpisodeVideoDetails {
+    width: Int!
+    height: Int!
+    duration: Int!
+    mimeType: String!
+    fileSize: Long!
+    fileName: String!
+}
+
+input CreateEpisodeVideoInput {
+    description: String!
+    telegramFileId: TelegramFileId!
+    telegramFileUniqueId: TelegramFileUniqueId!
+    priority: Int!
+    isAvailable: Boolean!
+    details: EpisodeVideoDetailsInput
+}
+
+input UpdateVideoInput {
+    description: String
+    telegramFileId: TelegramFileId
+    telegramFileUniqueId: TelegramFileUniqueId
+    priority: Int
+    isAvailable: Boolean
+    details: EpisodeVideoDetailsInput
 }

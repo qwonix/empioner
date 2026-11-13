@@ -18,11 +18,12 @@ public class TelegramVideoService {
     private final TelegramProperties telegramProperties;
 
     public List<Video> findAllVideoInGroup(VideoGroupId videoGroupId) {
-        return videoApi.findAllByVideoGroupId(videoGroupId);
+        return videoApi.findAllByVideoGroupId(videoGroupId).stream()
+                .filter(video -> Boolean.TRUE.equals(video.isAvailable())).toList();
     }
 
     public Optional<Video> findById(VideoId videoId) {
-        return videoApi.findById(videoId);
+        return videoApi.findById(videoId).filter(video -> Boolean.TRUE.equals(video.isAvailable()));
     }
 
     public Optional<Video> findMaxPriorityInGroup(VideoGroupId videoGroupId) {
