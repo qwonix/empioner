@@ -72,8 +72,7 @@ public class EpisodeCallbackDataHandler implements CallbackDataHandler {
         }
         Video video = optionalVideo.get();
 
-        List<Video> videos = telegramVideoService.findAllVideoInGroup(video.videoGroupId());
-        videos.remove(video);
+        List<Video> videos = telegramVideoService.findOtherVideos(video);
 
         String episodeText = telegramEpisodeService.createText(episode);
         String videoText = telegramVideoService.createText(video);
