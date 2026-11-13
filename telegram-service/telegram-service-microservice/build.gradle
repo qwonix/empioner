@@ -36,4 +36,5 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
     systemProperty 'api.version', '1.44'
+    testLogging { exceptionFormat = 'full' }
 }
