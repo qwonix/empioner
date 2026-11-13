@@ -71,8 +71,7 @@ public class MovieCallbackDataHandler implements CallbackDataHandler {
         }
         Video video = optionalVideo.get();
 
-        List<Video> videos = telegramVideoService.findAllVideoInGroup(video.videoGroupId());
-        videos.remove(video);
+        List<Video> videos = telegramVideoService.findOtherVideos(video);
 
         String text = telegramMovieService.createText(movie) + '\n' + telegramVideoService.createText(video);
 
