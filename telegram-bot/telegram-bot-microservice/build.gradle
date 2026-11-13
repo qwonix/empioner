@@ -28,6 +28,7 @@ dependencies {
     implementation libs.logstash
     implementation libs.micrometer.prometheus
     implementation libs.graphql.dgs.spring
+    implementation libs.graphql.scalars
 
     implementation libs.telegram.starter
     implementation libs.telegram.client
