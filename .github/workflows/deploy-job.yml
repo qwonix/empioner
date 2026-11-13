@@ -4,9 +4,15 @@ on:
   push:
     tags: [ '*' ]
 
+concurrency:
+  group: empioner-production
+  cancel-in-progress: false
+
 jobs:
   docker-build-push-telegram-bot:
     runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
     steps:
       - name: Docker meta
         id: meta
@@ -15,8 +21,7 @@ jobs:
           images: |
             ${{ secrets.DOCKERHUB_USERNAME }}/empioner-telegram-bot
           tags: |
-            type=semver,pattern={{version}}
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=long
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -31,6 +36,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v6
         with:
           file: ./telegram-bot/telegram-bot-microservice/Dockerfile
@@ -39,6 +45,8 @@ jobs:
 
   docker-build-push-telegram-service:
     runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
     steps:
       - name: Docker meta
         id: meta
@@ -47,8 +55,7 @@ jobs:
           images: |
             ${{ secrets.DOCKERHUB_USERNAME }}/empioner-telegram-service
           tags: |
-            type=semver,pattern={{version}}
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=long
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -63,25 +70,18 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v6
         with:
           file: ./telegram-service/telegram-service-microservice/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
 
-  prepare-environment:
+  deploy:
     runs-on: self-hosted
     needs:
       - docker-build-push-telegram-bot
       - docker-build-push-telegram-service
-    steps:
-      - name: Stop and remove containers, networks
-        run: docker compose stop
-      - name: Update images
-        run: docker compose pull
-
-  deploy:
-    runs-on: self-hosted
     env:
       REDIS_USER: ${{ secrets.REDIS_USER}}
       REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
@@ -103,16 +103,19 @@ jobs:
       BOT_CONFIG_SHOW_MOVIE_IMAGE_ID: ${{secrets.BOT_CONFIG_SHOW_MOVIE_IMAGE_ID}}
       BOT_SINGLE_SHOW_MODE_SHOW_ID: ${{secrets.BOT_SINGLE_SHOW_MODE_SHOW_ID}}
 
-    needs: prepare-environment
+      BOT_IMAGE: qwonix/empioner-telegram-bot@${{ needs.docker-build-push-telegram-bot.outputs.digest }}
+      SERVICE_IMAGE: qwonix/empioner-telegram-service@${{ needs.docker-build-push-telegram-service.outputs.digest }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Start docker containers
-        run: docker compose up -d
-
-  clear:
-    runs-on: self-hosted
-    needs: deploy
-    steps:
-      - name: Remove unused data
-        run: docker system prune -a -f
+      - uses: actions/checkout@v4
+      - name: Check running dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          for service in postgres mongo redis; do
+            test "$(docker inspect --format '{{.State.Health.Status}}' "$service")" = healthy
+          done
+          docker inspect --format '{{.Name}} {{.Image}}' bot service
+      - name: Pull release images before switching
+        run: docker compose pull bot service
+      - name: Switch applications and wait for health
+        run: docker compose up -d --no-deps --wait --wait-timeout 180 bot service
