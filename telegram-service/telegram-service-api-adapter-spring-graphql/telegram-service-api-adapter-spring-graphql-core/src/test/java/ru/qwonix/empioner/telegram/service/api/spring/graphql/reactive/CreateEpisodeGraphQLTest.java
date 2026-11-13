@@ -93,6 +93,47 @@ class CreateEpisodeGraphQLTest {
     }
 
     @Test
+    void publishesAndUnpublishesByEpisodeId() {
+        var id = new EpisodeId(UUID.randomUUID());
+        when(episodeApi.changeAvailable(id, true)).thenReturn(true);
+        when(episodeApi.changeAvailable(id, false)).thenReturn(true);
+        var variables = Map.<String, Object>of("id", id.value().toString());
+        var publish = executor.execute("mutation($id: EpisodeId!) { publishEpisode(id: $id) }", variables);
+        var unpublish = executor.execute("mutation($id: EpisodeId!) { unpublishEpisode(id: $id) }", variables);
+        assertTrue(publish.getErrors().isEmpty(), publish.getErrors().toString());
+        assertTrue(unpublish.getErrors().isEmpty(), unpublish.getErrors().toString());
+        Map<String, Object> published = publish.getData();
+        Map<String, Object> unpublished = unpublish.getData();
+        assertEquals(true, published.get("publishEpisode"));
+        assertEquals(true, unpublished.get("unpublishEpisode"));
+        verify(episodeApi).changeAvailable(id, true);
+        verify(episodeApi).changeAvailable(id, false);
+    }
+
+    @Test
+    void returnsFalseWhenEpisodeDoesNotExist() {
+        var id = new EpisodeId(UUID.randomUUID());
+        when(episodeApi.changeAvailable(id, true)).thenReturn(false);
+        when(episodeApi.changeAvailable(id, false)).thenReturn(false);
+        var variables = Map.<String, Object>of("id", id.value().toString());
+        var publish = executor.execute("mutation($id: EpisodeId!) { publishEpisode(id: $id) }", variables);
+        var unpublish = executor.execute("mutation($id: EpisodeId!) { unpublishEpisode(id: $id) }", variables);
+        assertTrue(publish.getErrors().isEmpty(), publish.getErrors().toString());
+        assertTrue(unpublish.getErrors().isEmpty(), unpublish.getErrors().toString());
+        Map<String, Object> published = publish.getData();
+        Map<String, Object> unpublished = unpublish.getData();
+        assertEquals(false, published.get("publishEpisode"));
+        assertEquals(false, unpublished.get("unpublishEpisode"));
+    }
+
+    @Test
+    void rejectsMalformedPublicationIdBeforeCallingService() {
+        var result = executor.execute("mutation($id: EpisodeId!) { publishEpisode(id: $id) }", Map.of("id", "not-a-uuid"));
+        assertFalse(result.getErrors().isEmpty());
+        verifyNoInteractions(episodeApi);
+    }
+
+    @Test
     void missingRequiredFieldFailsBeforeServiceCall() {
         ExecutionResult result = executor.execute("""
                 mutation Create($input: CreateEpisodeInput!) { createEpisode(input: $input) { id } }

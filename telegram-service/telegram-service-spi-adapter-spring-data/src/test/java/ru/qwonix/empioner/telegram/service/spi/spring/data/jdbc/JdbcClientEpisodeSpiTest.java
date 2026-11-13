@@ -123,6 +123,32 @@ class JdbcClientEpisodeSpiTest {
     }
 
     @Test
+    void publishingAndUnpublishingControlVisibilityWithoutChangingLinks() {
+        Episode first = episodes.create(episode(season, 1, "First"));
+        Episode second = episodes.create(episode(season, 2, "Second"));
+        jdbc.sql("update episode set next_episode_id = :next where id = :id")
+                .param("next", second.id().value()).param("id", first.id().value()).update();
+        jdbc.sql("update episode set previous_episode_id = :prev where id = :id")
+                .param("prev", first.id().value()).param("id", second.id().value()).update();
+
+        assertTrue(episodes.changeAvailable(first.id(), true));
+        assertTrue(episodes.changeAvailable(first.id(), true));
+        assertEquals(first.id(), episodes.findById(first.id()).orElseThrow().id());
+        assertEquals(1, episodes.findAllBySeasonIdOrderByNumberWithLimitAndPage(new SeasonId(season), 10, 0).size());
+        assertEquals(second.id(), episodes.findById(first.id()).orElseThrow().nextEpisodeId());
+        assertTrue(episodes.changeAvailable(first.id(), false));
+        assertTrue(episodes.changeAvailable(first.id(), false));
+        assertTrue(episodes.findById(first.id()).isEmpty());
+        assertTrue(episodes.findAllBySeasonIdOrderByNumberWithLimitAndPage(new SeasonId(season), 10, 0).isEmpty());
+        assertEquals(first.id().value(), jdbc.sql("select previous_episode_id from episode where id = :id")
+                .param("id", second.id().value()).query(UUID.class).single());
+        assertEquals(second.id().value(), jdbc.sql("select next_episode_id from episode where id = :id")
+                .param("id", first.id().value()).query(UUID.class).single());
+        assertFalse(episodes.changeAvailable(new EpisodeId(UUID.randomUUID()), true));
+        assertFalse(episodes.changeAvailable(new EpisodeId(UUID.randomUUID()), false));
+    }
+
+    @Test
     void addsMultipleVideoVariantsAndUpdatesOneWithoutChangingItsGroup() {
         Episode episode = episodes.create(episode(season, 1, "Pilot"));
         VideoSpi videos = context.getBean(VideoSpi.class);

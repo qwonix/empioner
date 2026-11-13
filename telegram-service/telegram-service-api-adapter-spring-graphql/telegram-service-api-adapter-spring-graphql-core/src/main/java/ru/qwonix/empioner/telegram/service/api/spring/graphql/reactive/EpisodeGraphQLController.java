@@ -70,6 +70,18 @@ public class EpisodeGraphQLController {
     }
 
     @DgsMutation
+    public Mono<Boolean> publishEpisode(@InputArgument("id") EpisodeId id) {
+        return Mono.fromCallable(() -> episodeApi.changeAvailable(id, true))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @DgsMutation
+    public Mono<Boolean> unpublishEpisode(@InputArgument("id") EpisodeId id) {
+        return Mono.fromCallable(() -> episodeApi.changeAvailable(id, false))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @DgsMutation
     public Mono<Boolean> changeAvailable(@InputArgument EpisodeId id, @InputArgument Boolean isAvailable) {
         return Mono.fromCallable(() -> episodeApi.changeAvailable(id, isAvailable));
     }

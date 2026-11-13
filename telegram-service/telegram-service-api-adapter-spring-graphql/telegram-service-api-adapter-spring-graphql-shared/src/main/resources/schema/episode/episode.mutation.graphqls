@@ -7,5 +7,7 @@ input CreateEpisodeInput {
 
 extend type Mutation {
     createEpisode(input: CreateEpisodeInput!): EpisodeInput!
+    publishEpisode(id: EpisodeId!): Boolean!
+    unpublishEpisode(id: EpisodeId!): Boolean!
     changeAvailable(id: EpisodeId!, isAvailable: Boolean!): Boolean
 }
