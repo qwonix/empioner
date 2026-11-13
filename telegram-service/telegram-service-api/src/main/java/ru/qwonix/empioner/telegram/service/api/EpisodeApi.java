@@ -1,6 +1,7 @@
 package ru.qwonix.empioner.telegram.service.api;
 
 import ru.qwonix.empioner.telegram.entity.Episode;
+import ru.qwonix.empioner.telegram.service.model.CreateEpisodeRequest;
 import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.id.SeasonId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EpisodeApi {
+    Episode create(CreateEpisodeRequest request);
+
     Optional<Episode> findById(EpisodeId id);
 
     Integer countAllBySeasonId(SeasonId seasonId);

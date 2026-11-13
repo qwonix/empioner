@@ -1,3 +1,11 @@
+input CreateEpisodeInput {
+    seasonId: SeasonId!
+    title: String!
+    description: String!
+    number: Int!
+}
+
 extend type Mutation {
+    createEpisode(input: CreateEpisodeInput!): EpisodeInput!
     changeAvailable(id: EpisodeId!, isAvailable: Boolean!): Boolean
 }

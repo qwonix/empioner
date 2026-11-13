@@ -7,6 +7,8 @@ import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.id.SeasonId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.service.api.EpisodeApi;
+import ru.qwonix.empioner.telegram.service.model.CreateEpisodeRequest;
+import java.util.UUID;
 import ru.qwonix.empioner.telegram.service.spi.EpisodeSpi;
 
 import java.util.List;
@@ -17,6 +19,13 @@ import java.util.Optional;
 public class EpisodeUseCase implements EpisodeApi {
 
     private final EpisodeSpi episodeDao;
+
+    @Override
+    public Episode create(CreateEpisodeRequest request) {
+        return episodeDao.create(new Episode(
+                new EpisodeId(UUID.randomUUID()), request.title(), request.description(), request.number(),
+                null, null, new VideoGroupId(UUID.randomUUID()), request.seasonId(), null, false));
+    }
 
     @Override
     public Optional<Episode> findById(EpisodeId id) {
