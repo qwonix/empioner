@@ -27,8 +27,15 @@ dependencies {
     implementation project(':telegram-service:telegram-service-core')
 
     testImplementation libs.spring.boot.starter.test
+    testImplementation libs.spring.boot.starter.data.jdbc
+    testImplementation libs.spring.boot.starter.data.mongodb
+    testImplementation 'org.testcontainers:postgresql:1.21.3'
+    testImplementation 'org.testcontainers:mongodb:1.21.3'
+    testImplementation 'org.testcontainers:junit-jupiter:1.21.3'
 }
 
 tasks.test {
     useJUnitPlatform()
+    systemProperty 'api.version', '1.44'
+    testLogging { exceptionFormat = 'full' }
 }
