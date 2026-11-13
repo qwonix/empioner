@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMemberUpdated;
 import ru.qwonix.empioner.telegram.bot.api.TelegramBotUserApi;
 import ru.qwonix.empioner.telegram.bot.api.VideoApi;
 import ru.qwonix.empioner.telegram.bot.telegram.config.ChatCommandAnnotationBeanPostProcessor;
+import ru.qwonix.empioner.telegram.bot.telegram.service.TelegramBotExecutionService;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.entity.UserStatus;
 import ru.qwonix.empioner.telegram.id.TelegramFileId;
@@ -25,6 +26,7 @@ public class DefaultUpdateHandler implements UpdateHandler {
     private final TelegramBotUserApi telegramBotUserApi;
     private final CallbackHandler callbackHandler;
     private final VideoApi videoApi;
+    private final TelegramBotExecutionService executionService;
 
     @Override
     public void onCallback(Update update, TelegramBotUser user) {
@@ -123,6 +125,7 @@ public class DefaultUpdateHandler implements UpdateHandler {
     @Override
     public void onVideo(Update update, TelegramBotUser user) {
         Video video = update.getMessage().getVideo();
+        executionService.replyWithVideoFileIds(update.getMessage());
 
         log.atInfo()
                 .addKeyValue("fileUniqueId", video.getFileUniqueId())
