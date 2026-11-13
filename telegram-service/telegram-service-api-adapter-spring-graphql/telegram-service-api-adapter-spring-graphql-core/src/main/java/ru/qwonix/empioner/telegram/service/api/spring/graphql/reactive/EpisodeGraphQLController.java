@@ -7,6 +7,13 @@ import com.netflix.graphql.dgs.InputArgument;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import graphql.GraphqlErrorException;
+import graphql.ErrorType;
+import ru.qwonix.empioner.telegram.service.api.graphql.model.CreateEpisodeInput;
+import ru.qwonix.empioner.telegram.service.model.CreateEpisodeRequest;
+import ru.qwonix.empioner.telegram.exception.SeasonNotFoundException;
+import ru.qwonix.empioner.telegram.exception.EpisodeAlreadyExistsException;
 import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.id.SeasonId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
@@ -44,6 +51,22 @@ public class EpisodeGraphQLController {
         return Mono.fromCallable(() -> episodeApi.findByVideoGroupId(id))
                 .map(optional -> optional.map(mapper::toInput))
                 .flatMap(optional -> optional.map(Mono::just).orElse(Mono.empty()));
+    }
+
+    @DgsMutation
+    public Mono<EpisodeInput> createEpisode(@InputArgument("input") CreateEpisodeInput input) {
+        return Mono.fromCallable(() -> episodeApi.create(new CreateEpisodeRequest(
+                        input.getSeasonId(), input.getTitle(), input.getDescription(), input.getNumber())))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(mapper::toInput)
+                .onErrorMap(IllegalArgumentException.class, EpisodeGraphQLController::inputError)
+                .onErrorMap(SeasonNotFoundException.class, EpisodeGraphQLController::inputError)
+                .onErrorMap(EpisodeAlreadyExistsException.class, EpisodeGraphQLController::inputError);
+    }
+
+    private static GraphqlErrorException inputError(RuntimeException error) {
+        return GraphqlErrorException.newErrorException().message(error.getMessage())
+                .errorClassification(ErrorType.DataFetchingException).cause(error).build();
     }
 
     @DgsMutation

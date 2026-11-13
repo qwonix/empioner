@@ -24,6 +24,9 @@ dependencies {
     annotationProcessor libs.lombok
     annotationProcessor libs.lombok.mapstruct.binding
 
+    testImplementation libs.spring.boot.starter.test
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
     implementation libs.graphql.dgs.spring
     implementation libs.spring.boot.starter.webflux
     implementation libs.spring.boot.starter.graphql

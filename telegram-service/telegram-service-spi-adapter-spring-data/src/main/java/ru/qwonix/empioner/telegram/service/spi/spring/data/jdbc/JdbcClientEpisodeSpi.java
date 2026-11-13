@@ -4,6 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.UUID;
+import ru.qwonix.empioner.telegram.exception.SeasonNotFoundException;
+import ru.qwonix.empioner.telegram.exception.EpisodeAlreadyExistsException;
 import ru.qwonix.empioner.telegram.entity.Episode;
 import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.id.SeasonId;
@@ -19,6 +23,34 @@ public class JdbcClientEpisodeSpi implements EpisodeSpi {
 
     private final JdbcClient jdbcClient;
     private final RowMapper<Episode> mapper;
+
+    @Override
+    @Transactional
+    public Episode create(Episode episode) {
+        // Lock the season so simultaneous creates through this operation cannot reuse a number.
+        boolean seasonExists = jdbcClient.sql("select id from season where id = :id for update")
+                .param("id", episode.seasonId().value()).query(UUID.class).optional().isPresent();
+        if (!seasonExists) {
+            throw new SeasonNotFoundException();
+        }
+        boolean duplicate = !jdbcClient.sql("select id from episode where season_id = :seasonId and number = :number")
+                .param("seasonId", episode.seasonId().value()).param("number", episode.number())
+                .query(UUID.class).list().isEmpty();
+        if (duplicate) {
+            throw new EpisodeAlreadyExistsException();
+        }
+        jdbcClient.sql("insert into video_group (id) values (:id)")
+                .param("id", episode.videoGroupId().value()).update();
+        return jdbcClient.sql("""
+                        insert into episode (id, title, description, number, season_id, video_group_id, is_available)
+                        values (:id, :title, :description, :number, :seasonId, :videoGroupId, false)
+                        returning *
+                        """)
+                .param("id", episode.id().value()).param("title", episode.title())
+                .param("description", episode.description()).param("number", episode.number())
+                .param("seasonId", episode.seasonId().value()).param("videoGroupId", episode.videoGroupId().value())
+                .query(mapper).single();
+    }
 
     @Override
     public Optional<Episode> findById(EpisodeId episodeId) {

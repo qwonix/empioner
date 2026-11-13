@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EpisodeSpi {
+    Episode create(Episode episode);
+
     Optional<Episode> findById(EpisodeId id);
 
     Integer countAllBySeasonId(SeasonId seasonId);
