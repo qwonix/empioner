@@ -70,7 +70,7 @@ services:
       retries: 5
 
   bot:
-    image: qwonix/empioner-telegram-bot:latest
+    image: ${BOT_IMAGE:-qwonix/empioner-telegram-bot:latest}
     container_name: bot
     restart: unless-stopped
     depends_on:
@@ -100,7 +100,7 @@ services:
       retries: 5
 
   service:
-    image: qwonix/empioner-telegram-service:latest
+    image: ${SERVICE_IMAGE:-qwonix/empioner-telegram-service:latest}
     container_name: service
     restart: unless-stopped
     ports:
