@@ -35,4 +35,5 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    systemProperty 'api.version', '1.44'
 }
