@@ -135,7 +135,7 @@ class JdbcClientEpisodeSpiTest {
         assertTrue(episodes.changeAvailable(first.id(), true));
         assertEquals(first.id(), episodes.findById(first.id()).orElseThrow().id());
         assertEquals(1, episodes.findAllBySeasonIdOrderByNumberWithLimitAndPage(new SeasonId(season), 10, 0).size());
-        assertEquals(second.id(), episodes.findById(first.id()).orElseThrow().nextEpisodeId());
+        assertNull(episodes.findById(first.id()).orElseThrow().nextEpisodeId());
         assertTrue(episodes.changeAvailable(first.id(), false));
         assertTrue(episodes.changeAvailable(first.id(), false));
         assertTrue(episodes.findById(first.id()).isEmpty());
@@ -146,6 +146,66 @@ class JdbcClientEpisodeSpiTest {
                 .param("id", first.id().value()).query(UUID.class).single());
         assertFalse(episodes.changeAvailable(new EpisodeId(UUID.randomUUID()), true));
         assertFalse(episodes.changeAvailable(new EpisodeId(UUID.randomUUID()), false));
+    }
+
+    @Test
+    void navigationCrossesPublishedSeasonsAndIgnoresLegacyPointersAndDrafts() {
+        jdbc.sql("update season set is_available = true where id = :id").param("id", season).update();
+        UUID series = jdbc.sql("select series_id from season where id = :id").param("id", season).query(UUID.class).single();
+        UUID season2 = UUID.randomUUID();
+        UUID hiddenSeason = UUID.randomUUID();
+        UUID emptySeason = UUID.randomUUID();
+        UUID season5 = UUID.randomUUID();
+        for (var item : java.util.List.of(new Object[]{season2, 2, true}, new Object[]{hiddenSeason, 3, false},
+                new Object[]{emptySeason, 4, true}, new Object[]{season5, 5, true})) {
+            jdbc.sql("insert into season (id, number, series_id, is_available) values (:id, :number, :series, :available)")
+                    .param("id", item[0]).param("number", item[1]).param("series", series).param("available", item[2]).update();
+        }
+        Episode one = episodes.create(episode(season, 1, "One"));
+        Episode two = episodes.create(episode(season, 2, "Two"));
+        Episode draft = episodes.create(episode(season, 3, "Draft"));
+        Episode four = episodes.create(episode(season, 4, "Four"));
+        Episode nextSeason = episodes.create(episode(season2, 1, "Next"));
+        Episode hidden = episodes.create(episode(hiddenSeason, 1, "Hidden"));
+        Episode last = episodes.create(episode(season5, 1, "Last"));
+        for (Episode e : java.util.List.of(one, two, four, nextSeason, hidden, last)) episodes.changeAvailable(e.id(), true);
+        jdbc.sql("update episode set next_episode_id = :wrong where id = :id")
+                .param("wrong", draft.id().value()).param("id", two.id().value()).update();
+
+        assertNull(episodes.findById(one.id()).orElseThrow().previousEpisodeId());
+        assertEquals(four.id(), episodes.findById(two.id()).orElseThrow().nextEpisodeId());
+        assertEquals(nextSeason.id(), episodes.findById(four.id()).orElseThrow().nextEpisodeId());
+        assertEquals(four.id(), episodes.findById(nextSeason.id()).orElseThrow().previousEpisodeId());
+        assertEquals(last.id(), episodes.findById(nextSeason.id()).orElseThrow().nextEpisodeId());
+        assertNull(episodes.findById(last.id()).orElseThrow().nextEpisodeId());
+        assertEquals(nextSeason.id(), episodes.findByVideoGroupId(four.videoGroupId()).orElseThrow().nextEpisodeId());
+        var page = episodes.findAllBySeasonIdOrderByNumberWithLimitAndPage(new SeasonId(season), 1, 1);
+        assertEquals(two.id(), page.getFirst().id());
+        assertEquals(one.id(), page.getFirst().previousEpisodeId());
+        assertEquals(four.id(), page.getFirst().nextEpisodeId());
+        episodes.changeAvailable(draft.id(), true);
+        assertEquals(draft.id(), episodes.findById(two.id()).orElseThrow().nextEpisodeId());
+        episodes.changeAvailable(draft.id(), false);
+        assertEquals(four.id(), episodes.findById(two.id()).orElseThrow().nextEpisodeId());
+    }
+
+    @Test
+    void navigationNeverCrossesSeries() {
+        jdbc.sql("update season set is_available = true where id = :id").param("id", season).update();
+        UUID otherSeries = UUID.randomUUID();
+        UUID otherSeason = UUID.randomUUID();
+        UUID show = jdbc.sql("select show_id from series where id = (select series_id from season where id = :id)")
+                .param("id", season).query(UUID.class).single();
+        jdbc.sql("insert into series (id,title,show_id,priority) values (:id,'Other',:show,1)")
+                .param("id", otherSeries).param("show", show).update();
+        jdbc.sql("insert into season (id,number,series_id,is_available) values (:id,2,:series,true)")
+                .param("id", otherSeason).param("series", otherSeries).update();
+        Episode one = episodes.create(episode(season, 1, "One"));
+        Episode other = episodes.create(episode(otherSeason, 1, "Other"));
+        episodes.changeAvailable(one.id(), true);
+        episodes.changeAvailable(other.id(), true);
+        assertNull(episodes.findById(one.id()).orElseThrow().nextEpisodeId());
+        assertNull(episodes.findById(other.id()).orElseThrow().previousEpisodeId());
     }
 
     @Test
