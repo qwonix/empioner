@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <changeSet id="2026-11-15-entity-timestamps" author="empioner">
+        <!-- TIMESTAMPTZ represents an instant; existing rows receive this migration's transaction time. -->
+        <sql splitStatements="false"><![CDATA[
+            DO $$
+            DECLARE table_name text;
+            BEGIN
+                FOREACH table_name IN ARRAY ARRAY['show', 'series', 'season', 'episode', 'movie',
+                                                  'video_group', 'video', 'video_details', 'image']
+                LOOP
+                    EXECUTE format('ALTER TABLE public.%I ADD COLUMN created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP, ADD COLUMN updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP', table_name);
+                END LOOP;
+            END;
+            $$;
+        ]]></sql>
+        <sql splitStatements="false"><![CDATA[
+            CREATE FUNCTION public.empioner_entity_timestamps() RETURNS trigger
+            LANGUAGE plpgsql AS $$
+            BEGIN
+                IF NEW.created_at IS DISTINCT FROM OLD.created_at THEN
+                    RAISE EXCEPTION 'created_at is immutable';
+                END IF;
+                NEW.updated_at := clock_timestamp();
+                RETURN NEW;
+            END;
+            $$;
+        ]]></sql>
+        <sql splitStatements="false"><![CDATA[
+            DO $$
+            DECLARE table_name text;
+            BEGIN
+                FOREACH table_name IN ARRAY ARRAY['show', 'series', 'season', 'episode', 'movie',
+                                                  'video_group', 'video', 'video_details', 'image']
+                LOOP
+                    EXECUTE format('CREATE TRIGGER empioner_entity_timestamps BEFORE UPDATE ON public.%I FOR EACH ROW EXECUTE FUNCTION public.empioner_entity_timestamps()', table_name);
+                END LOOP;
+            END;
+            $$;
+        ]]></sql>
+        <rollback>
+            <sql splitStatements="false"><![CDATA[
+                DO $$
+                DECLARE table_name text;
+                BEGIN
+                    FOREACH table_name IN ARRAY ARRAY['show', 'series', 'season', 'episode', 'movie',
+                                                      'video_group', 'video', 'video_details', 'image']
+                    LOOP
+                        EXECUTE format('DROP TRIGGER empioner_entity_timestamps ON public.%I', table_name);
+                        EXECUTE format('ALTER TABLE public.%I DROP COLUMN created_at, DROP COLUMN updated_at', table_name);
+                    END LOOP;
+                END;
+                $$;
+            ]]></sql>
+            <sql>DROP FUNCTION public.empioner_entity_timestamps();</sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
+

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -47,6 +48,33 @@ class EpisodeVideoFlowIntegrationTest {
     @Autowired ObjectMapper json;
     @Autowired MongoTemplate mongoTemplate;
     final HttpClient http = HttpClient.newHttpClient();
+
+    @Test
+    void timestampsAreRequiredAutomaticAndCreationTimeCannotBeChanged() {
+        int timestampColumns = jdbc.sql("""
+                select count(*)::int from information_schema.columns
+                where table_schema = 'public'
+                  and table_name in ('show','series','season','episode','movie',
+                                     'video_group','video','video_details','image')
+                  and column_name in ('created_at','updated_at')
+                  and data_type = 'timestamp with time zone' and is_nullable = 'NO'
+                """).query(Integer.class).single();
+        assertEquals(18, timestampColumns);
+
+        UUID id = UUID.randomUUID();
+        jdbc.sql("insert into show (id, title, priority, is_available) values (:id, 'Timestamp test', 1, true)")
+                .param("id", id).update();
+        assertTrue(jdbc.sql("select created_at is not null and updated_at is not null from show where id=:id")
+                .param("id", id).query(Boolean.class).single());
+        jdbc.sql("select pg_sleep(0.05)").query((rs, row) -> true).single();
+        jdbc.sql("update show set title='Changed', updated_at='2000-01-01T00:00:00Z' where id=:id")
+                .param("id", id).update();
+        assertTrue(jdbc.sql("select updated_at > created_at from show where id=:id")
+                .param("id", id).query(Boolean.class).single());
+        assertThrows(DataAccessException.class, () ->
+                jdbc.sql("update show set created_at=created_at + interval '1 second' where id=:id")
+                        .param("id", id).update());
+    }
 
     @Test
     void createsEpisodeAndVideoPublishesAndReadsThem() throws Exception {
