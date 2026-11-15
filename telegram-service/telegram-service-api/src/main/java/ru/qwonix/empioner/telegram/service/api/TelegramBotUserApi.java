@@ -17,5 +17,4 @@ public interface TelegramBotUserApi {
 
     void setStatus(TelegramBotUserId userId, UserStatus status);
 
-    void makeAdmin(TelegramBotUserId userId);
 }

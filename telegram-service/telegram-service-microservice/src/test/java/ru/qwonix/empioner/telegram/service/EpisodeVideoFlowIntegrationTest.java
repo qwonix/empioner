@@ -115,6 +115,12 @@ class EpisodeVideoFlowIntegrationTest {
 
     @Test
     void onlyStoredRolesGrantAdminAndRegistrationCannotAssignIt() throws Exception {
+        var mutationFields = graphql("{ __schema { mutationType { fields { name } } } }", Map.of())
+                .path("__schema").path("mutationType").path("fields");
+        assertTrue(mutationFields.isArray());
+        for (JsonNode field : mutationFields) {
+            assertNotEquals("makeAdmin", field.path("name").asText());
+        }
         long legacyId = 777000001L, adminId = 777000002L, newId = 777000003L;
         var users = mongoTemplate.getCollection("user");
         users.insertOne(new Document("_id", legacyId).append("role", java.util.List.of("ADMIN")));

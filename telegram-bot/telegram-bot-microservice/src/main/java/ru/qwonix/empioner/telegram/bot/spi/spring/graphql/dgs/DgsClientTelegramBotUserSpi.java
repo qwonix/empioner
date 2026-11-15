@@ -80,14 +80,4 @@ public class DgsClientTelegramBotUserSpi implements TelegramBotUserSpi {
                 .retrieveSync();
     }
 
-    @Override
-    public void makeAdmin(TelegramBotUserId id) {
-        dgsClient.request(MakeAdminGraphQLQuery.newRequest()
-                        .id(id)
-                        .build())
-                .coercing(TelegramBotUserId.class, telegramBotUserIdCoercing)
-                .projection(new BaseProjectionNode() {
-                })
-                .retrieveSync();
-    }
 }
