@@ -10,6 +10,7 @@ import ru.qwonix.empioner.telegram.bot.api.TelegramBotUserApi;
 import ru.qwonix.empioner.telegram.bot.api.VideoApi;
 import ru.qwonix.empioner.telegram.bot.telegram.config.ChatCommandAnnotationBeanPostProcessor;
 import ru.qwonix.empioner.telegram.bot.telegram.service.TelegramBotExecutionService;
+import ru.qwonix.empioner.telegram.bot.telegram.service.EpisodeVideoReplacementService;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.entity.UserStatus;
 import ru.qwonix.empioner.telegram.id.TelegramFileId;
@@ -27,6 +28,7 @@ public class DefaultUpdateHandler implements UpdateHandler {
     private final CallbackHandler callbackHandler;
     private final VideoApi videoApi;
     private final TelegramBotExecutionService executionService;
+    private final EpisodeVideoReplacementService replacementService;
 
     @Override
     public void onCallback(Update update, TelegramBotUser user) {
@@ -125,7 +127,14 @@ public class DefaultUpdateHandler implements UpdateHandler {
     @Override
     public void onVideo(Update update, TelegramBotUser user) {
         Video video = update.getMessage().getVideo();
-        executionService.replyWithVideoFileIds(update.getMessage(), user);
+        String replacementStatus;
+        try {
+            replacementStatus = replacementService.replace(update.getMessage(), user);
+        } catch (Exception e) {
+            log.error("Failed to replace episode video", e);
+            replacementStatus = "Не удалось обновить видео. Проверьте данные и повторите попытку.";
+        }
+        executionService.replyWithVideoFileIds(update.getMessage(), user, replacementStatus);
 
         log.atInfo()
                 .addKeyValue("fileUniqueId", video.getFileUniqueId())

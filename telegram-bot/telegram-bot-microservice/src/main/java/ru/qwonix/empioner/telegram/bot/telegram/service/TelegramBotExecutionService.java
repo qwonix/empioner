@@ -105,6 +105,10 @@ public class TelegramBotExecutionService {
     }
 
     public void replyWithVideoFileIds(Message message, TelegramBotUser user) {
+        replyWithVideoFileIds(message, user, "");
+    }
+
+    public void replyWithVideoFileIds(Message message, TelegramBotUser user, String status) {
         // Never publish file identifiers in a group, even when the sender is an admin.
         if (user == null || !user.isAdmin() || !Objects.equals(message.getChatId(), user.id().value())) {
             return;
@@ -124,7 +128,8 @@ public class TelegramBotExecutionService {
                 .text("file_name:\n<code>" + HtmlUtils.htmlEscape(fileName)
                         + "</code>\n\nfile_id:\n<code>" + HtmlUtils.htmlEscape(video.getFileId())
                         + "</code>\n\nfile_unique_id:\n<code>"
-                        + HtmlUtils.htmlEscape(video.getFileUniqueId()) + "</code>")
+                        + HtmlUtils.htmlEscape(video.getFileUniqueId()) + "</code>"
+                        + (status.isBlank() ? "" : "\n\n" + HtmlUtils.htmlEscape(status)))
                 .build();
         try {
             bot.execute(reply);
