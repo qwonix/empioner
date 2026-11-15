@@ -102,7 +102,8 @@ class VideoFileIdsReplyTest {
         var handler = new DefaultUpdateHandler(null, null, null, api,
                 new TelegramBotExecutionService(null, client, null));
         Update update = mock(Update.class);
-        when(update.getMessage()).thenReturn(message("file", "unique"));
+        Message source = message("file", "unique");
+        when(update.getMessage()).thenReturn(source);
         handler.onVideo(update, user);
         verify(client, never()).execute(any(SendMessage.class));
         verify(api).updateTelegramFileIdByTelegramFileUniqueId(any(), any());
