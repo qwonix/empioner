@@ -25,6 +25,7 @@ import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.id.ImageId;
 
 import java.util.UUID;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -103,8 +104,16 @@ public class TelegramBotExecutionService {
         }
     }
 
-    public void replyWithVideoFileIds(Message message) {
+    public void replyWithVideoFileIds(Message message, TelegramBotUser user) {
+        // Never publish file identifiers in a group, even when the sender is an admin.
+        if (user == null || !user.isAdmin() || !Objects.equals(message.getChatId(), user.id().value())) {
+            return;
+        }
         var video = message.getVideo();
+        String fileName = video.getFileName();
+        if (fileName == null || fileName.isBlank()) {
+            fileName = "не указано";
+        }
         SendMessage reply = SendMessage.builder()
                 .chatId(message.getChatId())
                 .replyParameters(ReplyParameters.builder()
@@ -112,7 +121,8 @@ public class TelegramBotExecutionService {
                         .allowSendingWithoutReply(true)
                         .build())
                 .parseMode(ParseMode.HTML)
-                .text("file_id:\n<code>" + HtmlUtils.htmlEscape(video.getFileId())
+                .text("file_name:\n<code>" + HtmlUtils.htmlEscape(fileName)
+                        + "</code>\n\nfile_id:\n<code>" + HtmlUtils.htmlEscape(video.getFileId())
                         + "</code>\n\nfile_unique_id:\n<code>"
                         + HtmlUtils.htmlEscape(video.getFileUniqueId()) + "</code>")
                 .build();
