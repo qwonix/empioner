@@ -12,6 +12,13 @@ import java.util.UUID;
 @JsonComponent
 public class EntityIdJsonConfiguration {
 
+    public static class TelegramBotUserIdDeserializer extends JsonDeserializer<TelegramBotUserId> {
+        @Override
+        public TelegramBotUserId deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            return new TelegramBotUserId(Long.parseLong(p.getText()));
+        }
+    }
+
     public static class EpisodeIdDeserializer extends JsonDeserializer<EpisodeId> {
         @Override
         public EpisodeId deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {

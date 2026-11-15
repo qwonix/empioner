@@ -2,11 +2,13 @@ package ru.qwonix.empioner.telegram.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bson.Document;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -43,6 +45,7 @@ class EpisodeVideoFlowIntegrationTest {
     @LocalServerPort int port;
     @Autowired JdbcClient jdbc;
     @Autowired ObjectMapper json;
+    @Autowired MongoTemplate mongoTemplate;
     final HttpClient http = HttpClient.newHttpClient();
 
     @Test
@@ -108,6 +111,43 @@ class EpisodeVideoFlowIntegrationTest {
                 Map.of("id", episode)).path("unpublishEpisode").asBoolean());
         assertTrue(graphql("query($id: EpisodeId!) { episodeById(id: $id) { id } }",
                 Map.of("id", episode)).path("episodeById").isNull());
+    }
+
+    @Test
+    void onlyStoredRolesGrantAdminAndRegistrationCannotAssignIt() throws Exception {
+        var mutationFields = graphql("{ __schema { mutationType { fields { name } } } }", Map.of())
+                .path("__schema").path("mutationType").path("fields");
+        assertTrue(mutationFields.isArray());
+        for (JsonNode field : mutationFields) {
+            assertNotEquals("makeAdmin", field.path("name").asText());
+        }
+        long legacyId = 777000001L, adminId = 777000002L, newId = 777000003L;
+        var users = mongoTemplate.getCollection("user");
+        users.insertOne(new Document("_id", legacyId).append("role", java.util.List.of("ADMIN")));
+        users.insertOne(new Document("_id", adminId).append("roles", java.util.List.of("ADMIN")));
+
+        String lookup = "query($id: TelegramBotUserId!) { telegramBotUserById(id: $id) { id roles } }";
+        assertTrue(graphql(lookup, Map.of("id", Long.toString(legacyId)))
+                .path("telegramBotUserById").path("roles").isEmpty());
+        assertEquals("ADMIN", graphql(lookup, Map.of("id", Long.toString(adminId)))
+                .path("telegramBotUserById").path("roles").get(0).asText());
+        assertTrue(graphql(lookup, Map.of("id", "777000004"))
+                .path("telegramBotUserById").isNull());
+
+        JsonNode registered = graphql("""
+                mutation($input: TelegramBotUserDetailsInput!) {
+                  mergeTelegramBotUser(userDetails: $input) { id roles }
+                }
+                """, Map.of("input", Map.of("id", Long.toString(newId), "firstName", "Test",
+                "status", "MEMBER", "roles", java.util.List.of("ADMIN"))))
+                .path("mergeTelegramBotUser");
+        assertEquals(Long.toString(newId), registered.path("id").asText());
+        assertTrue(registered.path("roles").isEmpty());
+        Document saved = users.find(new Document("_id", newId)).first();
+        assertNotNull(saved);
+        assertTrue(saved.getList("roles", String.class).isEmpty());
+        assertTrue(graphql(lookup, Map.of("id", Long.toString(newId)))
+                .path("telegramBotUserById").path("roles").isEmpty());
     }
 
     private JsonNode graphql(String query, Map<String, ?> variables) throws Exception {

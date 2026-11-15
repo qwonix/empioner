@@ -16,5 +16,4 @@ public interface TelegramBotUserSpi {
 
     void updateStatus(TelegramBotUserId id, UserStatus status);
 
-    void makeAdmin(TelegramBotUserId userId);
 }

@@ -11,6 +11,7 @@ enum UserRole {
 
 type TelegramBotUserInput {
     id: TelegramBotUserId!
+    roles: [UserRole!]!
 }
 
 input TelegramBotUserDetailsInput {

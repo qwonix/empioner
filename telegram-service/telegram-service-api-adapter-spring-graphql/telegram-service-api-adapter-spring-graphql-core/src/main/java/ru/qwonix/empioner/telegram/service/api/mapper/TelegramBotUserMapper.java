@@ -2,6 +2,7 @@ package ru.qwonix.empioner.telegram.service.api.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.Mapping;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUserDetails;
 import ru.qwonix.empioner.telegram.entity.UserRole;
@@ -14,5 +15,6 @@ import java.util.Set;
 public interface TelegramBotUserMapper {
     TelegramBotUserInput toInput(TelegramBotUser botUser);
 
+    @Mapping(target = "roles", source = "roles")
     TelegramBotUserDetails to(TelegramBotUserDetailsInput userDetails, Set<UserRole> roles);
 }

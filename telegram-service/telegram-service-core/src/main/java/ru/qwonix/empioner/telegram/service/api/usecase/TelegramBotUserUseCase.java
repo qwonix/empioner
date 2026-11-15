@@ -10,6 +10,7 @@ import ru.qwonix.empioner.telegram.service.api.TelegramBotUserApi;
 import ru.qwonix.empioner.telegram.service.spi.TelegramBotUserSpi;
 
 import java.util.Optional;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -23,7 +24,11 @@ public class TelegramBotUserUseCase implements TelegramBotUserApi {
     }
 
     public TelegramBotUser registerNewUser(TelegramBotUserDetails userDetails) {
-        return telegramBotUserDao.registerNewUser(userDetails);
+        // Registration is public: caller-supplied roles are never trusted.
+        var safeUser = new TelegramBotUserDetails(userDetails.id(), userDetails.firstName(),
+                userDetails.lastName(), userDetails.username(), userDetails.languageCode(),
+                userDetails.status(), Set.of());
+        return telegramBotUserDao.registerNewUser(safeUser);
     }
 
     @Override
@@ -42,8 +47,4 @@ public class TelegramBotUserUseCase implements TelegramBotUserApi {
         telegramBotUserDao.updateStatus(userId, status);
     }
 
-    @Override
-    public void makeAdmin(TelegramBotUserId userId) {
-        telegramBotUserDao.makeAdmin(userId);
-    }
 }

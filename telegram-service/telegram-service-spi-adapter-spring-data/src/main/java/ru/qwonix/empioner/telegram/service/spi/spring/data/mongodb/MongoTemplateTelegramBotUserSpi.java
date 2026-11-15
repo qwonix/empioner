@@ -33,8 +33,7 @@ public class MongoTemplateTelegramBotUserSpi implements TelegramBotUserSpi {
                 .inCollection(USER_COLLECTION)
                 .matching(query(where("id").is(id)))
                 .one()
-                .map(TelegramBotUserDetails::id)
-                .map(TelegramBotUser::new);
+                .map(user -> new TelegramBotUser(user.id(), user.roles()));
     }
 
     @Override
@@ -64,15 +63,4 @@ public class MongoTemplateTelegramBotUserSpi implements TelegramBotUserSpi {
         }
     }
 
-    @Override
-    public void makeAdmin(TelegramBotUserId id) {
-        UpdateResult result = mongoTemplate.update(TelegramBotUserDetails.class)
-                .inCollection(USER_COLLECTION)
-                .matching(query(where("id").is(id)))
-                .apply(new Update().addToSet("role", UserRole.ADMIN))
-                .first();
-        if (!result.wasAcknowledged()) {
-            log.error("User with id {} not found, can't make admin", id);
-        }
-    }
 }

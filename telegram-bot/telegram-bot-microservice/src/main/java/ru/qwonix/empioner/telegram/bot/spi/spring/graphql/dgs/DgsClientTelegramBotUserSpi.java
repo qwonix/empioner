@@ -32,7 +32,7 @@ public class DgsClientTelegramBotUserSpi implements TelegramBotUserSpi {
                         .build())
                 .coercing(TelegramBotUserId.class, telegramBotUserIdCoercing)
                 .projection(new TelegramBotUserByIdProjectionRoot<>()
-                        .id())
+                        .id().roles())
                 .retrieveSync()
                 .toEntity(TelegramBotUser.class));
     }
@@ -52,7 +52,7 @@ public class DgsClientTelegramBotUserSpi implements TelegramBotUserSpi {
                         .build())
                 .coercing(TelegramBotUserId.class, telegramBotUserIdCoercing)
                 .projection(new MergeTelegramBotUserProjectionRoot<>()
-                        .id())
+                        .id().roles())
                 .retrieveSync()
                 .toEntity(TelegramBotUser.class);
     }
@@ -80,14 +80,4 @@ public class DgsClientTelegramBotUserSpi implements TelegramBotUserSpi {
                 .retrieveSync();
     }
 
-    @Override
-    public void makeAdmin(TelegramBotUserId id) {
-        dgsClient.request(MakeAdminGraphQLQuery.newRequest()
-                        .id(id)
-                        .build())
-                .coercing(TelegramBotUserId.class, telegramBotUserIdCoercing)
-                .projection(new BaseProjectionNode() {
-                })
-                .retrieveSync();
-    }
 }
