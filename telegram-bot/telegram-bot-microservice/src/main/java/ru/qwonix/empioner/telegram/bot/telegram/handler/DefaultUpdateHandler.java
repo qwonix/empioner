@@ -125,7 +125,7 @@ public class DefaultUpdateHandler implements UpdateHandler {
     @Override
     public void onVideo(Update update, TelegramBotUser user) {
         Video video = update.getMessage().getVideo();
-        executionService.replyWithVideoFileIds(update.getMessage());
+        executionService.replyWithVideoFileIds(update.getMessage(), user);
 
         log.atInfo()
                 .addKeyValue("fileUniqueId", video.getFileUniqueId())
