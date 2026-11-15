@@ -39,10 +39,10 @@ class EmpionerBotApplicationTests {
     }
 
     @Test
-    void deserializesAdminFlagAndDefaultsMissingFlagToFalse() throws Exception {
-        var admin = json.readValue("{\"id\":\"123456\",\"admin\":true}", TelegramBotUser.class);
+    void deserializesRolesAndTreatsMissingRolesAsNonAdmin() throws Exception {
+        var admin = json.readValue("{\"id\":\"123456\",\"roles\":[\"ADMIN\"]}", TelegramBotUser.class);
         var legacy = json.readValue("{\"id\":\"123456\"}", TelegramBotUser.class);
-        assertTrue(admin.admin());
-        assertFalse(legacy.admin());
+        assertTrue(admin.isAdmin());
+        assertFalse(legacy.isAdmin());
     }
 }

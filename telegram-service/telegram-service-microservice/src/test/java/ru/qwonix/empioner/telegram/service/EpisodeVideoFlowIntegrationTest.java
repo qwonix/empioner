@@ -114,36 +114,34 @@ class EpisodeVideoFlowIntegrationTest {
     }
 
     @Test
-    void adminFlagDefaultsToFalseAndCanOnlyBeReadFromStoredBoolean() throws Exception {
+    void onlyStoredRolesGrantAdminAndRegistrationCannotAssignIt() throws Exception {
         long legacyId = 777000001L, adminId = 777000002L, newId = 777000003L;
         var users = mongoTemplate.getCollection("user");
-        users.insertOne(new Document("_id", legacyId).append("roles", java.util.List.of("ADMIN"))
-                .append("role", java.util.List.of("ADMIN")));
-        users.insertOne(new Document("_id", adminId).append("admin", true));
+        users.insertOne(new Document("_id", legacyId).append("role", java.util.List.of("ADMIN")));
+        users.insertOne(new Document("_id", adminId).append("roles", java.util.List.of("ADMIN")));
 
-        String lookup = "query($id: TelegramBotUserId!) { telegramBotUserById(id: $id) { id admin } }";
-        assertFalse(graphql(lookup, Map.of("id", Long.toString(legacyId)))
-                .path("telegramBotUserById").path("admin").asBoolean());
-        assertTrue(graphql(lookup, Map.of("id", Long.toString(adminId)))
-                .path("telegramBotUserById").path("admin").asBoolean());
+        String lookup = "query($id: TelegramBotUserId!) { telegramBotUserById(id: $id) { id roles } }";
+        assertTrue(graphql(lookup, Map.of("id", Long.toString(legacyId)))
+                .path("telegramBotUserById").path("roles").isEmpty());
+        assertEquals("ADMIN", graphql(lookup, Map.of("id", Long.toString(adminId)))
+                .path("telegramBotUserById").path("roles").get(0).asText());
         assertTrue(graphql(lookup, Map.of("id", "777000004"))
                 .path("telegramBotUserById").isNull());
 
         JsonNode registered = graphql("""
                 mutation($input: TelegramBotUserDetailsInput!) {
-                  mergeTelegramBotUser(userDetails: $input) { id admin }
+                  mergeTelegramBotUser(userDetails: $input) { id roles }
                 }
                 """, Map.of("input", Map.of("id", Long.toString(newId), "firstName", "Test",
                 "status", "MEMBER", "roles", java.util.List.of("ADMIN"))))
                 .path("mergeTelegramBotUser");
         assertEquals(Long.toString(newId), registered.path("id").asText());
-        assertFalse(registered.path("admin").asBoolean());
+        assertTrue(registered.path("roles").isEmpty());
         Document saved = users.find(new Document("_id", newId)).first();
         assertNotNull(saved);
-        assertEquals(false, saved.getBoolean("admin"));
         assertTrue(saved.getList("roles", String.class).isEmpty());
-        assertFalse(graphql(lookup, Map.of("id", Long.toString(newId)))
-                .path("telegramBotUserById").path("admin").asBoolean());
+        assertTrue(graphql(lookup, Map.of("id", Long.toString(newId)))
+                .path("telegramBotUserById").path("roles").isEmpty());
     }
 
     private JsonNode graphql(String query, Map<String, ?> variables) throws Exception {

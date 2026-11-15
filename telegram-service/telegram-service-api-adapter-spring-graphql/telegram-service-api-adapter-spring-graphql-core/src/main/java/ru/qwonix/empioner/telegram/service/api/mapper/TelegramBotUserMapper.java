@@ -16,6 +16,5 @@ public interface TelegramBotUserMapper {
     TelegramBotUserInput toInput(TelegramBotUser botUser);
 
     @Mapping(target = "roles", source = "roles")
-    @Mapping(target = "admin", ignore = true)
     TelegramBotUserDetails to(TelegramBotUserDetailsInput userDetails, Set<UserRole> roles);
 }

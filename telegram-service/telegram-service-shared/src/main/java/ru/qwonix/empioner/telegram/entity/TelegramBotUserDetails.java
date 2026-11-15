@@ -10,6 +10,5 @@ public record TelegramBotUserDetails(TelegramBotUserId id,
                                      String username,
                                      String languageCode,
                                      UserStatus status,
-                                     Set<UserRole> roles,
-                                     Boolean admin) {
+                                     Set<UserRole> roles) {
 }

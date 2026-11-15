@@ -32,7 +32,7 @@ public class DgsClientTelegramBotUserSpi implements TelegramBotUserSpi {
                         .build())
                 .coercing(TelegramBotUserId.class, telegramBotUserIdCoercing)
                 .projection(new TelegramBotUserByIdProjectionRoot<>()
-                        .id().admin())
+                        .id().roles())
                 .retrieveSync()
                 .toEntity(TelegramBotUser.class));
     }
@@ -52,7 +52,7 @@ public class DgsClientTelegramBotUserSpi implements TelegramBotUserSpi {
                         .build())
                 .coercing(TelegramBotUserId.class, telegramBotUserIdCoercing)
                 .projection(new MergeTelegramBotUserProjectionRoot<>()
-                        .id().admin())
+                        .id().roles())
                 .retrieveSync()
                 .toEntity(TelegramBotUser.class);
     }

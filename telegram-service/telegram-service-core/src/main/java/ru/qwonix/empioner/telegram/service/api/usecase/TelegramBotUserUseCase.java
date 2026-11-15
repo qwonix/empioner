@@ -24,10 +24,10 @@ public class TelegramBotUserUseCase implements TelegramBotUserApi {
     }
 
     public TelegramBotUser registerNewUser(TelegramBotUserDetails userDetails) {
-        // Registration is public: caller-supplied roles and admin status are never trusted.
+        // Registration is public: caller-supplied roles are never trusted.
         var safeUser = new TelegramBotUserDetails(userDetails.id(), userDetails.firstName(),
                 userDetails.lastName(), userDetails.username(), userDetails.languageCode(),
-                userDetails.status(), Set.of(), false);
+                userDetails.status(), Set.of());
         return telegramBotUserDao.registerNewUser(safeUser);
     }
 
