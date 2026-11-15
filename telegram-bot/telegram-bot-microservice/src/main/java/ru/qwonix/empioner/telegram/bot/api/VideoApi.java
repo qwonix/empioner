@@ -19,6 +19,8 @@ public interface VideoApi {
 
     VideoId createVideo(AddVideoInput addVideoInput);
 
+    void replaceVideo(VideoId id, String quality, org.telegram.telegrambots.meta.api.objects.Video video);
+
     void updateTelegramFileIdByTelegramFileUniqueId(
             TelegramFileUniqueId telegramFileUniqueId,
             TelegramFileId telegramFileId);
