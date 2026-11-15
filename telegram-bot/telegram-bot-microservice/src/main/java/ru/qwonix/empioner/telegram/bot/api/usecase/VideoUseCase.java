@@ -41,6 +41,11 @@ public class VideoUseCase implements VideoApi {
     }
 
     @Override
+    public void replaceVideo(VideoId id, String quality, org.telegram.telegrambots.meta.api.objects.Video video) {
+        videoSpi.replaceVideo(id, quality, video);
+    }
+
+    @Override
     public void updateTelegramFileIdByTelegramFileUniqueId(
             TelegramFileUniqueId telegramFileUniqueId,
             TelegramFileId telegramFileId) {

@@ -17,6 +17,8 @@ import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.id.VideoId;
 import ru.qwonix.empioner.telegram.service.api.graphql.api.*;
+import ru.qwonix.empioner.telegram.service.api.graphql.model.UpdateVideoInput;
+import ru.qwonix.empioner.telegram.service.api.graphql.model.EpisodeVideoDetailsInput;
 
 import java.util.List;
 import java.util.Optional;
@@ -100,6 +102,24 @@ public class DgsClientVideoSpi implements VideoSpi {
                 })
                 .retrieveSync()
                 .toEntity(VideoId.class);
+    }
+
+    @Override
+    public void replaceVideo(VideoId id, String quality, org.telegram.telegrambots.meta.api.objects.Video video) {
+        var details = EpisodeVideoDetailsInput.newBuilder()
+                .width(video.getWidth()).height(video.getHeight()).duration(video.getDuration())
+                .mimeType(video.getMimeType()).fileSize(video.getFileSize().longValue())
+                .fileName(video.getFileName()).build();
+        var input = UpdateVideoInput.newBuilder().description(quality)
+                .telegramFileId(new TelegramFileId(video.getFileId()))
+                .telegramFileUniqueId(new TelegramFileUniqueId(video.getFileUniqueId()))
+                .details(details).build();
+        dgsClient.request(UpdateVideoGraphQLQuery.newRequest().id(id).input(input).build())
+                .coercing(VideoId.class, videoIdCoercing)
+                .coercing(TelegramFileId.class, telegramFileIdCoercing)
+                .coercing(TelegramFileUniqueId.class, telegramFileUniqueIdCoercing)
+                .projection(new UpdateVideoProjectionRoot<>().id())
+                .retrieveSync().toEntity(Video.class);
     }
 
     @Override

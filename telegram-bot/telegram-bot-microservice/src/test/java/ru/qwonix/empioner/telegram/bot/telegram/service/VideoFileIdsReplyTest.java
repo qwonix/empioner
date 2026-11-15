@@ -47,7 +47,7 @@ class VideoFileIdsReplyTest {
         TelegramClient client = mock(TelegramClient.class);
         var service = new TelegramBotExecutionService(null, client, null);
         VideoApi api = mock(VideoApi.class);
-        var handler = new DefaultUpdateHandler(null, null, null, api, service);
+        var handler = new DefaultUpdateHandler(null, null, null, api, service, noReplacement());
         Message source = message("BAAC_file-id", "AgAD_unique-id");
         Update update = mock(Update.class);
         when(update.getMessage()).thenReturn(source);
@@ -70,7 +70,7 @@ class VideoFileIdsReplyTest {
         VideoApi api = mock(VideoApi.class);
         doThrow(new RuntimeException("Service unavailable"))
                 .when(api).updateTelegramFileIdByTelegramFileUniqueId(any(), any());
-        var handler = new DefaultUpdateHandler(null, null, null, api, service);
+        var handler = new DefaultUpdateHandler(null, null, null, api, service, noReplacement());
         Update update = mock(Update.class);
         Message source = message("file", "unique");
         when(update.getMessage()).thenReturn(source);
@@ -86,7 +86,7 @@ class VideoFileIdsReplyTest {
         when(client.execute(any(SendMessage.class))).thenThrow(new TelegramApiException("Telegram unavailable"));
         var service = new TelegramBotExecutionService(null, client, null);
         VideoApi api = mock(VideoApi.class);
-        var handler = new DefaultUpdateHandler(null, null, null, api, service);
+        var handler = new DefaultUpdateHandler(null, null, null, api, service, noReplacement());
         Update update = mock(Update.class);
         Message source = message("file", "unique");
         when(update.getMessage()).thenReturn(source);
@@ -100,7 +100,7 @@ class VideoFileIdsReplyTest {
         TelegramClient client = mock(TelegramClient.class);
         VideoApi api = mock(VideoApi.class);
         var handler = new DefaultUpdateHandler(null, null, null, api,
-                new TelegramBotExecutionService(null, client, null));
+                new TelegramBotExecutionService(null, client, null), noReplacement());
         Update update = mock(Update.class);
         Message source = message("file", "unique");
         when(update.getMessage()).thenReturn(source);
@@ -117,6 +117,12 @@ class VideoFileIdsReplyTest {
         when(groupMessage.getChatId()).thenReturn(-123L);
         service.replyWithVideoFileIds(groupMessage, admin);
         verify(client, never()).execute(any(SendMessage.class));
+    }
+
+    private EpisodeVideoReplacementService noReplacement() {
+        var service = mock(EpisodeVideoReplacementService.class);
+        when(service.replace(any(), any())).thenReturn("");
+        return service;
     }
 
     private Message message(String fileId, String uniqueId) {
