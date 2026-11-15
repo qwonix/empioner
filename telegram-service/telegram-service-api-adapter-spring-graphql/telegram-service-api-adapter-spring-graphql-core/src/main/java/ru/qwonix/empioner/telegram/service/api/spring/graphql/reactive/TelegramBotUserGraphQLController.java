@@ -6,7 +6,6 @@ import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import ru.qwonix.empioner.telegram.entity.UserRole;
 import ru.qwonix.empioner.telegram.entity.UserStatus;
 import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 import ru.qwonix.empioner.telegram.service.api.TelegramBotUserApi;
@@ -32,7 +31,7 @@ public class TelegramBotUserGraphQLController {
 
     @DgsMutation
     public Mono<TelegramBotUserInput> mergeTelegramBotUser(@InputArgument TelegramBotUserDetailsInput userDetails) {
-        return Mono.fromCallable(() -> telegramBotUserApi.merge(mapper.to(userDetails, Set.of(UserRole.ADMIN))))
+        return Mono.fromCallable(() -> telegramBotUserApi.merge(mapper.to(userDetails, Set.of())))
                 .map(mapper::toInput);
     }
 

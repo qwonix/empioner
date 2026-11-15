@@ -33,8 +33,7 @@ public class MongoTemplateTelegramBotUserSpi implements TelegramBotUserSpi {
                 .inCollection(USER_COLLECTION)
                 .matching(query(where("id").is(id)))
                 .one()
-                .map(TelegramBotUserDetails::id)
-                .map(TelegramBotUser::new);
+                .map(user -> new TelegramBotUser(user.id(), Boolean.TRUE.equals(user.admin())));
     }
 
     @Override
