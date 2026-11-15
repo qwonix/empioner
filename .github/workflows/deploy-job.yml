@@ -3,13 +3,38 @@ on:
   workflow_dispatch:
   push:
     tags: [ '*' ]
+  pull_request:
+    branches: [ master ]
+    types: [ closed ]
 
 concurrency:
   group: empioner-production
-  cancel-in-progress: false
+  queue: max
 
 jobs:
+  verify:
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+    uses: ./.github/workflows/ci.yml
+
+  version:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out merged commit with tags
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+      - name: Create the next minor version
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: bash .github/scripts/release-tag.sh
+
   docker-build-push-telegram-bot:
+    needs: version
     runs-on: ubuntu-latest
     outputs:
       digest: ${{ steps.build.outputs.digest }}
@@ -44,6 +69,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
 
   docker-build-push-telegram-service:
+    needs: version
     runs-on: ubuntu-latest
     outputs:
       digest: ${{ steps.build.outputs.digest }}

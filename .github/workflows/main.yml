@@ -1,5 +1,9 @@
 name: Master Pipeline
 
+concurrency:
+  group: empioner-production
+  queue: max
+
 on:
   workflow_dispatch:
     inputs:
