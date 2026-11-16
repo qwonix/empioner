@@ -21,6 +21,9 @@ public interface VideoApi {
 
     void replaceVideo(VideoId id, String quality, org.telegram.telegrambots.meta.api.objects.Video video);
 
+    void addVideoToEpisode(ru.qwonix.empioner.telegram.id.EpisodeId episodeId, String quality, int priority,
+                           org.telegram.telegrambots.meta.api.objects.Video video);
+
     void updateTelegramFileIdByTelegramFileUniqueId(
             TelegramFileUniqueId telegramFileUniqueId,
             TelegramFileId telegramFileId);

@@ -62,6 +62,44 @@ class EpisodeVideoReplacementServiceTest {
 
         assertEquals("Обновлено: сезон 7, серия 4, " + expectedQuality + ".", service.replace(message, admin));
         verify(videos).replaceVideo(videoId, expectedQuality, message.getVideo());
+        verify(videos, never()).addVideoToEpisode(any(), any(), anyInt(), any());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"480,FullHD,1,SD,0", "1080,SD,2,Full HD,3"})
+    void addsMissingQualityWithPriorityBelowOrAboveExisting(int height, String existingQuality,
+                                                             int existingPriority, String expectedQuality, int expectedPriority) {
+        Message message = input("704.mp4", height);
+        var show = mock(Show.class);
+        var seriesItem = mock(Series.class);
+        var season = mock(Season.class);
+        var episode = mock(Episode.class);
+        var existing = mock(Video.class);
+        var showId = new ShowId(UUID.randomUUID());
+        var seriesId = new SeriesId(UUID.randomUUID());
+        var seasonId = new SeasonId(UUID.randomUUID());
+        var episodeId = new EpisodeId(UUID.randomUUID());
+        var groupId = new VideoGroupId(UUID.randomUUID());
+        when(show.id()).thenReturn(showId);
+        when(seriesItem.id()).thenReturn(seriesId);
+        when(season.id()).thenReturn(seasonId);
+        when(season.number()).thenReturn(7);
+        when(episode.id()).thenReturn(episodeId);
+        when(episode.number()).thenReturn(4);
+        when(episode.videoGroupId()).thenReturn(groupId);
+        when(existing.description()).thenReturn(existingQuality);
+        when(existing.priority()).thenReturn(existingPriority);
+        when(shows.findAllOrderByNumberWithLimitAndPage(100, 0)).thenReturn(List.of(show));
+        when(series.findAllByShowId(showId)).thenReturn(List.of(seriesItem));
+        when(seasons.countAllBySeries(seriesId)).thenReturn(1);
+        when(seasons.findAllBySeriesIdOrderByNumberWithLimitAndPage(seriesId, 100, 0)).thenReturn(List.of(season));
+        when(episodes.countAllBySeasonId(seasonId)).thenReturn(1);
+        when(episodes.findAllBySeasonIdOrderByNumberWithLimitAndPage(seasonId, 100, 0)).thenReturn(List.of(episode));
+        when(videos.findAllByVideoGroupId(groupId)).thenReturn(List.of(existing));
+
+        assertEquals("Добавлено: сезон 7, серия 4, " + expectedQuality + ".", service.replace(message, admin));
+        verify(videos).addVideoToEpisode(episodeId, expectedQuality, expectedPriority, message.getVideo());
+        verify(videos, never()).replaceVideo(any(), any(), any());
     }
 
     @Test
