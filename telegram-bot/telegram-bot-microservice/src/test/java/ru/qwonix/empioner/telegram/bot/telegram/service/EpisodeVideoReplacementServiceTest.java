@@ -66,7 +66,7 @@ class EpisodeVideoReplacementServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"480,FullHD,1,SD,0", "1080,SD,2,Full HD,3"})
+    @CsvSource({"480,FullHD,1,SD,2", "1080,SD,2,Full HD,1", "480,4K,10,SD,11"})
     void addsMissingQualityWithPriorityBelowOrAboveExisting(int height, String existingQuality,
                                                              int existingPriority, String expectedQuality, int expectedPriority) {
         Message message = input("704.mp4", height);
@@ -89,6 +89,7 @@ class EpisodeVideoReplacementServiceTest {
         when(episode.videoGroupId()).thenReturn(groupId);
         when(existing.description()).thenReturn(existingQuality);
         when(existing.priority()).thenReturn(existingPriority);
+        when(existing.isAvailable()).thenReturn(true);
         when(shows.findAllOrderByNumberWithLimitAndPage(100, 0)).thenReturn(List.of(show));
         when(series.findAllByShowId(showId)).thenReturn(List.of(seriesItem));
         when(seasons.countAllBySeries(seriesId)).thenReturn(1);

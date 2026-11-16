@@ -83,14 +83,15 @@ public class EpisodeVideoReplacementService {
     }
 
     private Integer priorityForNewQuality(String quality, List<Video> existing) {
-        String other = quality.equals("Full HD") ? "SD" : "Full HD";
-        var priorities = existing.stream().filter(v -> other.equals(normalizeQuality(v.description())))
-                .map(Video::priority).filter(Objects::nonNull).mapToInt(Integer::intValue);
-        if (quality.equals("Full HD")) {
+        var available = existing.stream().filter(v -> Boolean.TRUE.equals(v.isAvailable()));
+        if (quality.equals("SD")) {
+            var priorities = available.map(Video::priority).filter(Objects::nonNull).mapToInt(Integer::intValue);
             var max = priorities.max();
             if (max.isEmpty()) return 2;
             return max.getAsInt() == Integer.MAX_VALUE ? null : max.getAsInt() + 1;
         }
+        var priorities = available.filter(v -> "SD".equals(normalizeQuality(v.description())))
+                .map(Video::priority).filter(Objects::nonNull).mapToInt(Integer::intValue);
         var min = priorities.min();
         if (min.isEmpty()) return 1;
         return min.getAsInt() == Integer.MIN_VALUE ? null : min.getAsInt() - 1;
