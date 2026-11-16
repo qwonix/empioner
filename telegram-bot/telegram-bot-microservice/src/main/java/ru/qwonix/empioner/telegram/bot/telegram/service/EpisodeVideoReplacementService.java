@@ -67,11 +67,33 @@ public class EpisodeVideoReplacementService {
             if (showPage.size() < PAGE_SIZE) break;
         }
         if (matches.size() != 1) return "Видео не обновлено: по коду " + code + " подходящих серий найдено " + matches.size() + ".";
-        List<Video> candidates = videos.findAllByVideoGroupId(matches.getFirst().videoGroupId()).stream()
+        var episode = matches.getFirst();
+        List<Video> existingVideos = videos.findAllByVideoGroupId(episode.videoGroupId());
+        List<Video> candidates = existingVideos.stream()
                 .filter(v -> quality.equals(normalizeQuality(v.description()))).toList();
+        if (candidates.isEmpty()) {
+            Integer priority = priorityForNewQuality(quality, existingVideos);
+            if (priority == null) return "Видео не добавлено: не удалось определить приоритет качества.";
+            videos.addVideoToEpisode(episode.id(), quality, priority, video);
+            return "Добавлено: сезон " + seasonNumber + ", серия " + episodeNumber + ", " + quality + ".";
+        }
         if (candidates.size() != 1) return "Видео не обновлено: вариантов качества " + quality + " найдено " + candidates.size() + ".";
         videos.replaceVideo(candidates.getFirst().id(), quality, video);
         return "Обновлено: сезон " + seasonNumber + ", серия " + episodeNumber + ", " + quality + ".";
+    }
+
+    private Integer priorityForNewQuality(String quality, List<Video> existing) {
+        String other = quality.equals("Full HD") ? "SD" : "Full HD";
+        var priorities = existing.stream().filter(v -> other.equals(normalizeQuality(v.description())))
+                .map(Video::priority).filter(Objects::nonNull).mapToInt(Integer::intValue);
+        if (quality.equals("Full HD")) {
+            var max = priorities.max();
+            if (max.isEmpty()) return 2;
+            return max.getAsInt() == Integer.MAX_VALUE ? null : max.getAsInt() + 1;
+        }
+        var min = priorities.min();
+        if (min.isEmpty()) return 1;
+        return min.getAsInt() == Integer.MIN_VALUE ? null : min.getAsInt() - 1;
     }
 
     public static String normalizeQuality(String label) {

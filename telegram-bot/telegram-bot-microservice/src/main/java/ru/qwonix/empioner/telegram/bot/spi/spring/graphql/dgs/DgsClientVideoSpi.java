@@ -8,6 +8,7 @@ import ru.qwonix.empioner.telegram.bot.config.coercing.TelegramFileIdCoercing;
 import ru.qwonix.empioner.telegram.bot.config.coercing.TelegramFileUniqueIdCoercing;
 import ru.qwonix.empioner.telegram.bot.config.coercing.VideoGroupIdCoercing;
 import ru.qwonix.empioner.telegram.bot.config.coercing.VideoIdCoercing;
+import ru.qwonix.empioner.telegram.bot.config.coercing.EpisodeIdCoercing;
 import ru.qwonix.empioner.telegram.bot.spi.VideoSpi;
 import ru.qwonix.empioner.telegram.bot.spi.spring.graphql.mapper.VideoMapper;
 import ru.qwonix.empioner.telegram.bot.spi.spring.graphql.model.AddVideoInput;
@@ -16,9 +17,11 @@ import ru.qwonix.empioner.telegram.id.TelegramFileId;
 import ru.qwonix.empioner.telegram.id.TelegramFileUniqueId;
 import ru.qwonix.empioner.telegram.id.VideoGroupId;
 import ru.qwonix.empioner.telegram.id.VideoId;
+import ru.qwonix.empioner.telegram.id.EpisodeId;
 import ru.qwonix.empioner.telegram.service.api.graphql.api.*;
 import ru.qwonix.empioner.telegram.service.api.graphql.model.UpdateVideoInput;
 import ru.qwonix.empioner.telegram.service.api.graphql.model.EpisodeVideoDetailsInput;
+import ru.qwonix.empioner.telegram.service.api.graphql.model.CreateEpisodeVideoInput;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +34,7 @@ public class DgsClientVideoSpi implements VideoSpi {
     private final DgsGraphQlClient dgsClient;
 
     private final VideoIdCoercing videoIdCoercing;
+    private final EpisodeIdCoercing episodeIdCoercing;
     private final VideoGroupIdCoercing videoGroupIdCoercing;
     private final TelegramFileIdCoercing telegramFileIdCoercing;
     private final TelegramFileUniqueIdCoercing telegramFileUniqueIdCoercing;
@@ -106,20 +110,38 @@ public class DgsClientVideoSpi implements VideoSpi {
 
     @Override
     public void replaceVideo(VideoId id, String quality, org.telegram.telegrambots.meta.api.objects.Video video) {
-        var details = EpisodeVideoDetailsInput.newBuilder()
-                .width(video.getWidth()).height(video.getHeight()).duration(video.getDuration())
-                .mimeType(video.getMimeType()).fileSize(video.getFileSize().longValue())
-                .fileName(video.getFileName()).build();
         var input = UpdateVideoInput.newBuilder().description(quality)
                 .telegramFileId(new TelegramFileId(video.getFileId()))
                 .telegramFileUniqueId(new TelegramFileUniqueId(video.getFileUniqueId()))
-                .details(details).build();
+                .details(details(video)).build();
         dgsClient.request(UpdateVideoGraphQLQuery.newRequest().id(id).input(input).build())
                 .coercing(VideoId.class, videoIdCoercing)
                 .coercing(TelegramFileId.class, telegramFileIdCoercing)
                 .coercing(TelegramFileUniqueId.class, telegramFileUniqueIdCoercing)
                 .projection(new UpdateVideoProjectionRoot<>().id())
                 .retrieveSync().toEntity(Video.class);
+    }
+
+    @Override
+    public void addVideoToEpisode(EpisodeId episodeId, String quality, int priority,
+                                  org.telegram.telegrambots.meta.api.objects.Video video) {
+        var input = CreateEpisodeVideoInput.newBuilder().description(quality)
+                .telegramFileId(new TelegramFileId(video.getFileId()))
+                .telegramFileUniqueId(new TelegramFileUniqueId(video.getFileUniqueId()))
+                .priority(priority).isAvailable(true).details(details(video)).build();
+        dgsClient.request(AddVideoToEpisodeGraphQLQuery.newRequest().episodeId(episodeId).input(input).build())
+                .coercing(EpisodeId.class, episodeIdCoercing)
+                .coercing(TelegramFileId.class, telegramFileIdCoercing)
+                .coercing(TelegramFileUniqueId.class, telegramFileUniqueIdCoercing)
+                .projection(new AddVideoToEpisodeProjectionRoot<>().id())
+                .retrieveSync().toEntity(Video.class);
+    }
+
+    private EpisodeVideoDetailsInput details(org.telegram.telegrambots.meta.api.objects.Video video) {
+        return EpisodeVideoDetailsInput.newBuilder()
+                .width(video.getWidth()).height(video.getHeight()).duration(video.getDuration())
+                .mimeType(video.getMimeType()).fileSize(video.getFileSize().longValue())
+                .fileName(video.getFileName()).build();
     }
 
     @Override

@@ -46,6 +46,12 @@ public class VideoUseCase implements VideoApi {
     }
 
     @Override
+    public void addVideoToEpisode(ru.qwonix.empioner.telegram.id.EpisodeId episodeId, String quality, int priority,
+                                  org.telegram.telegrambots.meta.api.objects.Video video) {
+        videoSpi.addVideoToEpisode(episodeId, quality, priority, video);
+    }
+
+    @Override
     public void updateTelegramFileIdByTelegramFileUniqueId(
             TelegramFileUniqueId telegramFileUniqueId,
             TelegramFileId telegramFileId) {
