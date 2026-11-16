@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class EpisodeVideoReplacementService {
     private static final int PAGE_SIZE = 100;
-    private static final Pattern CODE = Pattern.compile("(?<![0-9xX])([1-9][0-9]{2})(?![0-9pP])");
+    private static final Pattern CODE = Pattern.compile("(?<![0-9xX])([1-9][0-9]{2})(?![0-9pP]|\\s+[pP](?![a-zA-Z]))");
     private final ShowApi shows;
     private final SeriesApi series;
     private final SeasonApi seasons;
@@ -32,7 +32,6 @@ public class EpisodeVideoReplacementService {
         var matcher = CODE.matcher(name);
         if (!matcher.find()) return "Видео не обновлено: в имени не найден код серии.";
         var code = matcher.group(1);
-        if (matcher.find()) return "Видео не обновлено: в имени несколько трёхзначных кодов.";
         int seasonNumber = code.charAt(0) - '0';
         int episodeNumber = Integer.parseInt(code.substring(1));
         if (episodeNumber == 0) return "Видео не обновлено: номер серии должен быть больше нуля.";
@@ -67,7 +66,7 @@ public class EpisodeVideoReplacementService {
             }
             if (showPage.size() < PAGE_SIZE) break;
         }
-        if (matches.size() != 1) return "Видео не обновлено: подходящих серий найдено " + matches.size() + ".";
+        if (matches.size() != 1) return "Видео не обновлено: по коду " + code + " подходящих серий найдено " + matches.size() + ".";
         List<Video> candidates = videos.findAllByVideoGroupId(matches.getFirst().videoGroupId()).stream()
                 .filter(v -> quality.equals(normalizeQuality(v.description()))).toList();
         if (candidates.size() != 1) return "Видео не обновлено: вариантов качества " + quality + " найдено " + candidates.size() + ".";

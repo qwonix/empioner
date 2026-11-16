@@ -25,9 +25,15 @@ class EpisodeVideoReplacementServiceTest {
     final TelegramBotUser admin = new TelegramBotUser(new TelegramBotUserId(123L), Set.of(UserRole.ADMIN));
 
     @ParameterizedTest
-    @CsvSource({"1080,FullHD,Full HD", "1080,1080p,Full HD", "480,SD,SD", "480,480p,SD"})
-    void findsEpisodeAndReplacesBothIdsUsingQualityAndMetadata(int height, String existingQuality, String expectedQuality) {
-        Message message = input("Some video 704 1080p x264 final.mp4", height);
+    @CsvSource({
+            "1080,FullHD,Full HD,Some video 704 1080p x264 final.mp4",
+            "1080,1080p,Full HD,704 603.mp4",
+            "480,SD,SD,704 480P.mp4",
+            "480,480p,SD,480P episode 704 x264.mp4",
+            "480,SD,SD,480 P episode 704.mp4"
+    })
+    void findsEpisodeAndReplacesBothIdsUsingQualityAndMetadata(int height, String existingQuality, String expectedQuality, String filename) {
+        Message message = input(filename, height);
         var show = mock(Show.class);
         var seriesItem = mock(Series.class);
         var season = mock(Season.class);
@@ -59,8 +65,8 @@ class EpisodeVideoReplacementServiceTest {
     }
 
     @Test
-    void refusesAmbiguousCodesAndUnsupportedResolution() {
-        assertTrue(service.replace(input("704 603.mp4", 1080), admin).contains("несколько"));
+    void refusesMissingFirstEpisodeAndUnsupportedResolution() {
+        assertTrue(service.replace(input("999 704.mp4", 1080), admin).contains("по коду 999"));
         assertTrue(service.replace(input("704.mp4", 720), admin).contains("1080 и 480"));
         assertTrue(service.replace(input("1704.mp4", 1080), admin).contains("не найден"));
         assertTrue(service.replace(input("704 480p.mp4", 480), admin).contains("найдено 0"));
