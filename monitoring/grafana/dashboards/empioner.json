@@ -2,7 +2,7 @@
   "uid": "empioner-overview",
   "title": "Empioner · Production",
   "schemaVersion": 41,
-  "version": 1,
+  "version": 2,
   "tags": [
     "empioner"
   ],
@@ -45,7 +45,7 @@
         {
           "refId": "A",
           "expr": "up",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "{{job}}"
         }
       ],
       "fieldConfig": {
@@ -82,7 +82,7 @@
         {
           "refId": "A",
           "expr": "sum by (outcome) (rate(empioner_updates_processed_total[5m]))",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "{{outcome}}"
         }
       ],
       "fieldConfig": {
@@ -119,7 +119,7 @@
         {
           "refId": "A",
           "expr": "histogram_quantile(0.95, sum by (le, type) (rate(empioner_update_processing_seconds_bucket[10m])))",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "{{type}}"
         }
       ],
       "fieldConfig": {
@@ -156,7 +156,7 @@
         {
           "refId": "A",
           "expr": "sum by (method,outcome) (rate(empioner_telegram_api_requests_total[5m]))",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "{{method}} · {{outcome}}"
         }
       ],
       "fieldConfig": {
@@ -193,7 +193,7 @@
         {
           "refId": "A",
           "expr": "empioner_worker_inflight",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "{{job}}"
         }
       ],
       "fieldConfig": {
@@ -243,7 +243,7 @@
         {
           "refId": "A",
           "expr": "sum by(job) (jvm_memory_used_bytes{area=\"heap\"})",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "{{job}}"
         }
       ],
       "fieldConfig": {
@@ -264,7 +264,7 @@
     },
     {
       "id": 9,
-      "title": "Process RSS",
+      "title": "Application CPU usage",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -279,13 +279,13 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "process_resident_memory_bytes{job=~\"bot|service\"}",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "expr": "process_cpu_usage{job=~\"bot|service\"}",
+          "legendFormat": "{{job}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "bytes"
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -297,7 +297,8 @@
         "tooltip": {
           "mode": "multi"
         }
-      }
+      },
+      "description": "Process CPU usage as reported by the JVM; not container memory."
     },
     {
       "id": 10,
@@ -317,7 +318,7 @@
         {
           "refId": "A",
           "expr": "sum by(job) (rate(jvm_gc_pause_seconds_sum[5m]))",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "{{job}}"
         }
       ],
       "fieldConfig": {
@@ -338,7 +339,7 @@
     },
     {
       "id": 11,
-      "title": "JDBC active / pending",
+      "title": "JDBC connections: active and pending",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -353,8 +354,13 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "hikaricp_connections_active or hikaricp_connections_pending",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "expr": "hikaricp_connections_active",
+          "legendFormat": "active · {{pool}}"
+        },
+        {
+          "refId": "B",
+          "expr": "hikaricp_connections_pending",
+          "legendFormat": "pending · {{pool}}"
         }
       ],
       "fieldConfig": {
@@ -371,7 +377,8 @@
         "tooltip": {
           "mode": "multi"
         }
-      }
+      },
+      "description": "Active connections and threads waiting for a connection are separate series."
     },
     {
       "id": 12,
@@ -404,7 +411,7 @@
         {
           "refId": "A",
           "expr": "node_memory_MemAvailable_bytes",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "available"
         }
       ],
       "fieldConfig": {
@@ -441,7 +448,7 @@
         {
           "refId": "A",
           "expr": "1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "busy"
         }
       ],
       "fieldConfig": {
@@ -478,7 +485,7 @@
         {
           "refId": "A",
           "expr": "node_filesystem_avail_bytes{fstype!~\"tmpfs|overlay|squashfs\"} / node_filesystem_size_bytes",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "{{mountpoint}}"
         }
       ],
       "fieldConfig": {
@@ -515,7 +522,7 @@
         {
           "refId": "A",
           "expr": "rate(node_disk_io_time_seconds_total[5m])",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "{{device}}"
         }
       ],
       "fieldConfig": {
@@ -565,7 +572,7 @@
         {
           "refId": "A",
           "expr": "pg_up or redis_up or mongodb_up",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "{{job}}"
         }
       ],
       "fieldConfig": {
@@ -602,7 +609,7 @@
         {
           "refId": "A",
           "expr": "pg_stat_database_numbackends",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "{{datname}}"
         }
       ],
       "fieldConfig": {
@@ -639,7 +646,7 @@
         {
           "refId": "A",
           "expr": "redis_memory_used_bytes",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "Redis"
         }
       ],
       "fieldConfig": {
@@ -676,7 +683,7 @@
         {
           "refId": "A",
           "expr": "rate(redis_evicted_keys_total[5m])",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "evictions"
         }
       ],
       "fieldConfig": {
@@ -726,7 +733,7 @@
         {
           "refId": "A",
           "expr": "ALERTS{alertstate=\"firing\",alertname!=\"Watchdog\"}",
-          "legendFormat": "{{job}} {{type}} {{outcome}} {{method}} {{instance}} {{mountpoint}}"
+          "legendFormat": "{{alertname}}"
         }
       ],
       "fieldConfig": {

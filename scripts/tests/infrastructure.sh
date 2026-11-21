@@ -60,6 +60,17 @@ until_ready() {
 }
 until_ready http://loki:3100/ready
 until_ready http://grafana:3000/api/health
+# Check file provisioning, not just that Grafana's HTTP server is alive.
+for uid in empioner-overview empioner-product; do
+  for ((i=0; i<30; i++)); do
+    if docker exec grafana sh -ec 'auth=$(printf "%s:%s" "$GF_SECURITY_ADMIN_USER" "$GF_SECURITY_ADMIN_PASSWORD" | base64 | tr -d "\n"); wget -qO- --header="Authorization: Basic $auth" "http://127.0.0.1:3000/api/dashboards/uid/$1"' sh "$uid" > "$temporary/dashboard.json" 2>/dev/null; then break; fi
+    sleep 2
+  done
+  python3 - "$temporary/dashboard.json" "$uid" <<'PY'
+import json, sys
+assert json.load(open(sys.argv[1]))['dashboard']['uid'] == sys.argv[2]
+PY
+done
 for pair in postgres-exporter:9187/metrics mongo-exporter:9216/metrics redis-exporter:9121/metrics node-exporter:9100/metrics; do until_ready "http://$pair"; done
 fetch http://postgres-exporter:9187/metrics | grep '^pg_up 1' >/dev/null
 mongo_metrics=$(fetch http://mongo-exporter:9216/metrics)

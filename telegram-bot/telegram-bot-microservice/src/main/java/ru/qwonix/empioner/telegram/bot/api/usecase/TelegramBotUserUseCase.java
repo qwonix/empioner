@@ -1,6 +1,7 @@
 package ru.qwonix.empioner.telegram.bot.api.usecase;
 
-import lombok.RequiredArgsConstructor;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.User;
 import ru.qwonix.empioner.telegram.bot.api.TelegramBotUserApi;
@@ -11,11 +12,16 @@ import ru.qwonix.empioner.telegram.id.TelegramBotUserId;
 
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Service
 public class TelegramBotUserUseCase implements TelegramBotUserApi {
 
     private final TelegramBotUserSpi telegramBotUserSpi;
+    private final Counter registrations;
+
+    public TelegramBotUserUseCase(TelegramBotUserSpi telegramBotUserSpi, MeterRegistry registry) {
+        this.telegramBotUserSpi = telegramBotUserSpi;
+        this.registrations = registry.counter("empioner.users.registered");
+    }
 
     @Override
     public Optional<TelegramBotUser> findUser(TelegramBotUserId id) {
@@ -23,7 +29,9 @@ public class TelegramBotUserUseCase implements TelegramBotUserApi {
     }
 
     public TelegramBotUser registerNewUser(User telegramUser) {
-        return telegramBotUserSpi.registerNewUser(telegramUser);
+        TelegramBotUser result = telegramBotUserSpi.registerNewUser(telegramUser);
+        registrations.increment();
+        return result;
     }
 
     @Override
