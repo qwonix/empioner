@@ -51,6 +51,15 @@ docker exec postgres sh -ec 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ER
 docker exec mongo mongosh --quiet --nodb --eval '
   const c = new Mongo("mongodb://" + encodeURIComponent(process.env.MONGODB_USER) + ":" + encodeURIComponent(process.env.MONGODB_PASSWORD) + "@127.0.0.1:27017/" + process.env.MONGODB_DATABASE);
   c.getDB(process.env.MONGODB_DATABASE).user.insertOne({_id:Long("123"),roles:["ADMIN"]});'
+printf '%s\n' '[{"_id":123,"firstName":"Private"},{"_id":{"value":123}},{"_id":456}]' > "$temporary/users.json"
+python3 scripts/ops/import-historical-users.py "$temporary/users.json"
+python3 scripts/ops/import-historical-users.py "$temporary/users.json"
+printf '%s\n' '[{"_id":789}]' > "$temporary/other-users.json"
+if python3 scripts/ops/import-historical-users.py "$temporary/other-users.json" >/dev/null 2>&1; then echo 'Historical import must reject a different dataset' >&2; exit 1; fi
+docker exec mongo mongosh --quiet --nodb --eval '
+  const c = new Mongo("mongodb://" + encodeURIComponent(process.env.MONGODB_USER) + ":" + encodeURIComponent(process.env.MONGODB_PASSWORD) + "@127.0.0.1:27017/" + process.env.MONGODB_DATABASE);
+  const targetDb = c.getDB(process.env.MONGODB_DATABASE), a = targetDb.analytics_historical_users;
+  if (a.countDocuments({}) !== 2 || a.findOne({_id:Long("123")}).firstName !== undefined || targetDb.user.findOne({_id:Long("123")}).roles[0] !== "ADMIN") quit(1);'
 dc --profile observability up -d --no-deps prometheus loki docker-socket-proxy alloy grafana \
   postgres-exporter mongo-exporter redis-exporter node-exporter
 fetch() { docker exec prometheus wget -qO- "$1"; }
@@ -103,6 +112,7 @@ bash scripts/ops/restore.sh "$temporary/backup" --confirm-empty-target
 [[ $(docker exec redis sh -ec 'REDISCLI_AUTH="$REDIS_USER_PASSWORD" redis-cli --user "$REDIS_USER" GET migration-probe') == preserved ]]
 docker exec mongo mongosh --quiet --nodb --eval '
   const c = new Mongo("mongodb://" + encodeURIComponent(process.env.MONGODB_USER) + ":" + encodeURIComponent(process.env.MONGODB_PASSWORD) + "@127.0.0.1:27017/" + process.env.MONGODB_DATABASE);
-  if (c.getDB(process.env.MONGODB_DATABASE).user.findOne({_id:Long("123")}).roles[0] !== "ADMIN") quit(1);'
+  const targetDb = c.getDB(process.env.MONGODB_DATABASE);
+  if (targetDb.user.findOne({_id:Long("123")}).roles[0] !== "ADMIN" || targetDb.analytics_historical_users.countDocuments({}) !== 2) quit(1);'
 if bash scripts/ops/restore.sh "$temporary/backup" --confirm-empty-target; then echo 'Restore must reject a populated target' >&2; exit 1; fi
 echo 'Infrastructure smoke test passed'
