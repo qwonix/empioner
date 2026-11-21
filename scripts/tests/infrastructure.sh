@@ -46,6 +46,7 @@ dc up -d --wait --wait-timeout 240 postgres mongo redis
 if docker exec -e REDISCLI_AUTH=wrong redis redis-cli --user empioner -e ping; then exit 1; fi
 if docker exec -e MONGODB_PASSWORD=wrong mongo mongosh --quiet --nodb /opt/empioner/mongo-health.js; then exit 1; fi
 docker exec redis sh -ec 'REDISCLI_AUTH="$REDIS_USER_PASSWORD" redis-cli --user "$REDIS_USER" -e SET migration-probe preserved EX 3600'
+docker exec redis sh -ec 'REDISCLI_AUTH="$REDIS_USER_PASSWORD" redis-cli --user "$REDIS_USER" -e INFO server | grep -q "^redis_version:"'
 docker exec postgres sh -ec 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 -c "CREATE TABLE migration_probe(id integer); INSERT INTO migration_probe VALUES (42);"'
 docker exec mongo mongosh --quiet --nodb --eval '
   const c = new Mongo("mongodb://" + encodeURIComponent(process.env.MONGODB_USER) + ":" + encodeURIComponent(process.env.MONGODB_PASSWORD) + "@127.0.0.1:27017/" + process.env.MONGODB_DATABASE);
