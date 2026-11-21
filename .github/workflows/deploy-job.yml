@@ -72,7 +72,8 @@ jobs:
         with:
           context: .
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # A merged pull_request event can read the cache but cannot write it.
+          cache-to: ${{ github.event_name != 'pull_request' && 'type=gha,mode=max,ignore-error=true' || '' }}
           file: ./telegram-bot/telegram-bot-microservice/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -111,7 +112,8 @@ jobs:
         with:
           context: .
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # A merged pull_request event can read the cache but cannot write it.
+          cache-to: ${{ github.event_name != 'pull_request' && 'type=gha,mode=max,ignore-error=true' || '' }}
           file: ./telegram-service/telegram-service-microservice/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
