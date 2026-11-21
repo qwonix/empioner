@@ -5,8 +5,10 @@ RUN gradle :telegram-service:telegram-service-microservice:bootJar
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
+RUN addgroup -S -g 10001 empioner && adduser -S -D -H -u 10001 -G empioner empioner
 
 COPY --from=build /home/gradle/src/telegram-service/telegram-service-microservice/build/libs/*.jar /app/app.jar
 EXPOSE 8080
+USER 10001:10001
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

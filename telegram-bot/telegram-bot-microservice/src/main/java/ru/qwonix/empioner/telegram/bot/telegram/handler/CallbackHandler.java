@@ -2,6 +2,7 @@ package ru.qwonix.empioner.telegram.bot.telegram.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import ru.qwonix.empioner.telegram.bot.config.UpdateProcessingContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -33,6 +34,7 @@ public class CallbackHandler {
 
             return new Callback(update.getCallbackQuery(), callbackData);
         } catch (Exception e) {
+            UpdateProcessingContext.failed();
             log.atError()
                     .setCause(e)
                     .addKeyValue("callbackQueryId", update.hasCallbackQuery() ? update.getCallbackQuery().getId() : null)
@@ -79,6 +81,7 @@ public class CallbackHandler {
                         .addKeyValue("handler", handler.getClass().getSimpleName())
                         .log("Handler executed successfully");
             } catch (Exception e) {
+                UpdateProcessingContext.failed();
                 log.atError()
                         .setCause(e)
                         .addKeyValue("handler", handler.getClass().getSimpleName())

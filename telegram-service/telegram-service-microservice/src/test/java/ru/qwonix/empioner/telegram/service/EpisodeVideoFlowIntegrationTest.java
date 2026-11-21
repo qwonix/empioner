@@ -27,7 +27,9 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
+        "spring.security.user.name=integration", "spring.security.user.password=integration-password"
+})
 class EpisodeVideoFlowIntegrationTest {
     @Container
     static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17-alpine");
@@ -178,9 +180,23 @@ class EpisodeVideoFlowIntegrationTest {
                 .path("telegramBotUserById").path("roles").isEmpty());
     }
 
+    @Test
+    void rejectsUnauthenticatedGraphqlButAllowsHealth() throws Exception {
+        var unauthorized = http.send(HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/graphql"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString("{\"query\":\"{ __typename }\"}")).build(),
+                HttpResponse.BodyHandlers.ofString());
+        assertEquals(401, unauthorized.statusCode());
+        var health = http.send(HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/actuator/health"))
+                .GET().build(), HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, health.statusCode());
+    }
+
     private JsonNode graphql(String query, Map<String, ?> variables) throws Exception {
         var request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/graphql"))
                 .header("Content-Type", "application/json")
+                .header("Authorization", "Basic " + java.util.Base64.getEncoder().encodeToString(
+                        "integration:integration-password".getBytes(java.nio.charset.StandardCharsets.UTF_8)))
                 .POST(HttpRequest.BodyPublishers.ofString(json.writeValueAsString(
                         Map.of("query", query, "variables", variables))))
                 .build();

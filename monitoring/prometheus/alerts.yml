@@ -1,0 +1,55 @@
+groups:
+  - name: empioner
+    rules:
+      - alert: Watchdog
+        expr: vector(1)
+        labels: {severity: none}
+        annotations:
+          summary: External dead-man integration must continuously receive this alert
+      - alert: ScrapeTargetDown
+        expr: up == 0
+        for: 3m
+        labels: {severity: critical}
+        annotations:
+          summary: 'Cannot scrape {{ $labels.job }} / {{ $labels.instance }}'
+      - alert: DatabaseUnavailable
+        expr: pg_up == 0 or redis_up == 0 or mongodb_up == 0
+        for: 2m
+        labels: {severity: critical}
+        annotations:
+          summary: 'Database connection failed: {{ $labels.job }}'
+      - alert: HostMemoryLow
+        expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.15
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: Less than 15 percent host memory available
+      - alert: HostDiskLow
+        expr: node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes < 0.20
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: 'Less than 20 percent disk available on {{ $labels.mountpoint }}'
+      - alert: UpdateFailures
+        expr: |
+          (sum(increase(empioner_updates_processed_total{outcome=~"error|partial"}[10m]))
+           / clamp_min(sum(increase(empioner_updates_processed_total{outcome!="ignored"}[10m])), 1) > 0.05)
+          and sum(increase(empioner_updates_processed_total{outcome!="ignored"}[10m])) >= 20
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: More than 5 percent update processing failures
+      - alert: UpdateProcessingSlow
+        expr: |
+          histogram_quantile(0.95, sum by (le) (rate(empioner_update_processing_seconds_bucket[10m]))) > 2
+          and sum(increase(empioner_update_processing_seconds_count[10m])) >= 20
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: Update processing p95 exceeds 2 seconds
+      - alert: WorkerStuck
+        expr: empioner_worker_inflight > 0 and on(job, instance) (time() - empioner_worker_started_timestamp_seconds > 60)
+        for: 1m
+        labels: {severity: critical}
+        annotations:
+          summary: A Telegram update has been in flight for more than a minute

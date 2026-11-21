@@ -72,6 +72,7 @@ public class ChatCommandHandler {
 
     @ChatCommand("/open")
     public void open(TelegramBotUser user, String[] args) {
+        requireAdmin(user);
         if (args.length != 1) {
             return;
         }
@@ -83,6 +84,7 @@ public class ChatCommandHandler {
 
     @ChatCommand("/close")
     public void close(TelegramBotUser user, String[] args) {
+        requireAdmin(user);
         if (args.length != 1) {
             return;
         }
@@ -92,4 +94,9 @@ public class ChatCommandHandler {
         }
     }
 
+    private static void requireAdmin(TelegramBotUser user) {
+        if (user == null || !user.isAdmin()) {
+            throw new SecurityException("Administrative command requires ADMIN role");
+        }
+    }
 }

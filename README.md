@@ -1,0 +1,16 @@
+# Empioner
+
+Telegram-бот и GraphQL-сервис каталога. Java 21, PostgreSQL, MongoDB и Redis;
+развёртывание через Docker Compose на одном Linux VPS.
+
+- [Подготовка VPS, миграция данных и production-деплой](docs/deployment.md)
+- [Метрики, логи, ресурсы и уведомления](docs/observability.md)
+- [Переменные окружения без реальных секретов](.env.example)
+
+Для нового production сначала поднимаются базы, затем восстанавливаются данные,
+после проверки запускаются приложения и observability. Обычный CI-деплой
+обновляет только приложения. Kubernetes для этой конфигурации не требуется.
+
+Автодеплой выполняется GitHub Actions по SSH и включается явно переменной
+репозитория `EMPIONER_DEPLOY_ENABLED=true`; до настройки SSH CI только проверяет
+и публикует образы. Постоянный GitHub runner на VPS не требуется.

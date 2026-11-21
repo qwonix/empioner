@@ -8,6 +8,8 @@ import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+import io.micrometer.core.instrument.MeterRegistry;
+import ru.qwonix.empioner.telegram.bot.config.ObservedTelegramClient;
 import ru.qwonix.empioner.telegram.bot.config.EmpionerServiceProperties;
 import ru.qwonix.empioner.telegram.bot.telegram.MoviePlayerBot;
 import ru.qwonix.empioner.telegram.bot.telegram.config.TelegramProperties;
@@ -23,8 +25,8 @@ public class EmpionerTelegramBotApplication {
     }
 
     @Bean
-    public TelegramClient telegramClient(TelegramProperties telegramProperties) {
-        return new OkHttpTelegramClient(telegramProperties.token());
+    public TelegramClient telegramClient(TelegramProperties telegramProperties, MeterRegistry registry) {
+        return ObservedTelegramClient.wrap(new OkHttpTelegramClient(telegramProperties.token()), registry);
     }
 
     @Bean
