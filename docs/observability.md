@@ -63,7 +63,11 @@ latency, Telegram API, JVM, память/CPU/диск хоста, DB health и �
 - `empioner_telegram_api_requests_total{method,outcome,error_type}` — synchronous execute;
 - `empioner_telegram_api_request_seconds_{count,sum}` — время Telegram API;
 - `empioner_worker_inflight` и `empioner_worker_started_timestamp_seconds` — зависание обработки;
-- `empioner_users_registered_total` — успешные первые регистрации, начиная с установки метрики;
+- `empioner_users_registered_total` — первые регистрации в текущей базе после установки
+  метрики; старый пользователь, вернувшийся из исторической выгрузки, может попасть в счётчик;
+- `empioner_users_snapshot{source}` — периодический подсчёт текущих пользователей,
+  идентификаторов старой выгрузки и их объединения без повторов;
+- `empioner_users_snapshot_updated_timestamp_seconds` — время последнего успешного подсчёта;
 - `empioner_video_delivery_total{operation,outcome}` — синхронные отправки и изменения
   видео через Telegram API, с результатом success/error;
 - старый `telegram_updates_total{status}` теперь тоже фиксирует реальный итог.
@@ -80,6 +84,18 @@ Async Telegram methods wrapper не измеряет: текущий код ис
 времени; не выполнять полный подсчёт коллекции при каждом сборе Prometheus.
 Отсутствие updates ночью нормально. Отдельного heartbeat успешных пустых polling
 циклов здесь нет: health Spring не доказывает исправность long polling.
+
+Историческая коллекция `analytics_historical_users` содержит только BSON long `_id`
+и не является рабочей коллекцией пользователей. Импорт выполняется скриптом
+`python3 scripts/ops/import-historical-users.py /путь/к/защищённой/user.json`;
+он нормализует два старых формата ID, удаляет повторы, допускает безопасное
+повторение того же импорта и отказывается смешивать другой набор с существующим.
+Исходный экспорт хранить отдельно с ограниченным доступом. При стандартном
+`mongodump` коллекция попадает в резервную копию MongoDB. Метрика объединения
+обновляется примерно раз в 15 минут; при ошибке сохраняет последнее значение,
+поэтому проверяйте время успешного обновления. Она означает пользователей,
+встречавшихся в этих двух источниках, а не активную аудиторию. В выгрузке нет
+дат регистрации, поэтому восстановить динамику прошлых регистраций нельзя.
 
 Нельзя добавлять user/chat/update IDs, текст сообщений и UUID каталога в labels.
 Полный текст сообщений и file IDs убраны из обычных логов. UUID в MDC остаётся

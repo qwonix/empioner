@@ -2,7 +2,7 @@
   "uid": "empioner-product",
   "title": "Empioner · Product",
   "schemaVersion": 41,
-  "version": 1,
+  "version": 3,
   "tags": [
     "empioner",
     "product"
@@ -31,7 +31,7 @@
     {
       "id": 2,
       "title": "New registrations",
-      "description": "Approximate number of successful first registrations during the selected period. Only collected after the metric is deployed.",
+      "description": "Approximate number of first registrations in the current database. A returning user from the historical export can be counted again. Only collected after deployment.",
       "type": "stat",
       "datasource": {
         "type": "prometheus",
@@ -275,7 +275,7 @@
     {
       "id": 8,
       "title": "New registrations per hour",
-      "description": "Rate of successful first registrations. Resets on bot restart are handled by Prometheus.",
+      "description": "Rate of first registrations in the current database; returning users from the historical export can register again.",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -411,6 +411,207 @@
         "tooltip": {
           "mode": "multi"
         }
+      }
+    },
+    {
+      "id": 11,
+      "title": "Users in current database and historical export",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "panels": []
+    },
+    {
+      "id": 12,
+      "title": "Combined unique users",
+      "description": "Deduplicated identifiers from the current database and the historical export. This is not the number of current active users.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 24
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "empioner_users_snapshot{source=\"combined_unique\"}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 13,
+      "title": "Current database users",
+      "description": "Records in the current database included in the most recent aggregation.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 24
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "empioner_users_snapshot{source=\"current\"}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 14,
+      "title": "Historical export users",
+      "description": "Unique identifiers in the historical export. These overlap with current database users.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 24
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "empioner_users_snapshot{source=\"historical\"}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 15,
+      "title": "Time since statistics refresh",
+      "description": "Aggregation runs roughly every 15 minutes. A growing value means these user counts may be stale.",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 24
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "time() - empioner_users_snapshot_updated_timestamp_seconds",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
       }
     }
   ]
