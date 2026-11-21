@@ -1,6 +1,7 @@
 package ru.qwonix.empioner.telegram.bot.telegram.handler;
 
 import lombok.RequiredArgsConstructor;
+import ru.qwonix.empioner.telegram.bot.config.UpdateProcessingContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -36,6 +37,7 @@ public class DefaultUpdateHandler implements UpdateHandler {
             callbackHandler.onCallback(update, user);
             log.atDebug().log("Callback handled successfully");
         } catch (Exception e) {
+            UpdateProcessingContext.failed();
             log.atError()
                     .setCause(e)
                     .log("Error while handling callback");
@@ -50,6 +52,7 @@ public class DefaultUpdateHandler implements UpdateHandler {
             log.atWarn()
                     .log("Photo handling not implemented yet");
         } catch (Exception e) {
+            UpdateProcessingContext.failed();
             log.atError()
                     .setCause(e)
                     .log("Error while processing photo message");
@@ -61,7 +64,6 @@ public class DefaultUpdateHandler implements UpdateHandler {
         String text = update.getMessage().getText();
 
         log.atInfo()
-                .addKeyValue("text", text)
                 .log("Received text message");
 
         try {
@@ -84,9 +86,9 @@ public class DefaultUpdateHandler implements UpdateHandler {
                 log.atDebug().log("Text message ignored (not a command)");
             }
         } catch (Exception e) {
+            UpdateProcessingContext.failed();
             log.atError()
                     .setCause(e)
-                    .addKeyValue("text", text)
                     .log("Error while processing text message");
         }
     }
@@ -117,6 +119,7 @@ public class DefaultUpdateHandler implements UpdateHandler {
                         .log("Unknown user status received");
             }
         } catch (Exception e) {
+            UpdateProcessingContext.failed();
             log.atError()
                     .setCause(e)
                     .addKeyValue("status", newStatus)
@@ -131,14 +134,13 @@ public class DefaultUpdateHandler implements UpdateHandler {
         try {
             replacementStatus = replacementService.replace(update.getMessage(), user);
         } catch (Exception e) {
+            UpdateProcessingContext.failed();
             log.error("Failed to replace episode video", e);
             replacementStatus = "Не удалось обновить видео. Проверьте данные и повторите попытку.";
         }
         executionService.replyWithVideoFileIds(update.getMessage(), user, replacementStatus);
 
         log.atInfo()
-                .addKeyValue("fileUniqueId", video.getFileUniqueId())
-                .addKeyValue("fileId", video.getFileId())
                 .log("Received video message");
 
         try {
@@ -148,12 +150,11 @@ public class DefaultUpdateHandler implements UpdateHandler {
             );
 
             log.atInfo()
-                    .addKeyValue("fileUniqueId", video.getFileUniqueId())
                     .log("Video file info updated successfully");
         } catch (Exception e) {
+            UpdateProcessingContext.failed();
             log.atError()
                     .setCause(e)
-                    .addKeyValue("fileUniqueId", video.getFileUniqueId())
                     .log("Error while updating video file info");
         }
     }

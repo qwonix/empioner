@@ -1,6 +1,11 @@
 name: Docker
 on:
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deploy after build (requires EMPIONER_DEPLOY_ENABLED repository variable)
+        type: boolean
+        default: false
   push:
     tags: [ '*' ]
   pull_request:
@@ -39,6 +44,7 @@ jobs:
     outputs:
       digest: ${{ steps.build.outputs.digest }}
     steps:
+      - uses: actions/checkout@v4
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -64,6 +70,9 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
+          context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           file: ./telegram-bot/telegram-bot-microservice/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -74,6 +83,7 @@ jobs:
     outputs:
       digest: ${{ steps.build.outputs.digest }}
     steps:
+      - uses: actions/checkout@v4
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -99,49 +109,25 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
+          context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           file: ./telegram-service/telegram-service-microservice/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
 
   deploy:
-    runs-on: self-hosted
+    if: vars.EMPIONER_DEPLOY_ENABLED == 'true' && (github.event_name != 'workflow_dispatch' || inputs.deploy)
+    runs-on: [self-hosted, linux, x64, empioner-prod]
+    environment: production
     needs:
       - docker-build-push-telegram-bot
       - docker-build-push-telegram-service
     env:
-      REDIS_USER: ${{ secrets.REDIS_USER}}
-      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
-      REDIS_USER_PASSWORD: ${{ secrets.REDIS_USER_PASSWORD}}
-      POSTGRES_DB: ${{ secrets.POSTGRES_DB}}
-      POSTGRES_USER: ${{ secrets.POSTGRES_USER}}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD}}
-      MONGODB_USER: ${{ secrets.MONGODB_USER}}
-      MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD}}
-      MONGODB_AUTHENTICATION_DATABASE: ${{ secrets.MONGODB_AUTHENTICATION_DATABASE}}
-      BOT_TITLE: ${{secrets.BOT_TITLE}}
-      BOT_DESCRIPTION: ${{secrets.BOT_DESCRIPTION}}
-      BOT_USERNAME: ${{secrets.BOT_USERNAME}}
-      BOT_TOKEN: ${{secrets.BOT_TOKEN}}
-      BOT_CONFIG_IMAGE_PLACEHOLDER: ${{secrets.BOT_CONFIG_IMAGE_PLACEHOLDER}}
-      BOT_CONFIG_SHOW_SHOW_IMAGE_ID: ${{secrets.BOT_CONFIG_SHOW_SHOW_IMAGE_ID}}
-      BOT_CONFIG_SHOW_SERIES_IMAGE_ID: ${{secrets.BOT_CONFIG_SHOW_SERIES_IMAGE_ID}}
-      BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID: ${{secrets.BOT_CONFIG_SHOW_SPECIAL_IMAGE_ID}}
-      BOT_CONFIG_SHOW_MOVIE_IMAGE_ID: ${{secrets.BOT_CONFIG_SHOW_MOVIE_IMAGE_ID}}
-      BOT_SINGLE_SHOW_MODE_SHOW_ID: ${{secrets.BOT_SINGLE_SHOW_MODE_SHOW_ID}}
-
-      BOT_IMAGE: qwonix/empioner-telegram-bot@${{ needs.docker-build-push-telegram-bot.outputs.digest }}
-      SERVICE_IMAGE: qwonix/empioner-telegram-service@${{ needs.docker-build-push-telegram-service.outputs.digest }}
+      EMPIONER_PROJECT_DIR: /opt/empioner
+      BOT_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/empioner-telegram-bot@${{ needs.docker-build-push-telegram-bot.outputs.digest }}
+      SERVICE_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/empioner-telegram-service@${{ needs.docker-build-push-telegram-service.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
-      - name: Check running dependencies
-        shell: bash
-        run: |
-          set -euo pipefail
-          for service in postgres mongo redis; do
-            test "$(docker inspect --format '{{.State.Health.Status}}' "$service")" = healthy
-          done
-          docker inspect --format '{{.Name}} {{.Image}}' bot service
-      - name: Pull release images before switching
-        run: docker compose pull bot service
-      - name: Switch applications and wait for health
-        run: docker compose up -d --no-deps --wait --wait-timeout 180 bot service
+      - name: Update applications with health check and image rollback
+        run: bash scripts/ops/deploy.sh

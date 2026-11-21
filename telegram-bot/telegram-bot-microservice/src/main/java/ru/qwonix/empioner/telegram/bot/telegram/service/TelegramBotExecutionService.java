@@ -1,6 +1,7 @@
 package ru.qwonix.empioner.telegram.bot.telegram.service;
 
 import lombok.RequiredArgsConstructor;
+import ru.qwonix.empioner.telegram.bot.config.UpdateProcessingContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -67,7 +68,8 @@ public class TelegramBotExecutionService {
                 try {
                     bot.execute(editMedia);
                 } catch (TelegramApiException e) {
-                    log.error("message editing error {}", user, e);
+                    UpdateProcessingContext.failed();
+                    log.error("Message editing failed", e);
                 }
             }
 
@@ -82,6 +84,7 @@ public class TelegramBotExecutionService {
             try {
                 bot.execute(editMessageCaption);
             } catch (TelegramApiException e) {
+                UpdateProcessingContext.failed();
                 log.error("message editing error {}", user, e);
             }
         } else {
@@ -98,6 +101,7 @@ public class TelegramBotExecutionService {
                     Message execute = bot.execute(photo);
                     messageApi.setMessageId(user, execute.getMessageId());
                 } catch (TelegramApiException e) {
+                    UpdateProcessingContext.failed();
                     throw new RuntimeException(e);
                 }
             }
@@ -134,6 +138,7 @@ public class TelegramBotExecutionService {
         try {
             bot.execute(reply);
         } catch (TelegramApiException e) {
+            UpdateProcessingContext.failed();
             log.error("Error while replying with video file IDs", e);
         }
     }
@@ -156,6 +161,7 @@ public class TelegramBotExecutionService {
         try {
             bot.execute(answerCallbackQuery);
         } catch (TelegramApiException e) {
+            UpdateProcessingContext.failed();
             log.error("execute alert sending error ", e);
         }
     }

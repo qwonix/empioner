@@ -18,6 +18,7 @@ dependencies {
     annotationProcessor libs.spring.boot.configuration.processor
 
     implementation libs.spring.boot.starter.actuator
+    implementation libs.spring.boot.starter.security
     implementation libs.spring.boot.starter.validation
     implementation libs.logstash
     implementation libs.micrometer.prometheus

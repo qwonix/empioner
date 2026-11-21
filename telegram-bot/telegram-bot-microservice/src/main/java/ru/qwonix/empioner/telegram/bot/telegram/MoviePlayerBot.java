@@ -1,6 +1,9 @@
 package ru.qwonix.empioner.telegram.bot.telegram;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import ru.qwonix.empioner.telegram.bot.config.UpdateProcessingContext;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.context.annotation.Lazy;
@@ -14,6 +17,8 @@ import ru.qwonix.empioner.telegram.bot.telegram.handler.UpdateHandler;
 import ru.qwonix.empioner.telegram.entity.TelegramBotUser;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static ru.qwonix.empioner.telegram.bot.config.Metrics.TELEGRAM_UPDATES_TOTAL;
 
@@ -24,6 +29,8 @@ public class MoviePlayerBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramBotUserApi telegramBotUserApi;
     private final UpdateHandler updateHandler;
     private final MeterRegistry meterRegistry;
+    private final AtomicInteger inFlight = new AtomicInteger();
+    private final AtomicLong startedAt = new AtomicLong();
 
     public MoviePlayerBot(TelegramBotUserApi telegramBotUserApi,
                           @Lazy UpdateHandler updateHandler,
@@ -31,13 +38,25 @@ public class MoviePlayerBot implements LongPollingSingleThreadUpdateConsumer {
         this.telegramBotUserApi = telegramBotUserApi;
         this.updateHandler = updateHandler;
         this.meterRegistry = meterRegistry;
+        meterRegistry.gauge("empioner.worker.inflight", inFlight);
+        meterRegistry.gauge("empioner.worker.started.timestamp.seconds", startedAt);
+        for (String type : new String[]{"text", "video", "photo", "callback_query", "my_chat_member", "other"}) {
+            meterRegistry.counter("empioner.updates.received", "type", type);
+            for (String outcome : new String[]{"success", "error", "partial", "ignored"}) {
+                meterRegistry.counter("empioner.updates.processed", "type", type, "outcome", outcome);
+            }
+        }
     }
 
     @Override
     public void consume(Update update) {
-        meterRegistry.counter(TELEGRAM_UPDATES_TOTAL.getName(),
-                "status", "success"
-        ).increment();
+        String type = updateType(update);
+        String outcome = "error";
+        meterRegistry.counter("empioner.updates.received", "type", type).increment();
+        Timer.Sample sample = Timer.start(meterRegistry);
+        UpdateProcessingContext.begin();
+        startedAt.set(System.currentTimeMillis() / 1000);
+        inFlight.incrementAndGet();
 
         MDC.put("traceId", UUID.randomUUID().toString());
         MDC.put("updateId", String.valueOf(update.getUpdateId()));
@@ -45,13 +64,15 @@ public class MoviePlayerBot implements LongPollingSingleThreadUpdateConsumer {
         log.atInfo().log("Received new update");
 
         try {
+            if (type.equals("other") || type.equals("photo")) {
+                outcome = "ignored";
+                return;
+            }
             User telegramUser = extractTelegramUser(update);
             MDC.put("userId", String.valueOf(telegramUser.getId()));
 
             log.atDebug()
                     .addKeyValue("userId", telegramUser.getId())
-                    .addKeyValue("userName", telegramUser.getUserName())
-                    .addKeyValue("firstName", telegramUser.getFirstName())
                     .log("Resolved Telegram user from update");
 
             TelegramBotUser user = telegramBotUserApi.merge(telegramUser);
@@ -88,7 +109,8 @@ public class MoviePlayerBot implements LongPollingSingleThreadUpdateConsumer {
             log.atInfo()
                     .addKeyValue("updateId", update.getUpdateId())
                     .addKeyValue("userId", telegramUser.getId())
-                    .log("Update processed successfully");
+                    .log("Update processing finished");
+            outcome = UpdateProcessingContext.hasFailure() ? "partial" : "success";
 
         } catch (Exception e) {
             log.atError()
@@ -96,8 +118,28 @@ public class MoviePlayerBot implements LongPollingSingleThreadUpdateConsumer {
                     .addKeyValue("updateId", update.getUpdateId())
                     .log("Error while processing update");
         } finally {
+            meterRegistry.counter("empioner.updates.processed", "type", type, "outcome", outcome).increment();
+            meterRegistry.counter(TELEGRAM_UPDATES_TOTAL.getName(), "status", outcome).increment();
+            sample.stop(Timer.builder("empioner.update.processing")
+                    .tag("type", type).tag("outcome", outcome)
+                    .serviceLevelObjectives(Duration.ofMillis(100), Duration.ofMillis(250),
+                            Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(2),
+                            Duration.ofSeconds(5), Duration.ofSeconds(10))
+                    .register(meterRegistry));
+            UpdateProcessingContext.clear();
+            inFlight.decrementAndGet();
             MDC.clear();
         }
+    }
+
+    private static String updateType(Update update) {
+        if (update.hasCallbackQuery()) return "callback_query";
+        if (update.hasMyChatMember()) return "my_chat_member";
+        if (!update.hasMessage()) return "other";
+        if (update.getMessage().hasText()) return "text";
+        if (update.getMessage().hasVideo()) return "video";
+        if (update.getMessage().hasPhoto()) return "photo";
+        return "other";
     }
 
     private User extractTelegramUser(Update update) {

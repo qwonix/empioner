@@ -1,13 +1,13 @@
 // Loki Write Target
 loki.write "local" {
   endpoint {
-    url = "http://loki:3100/loki/api/v1/push"
+    url = sys.env("GRAFANA_LOKI_URL")
   }
 }
 
 // Discover running Docker containers
 discovery.docker "containers" {
-  host             = "unix:///var/run/docker.sock"
+  host             = "tcp://docker-socket-proxy:2375"
   refresh_interval = "5s"
 }
 
@@ -45,7 +45,7 @@ discovery.relabel "containers" {
 
 // Pull logs from container output and forward to Loki
 loki.source.docker "containers" {
-  host          = "unix:///var/run/docker.sock"
+  host          = "tcp://docker-socket-proxy:2375"
   targets       = discovery.docker.containers.targets
   relabel_rules = discovery.relabel.containers.rules
   forward_to    = [loki.write.local.receiver]

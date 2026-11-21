@@ -10,6 +10,14 @@ permissions:
   contents: read
 
 jobs:
+  infrastructure:
+    name: Compose, monitoring and backup/restore smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate and exercise infrastructure
+        run: bash scripts/tests/infrastructure.sh
   verify:
     name: Test and build
     runs-on: ubuntu-latest
