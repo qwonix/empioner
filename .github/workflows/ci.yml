@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate and exercise infrastructure
-        run: bash -x scripts/tests/infrastructure.sh
+        run: bash scripts/tests/infrastructure.sh
   verify:
     name: Test and build
     runs-on: ubuntu-latest

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
+trap 'echo "Infrastructure check failed at line $LINENO" >&2' ERR
 [[ ${CI:-} == true ]] || { echo 'This destructive smoke test runs only in disposable CI' >&2; exit 1; }
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 cd "$ROOT"
@@ -60,7 +61,11 @@ until_ready http://loki:3100/ready
 until_ready http://grafana:3000/api/health
 for pair in postgres-exporter:9187/metrics mongo-exporter:9216/metrics redis-exporter:9121/metrics node-exporter:9100/metrics; do until_ready "http://$pair"; done
 fetch http://postgres-exporter:9187/metrics | grep '^pg_up 1' >/dev/null
-fetch http://mongo-exporter:9216/metrics | grep '^mongodb_up 1' >/dev/null
+mongo_metrics=$(fetch http://mongo-exporter:9216/metrics)
+printf '%s\n' "$mongo_metrics" | grep -E '^mongodb_up(\{[^}]*\})? 1$' >/dev/null || {
+  printf '%s\n' "$mongo_metrics" | grep '^mongodb_up' >&2 || true
+  exit 1
+}
 fetch http://redis-exporter:9121/metrics | grep '^redis_up 1' >/dev/null
 fetch http://node-exporter:9100/metrics | grep '^node_memory_MemTotal_bytes ' >/dev/null
 payload=$(printf '{"streams":[{"stream":{"job":"ci"},"values":[["%s","persistence-smoke"]]}]}' "$(date +%s%N)")
