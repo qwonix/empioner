@@ -1,0 +1,9 @@
+[Unit]
+Description=Empioner consistent local backup
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/empioner/scripts/ops/backup.sh
+Nice=10

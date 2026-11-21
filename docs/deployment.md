@@ -194,3 +194,20 @@ Liquibase-миграции таким откатом не отменяются: 
 - Старые и новые данные не расходятся; окно отката и его способ определены.
 
 Не выполнять `docker compose down -v` на production для обычного обновления.
+
+## Регулярные локальные копии
+
+Пример systemd timer в `infra/systemd` запускает `backup.sh` ежедневно около
+03:30 по Москве. Во время копирования bot/service и Redis кратковременно
+останавливаются; используется общий с deploy lock. Установить при необходимости:
+
+```bash
+sudo install -m 644 infra/systemd/empioner-backup.{service,timer} /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now empioner-backup.timer
+systemctl list-timers empioner-backup.timer
+```
+
+Копии сохраняются в `/var/lib/empioner/backups`, автоматического удаления нет.
+Контролировать свободное место, результаты и восстановление; настроить отдельную
+защищённую offsite-копию. Этот timer сам по себе не защищает от потери VPS.
