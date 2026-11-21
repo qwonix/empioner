@@ -7,10 +7,10 @@
 Установить Docker Engine, Compose plugin >=2.24, Git, Bash, Python 3 и util-linux
 (`flock`). Java и Gradle на VPS не нужны: приложения собираются в GitHub Actions.
 
-Пользователь деплоя имеет доступ к Docker. Такой доступ фактически даёт
-административные возможности: на этом runner нельзя выполнять недоверенные PR.
-CI с тестами запускается на `ubuntu-latest`; на VPS выполняются только доверенные
-production jobs. Не назначать production-метку другим runner.
+Пользователь деплоя имеет доступ к Docker, который фактически даёт права
+администратора. GitHub Actions использует отдельный SSH-ключ с принудительной
+командой; он может запускать только проверку готовности или обновление образами
+указанного владельца registry. Защищать ключ и доступ к изменениям workflow.
 
 В firewall провайдера разрешить SSH с нужных адресов. Приложения и базы не
 публикуют host ports. Grafana доступна только через localhost/SSH. Docker API
@@ -32,7 +32,7 @@ install -m 600 .env.example /etc/empioner/prod.env
 Отредактировать `/etc/empioner/prod.env`: заменить ВСЕ значения `replace-*`,
 UUID изображений и параметры бота реальными значениями. Пароли можно генерировать
 через `openssl rand -hex 32`. Значения с `$` заключать в одинарные кавычки.
-Секреты не класть в runner checkout, Git, Docker build context или PR-логи.
+Секреты не класть в checkout, Git, Docker build context или PR-логи.
 
 `MONGODB_DATABASE` — фактическая прикладная БД старого сервера. В старой
 конфигурации Spring без явного имени использовал `test`. `admin`/authSource не
@@ -45,7 +45,7 @@ monitoring users только на пустом volume. PostgreSQL init созд
 
 Скрипты читают Compose env-файл, но не исполняют его через `source`.
 Пути переопределяются `EMPIONER_ENV_FILE` и `EMPIONER_STATE_DIR`.
-Jobs runner используют постоянный `EMPIONER_PROJECT_DIR=/opt/empioner`, поэтому
+SSH-деплой использует постоянный `EMPIONER_PROJECT_DIR=/opt/empioner`, поэтому
 bind mounts не зависят от временного checkout Actions. При изменении Compose,
 скриптов или конфигураций мониторинга сначала обновить этот постоянный checkout
 до проверенного коммита и отдельно применить изменения; обычный app deploy их
@@ -156,22 +156,34 @@ bash scripts/ops/bootstrap.sh apps --confirm-single-poller
 затем на сервере выполняется `bash scripts/ops/admin.sh TELEGRAM_USER_ID`.
 Скрипт меняет только существующего пользователя и не создаёт публичной mutation.
 
-## Новый runner и следующие релизы
+## SSH-деплой и следующие релизы
 
-В GitHub зарегистрировать новый repository runner Linux x64 с custom label
-`empioner-prod`, установить его как systemd service и дать доступ к Docker,
-`/etc/empioner/prod.env`, `/var/lib/empioner`. До готовности нового VPS
-`EMPIONER_DEPLOY_ENABLED` оставить unset/false. Старый runner остановить и
-удалить/снять production label; прежний VPS сохранить для отката.
+GitHub-hosted runner собирает образы и подключается к VPS как `empioner-deploy`.
+Постоянный runner на VPS не нужен; прежний runner следует остановить и отключить.
+Первичное восстановление и bootstrap выполняются вручную по разделам выше.
 
-Workflow **Prepare production VPS** повторяет три явных фазы: dependencies,
-apps (с подтверждением single poller), monitoring. Он работает только с master.
-Первый bootstrap допустимо выполнить вручную до регистрации runner.
+На VPS нужен отдельный пользователь `empioner-deploy` в группе `docker` с
+доступом к `/etc/empioner/prod.env` и `/var/lib/empioner`. В файл
+`/etc/empioner/image-owner` записать имя владельца образов в Docker Hub, например
+`qwonix`. Его SSH public key добавить в `~empioner-deploy/.ssh/authorized_keys`
+с ограничениями (подставить только public key):
 
-Для штатного автодеплоя установить repository variable
-`EMPIONER_DEPLOY_ENABLED=true`. В repository secrets для сборки остаются
-`DOCKERHUB_USERNAME` и `DOCKERHUB_TOKEN`. Runtime secrets теперь берутся из
-защищённого файла на VPS; дублировать их во всех workflow не требуется.
+```text
+restrict,command="bash /opt/empioner/scripts/ops/ssh-deploy.sh" ssh-ed25519 PUBLIC_KEY
+```
+
+Каталог `.ssh` и `authorized_keys` должны принадлежать root и не быть доступны
+для записи пользователю деплоя. Принудительная команда принимает только `verify`
+или `deploy` с двумя полными digest из разрешённого registry. Права Docker всё
+равно остаются привилегированными; использовать отдельный ключ только для CI.
+
+В GitHub repository secrets задать `EMPIONER_DEPLOY_HOST` (IP или DNS VPS) и
+`EMPIONER_DEPLOY_SSH_KEY` (закрытый ключ целиком). Для сборки остаются
+`DOCKERHUB_USERNAME` и `DOCKERHUB_TOKEN`. SSH host key закреплён в
+`.github/empioner-known-hosts`; при замене VPS его необходимо независимо сверить
+и обновить. Никогда не подменять проверку ключа автоматическим `ssh-keyscan`.
+Сначала проверить подключение и только после этого установить repository variable
+`EMPIONER_DEPLOY_ENABLED=true`. Runtime secrets остаются на VPS.
 
 При релизе `deploy.sh` проверяет зависимости, заранее тянет новые digest,
 останавливает bot, обновляет service, затем bot. При health failure возвращает
