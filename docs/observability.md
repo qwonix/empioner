@@ -47,8 +47,10 @@ Prometheus хранит 15 дней, size retention 5 GB (WAL/head и служе
 ## Дашборд и сигналы
 
 Provisioned dashboard `Empioner · Production` включает application outcomes и
-latency, Telegram API, JVM, память/CPU/диск хоста, DB health и логи. На некоторых
-платформах JVM RSS metric не публикуется — проверять доступные серии. Host exporter
+latency, Telegram API, JVM, память/CPU/диск хоста, DB health и логи. CPU приложений
+показывается по `process_cpu_usage`: JVM RSS в текущей конфигурации не публикуется.
+Отдельный дашборд `Empioner · Product` показывает регистрации, операции выдачи видео,
+их ошибки и обработку событий. Host exporter
 не использует host network: сетевые collectors отключены, чтобы не показывать
 сетевую статистику контейнера как статистику VPS. CPU/RAM/disk читаются с хоста.
 Полные container working-set/OOM metrics через cAdvisor пока не добавлены.
@@ -61,12 +63,21 @@ latency, Telegram API, JVM, память/CPU/диск хоста, DB health и �
 - `empioner_telegram_api_requests_total{method,outcome,error_type}` — synchronous execute;
 - `empioner_telegram_api_request_seconds_{count,sum}` — время Telegram API;
 - `empioner_worker_inflight` и `empioner_worker_started_timestamp_seconds` — зависание обработки;
+- `empioner_users_registered_total` — успешные первые регистрации, начиная с установки метрики;
+- `empioner_video_delivery_total{operation,outcome}` — синхронные отправки и изменения
+  видео через Telegram API, с результатом success/error;
 - старый `telegram_updates_total{status}` теперь тоже фиксирует реальный итог.
 
 Вложенные handlers, которые восстанавливаются после исключений, отмечают partial;
 контекст очищается между updates. Смена потоков потребует явного переноса контекста.
 Async Telegram methods wrapper не измеряет: текущий код использует sync execute.
 Успешный API-вызов означает принятие Telegram, а не просмотр видео пользователем.
+Изменение качества и повторная отправка могут создать несколько операций для одного
+просмотра. Счётчики не восстанавливают историю до установки и значения `increase`
+приблизительны из-за интервалов сбора и возможных перезапусков. Метрики не содержат
+идентификаторы пользователей или видео. Для уникальных активных пользователей за
+24 часа/7 дней нужна отдельная периодическая агрегация `activity` с индексом по
+времени; не выполнять полный подсчёт коллекции при каждом сборе Prometheus.
 Отсутствие updates ночью нормально. Отдельного heartbeat успешных пустых polling
 циклов здесь нет: health Spring не доказывает исправность long polling.
 
